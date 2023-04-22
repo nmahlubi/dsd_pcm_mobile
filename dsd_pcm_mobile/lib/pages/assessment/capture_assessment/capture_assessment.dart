@@ -10,6 +10,7 @@ import '../../../model/pcm/query/assessment_count_query_dto.dart';
 import '../../../service/pcm/assessment_service.dart';
 import '../view_child_details.dart';
 import 'capture_recommendation/capture_recommendation_detail.dart';
+import 'child_detail/update_child_detail.dart';
 import 'family/family.dart';
 import 'general_details/general_detail.dart';
 import 'health_detail/health_detail.dart';
@@ -92,7 +93,17 @@ class _CaptureAssessmentPageState extends State<CaptureAssessmentPage> {
           ListTile(
             title: const Text('Child Details'),
             trailing: const Icon(Icons.check, color: Colors.green),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const UpdateChildDetailPage(),
+                  settings: RouteSettings(
+                    arguments: acceptedWorklistDto,
+                  ),
+                ),
+              );
+            },
           ),
           const Divider(thickness: 1),
           ListTile(
