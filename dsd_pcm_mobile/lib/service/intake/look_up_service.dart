@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http_interceptor/http/intercepted_client.dart';
 
+import '../../model/intake/address_type_dto.dart';
 import '../../model/intake/disability_type_dto.dart';
 import '../../model/intake/gender_dto.dart';
 import '../../model/intake/health_status_dto.dart';

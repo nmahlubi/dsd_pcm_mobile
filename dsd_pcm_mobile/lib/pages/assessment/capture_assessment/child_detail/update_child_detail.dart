@@ -2,14 +2,17 @@ import 'package:dropdown_plus/dropdown_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../model/intake/address_type_dto.dart';
 import '../../../../model/intake/disability_type_dto.dart';
 import '../../../../model/intake/gender_dto.dart';
 import '../../../../model/intake/identification_type_dto.dart';
 import '../../../../model/intake/language_dto.dart';
 import '../../../../model/intake/marital_status_dto.dart';
 import '../../../../model/intake/nationality_dto.dart';
+import '../../../../model/intake/person_address_dto.dart';
 import '../../../../model/intake/person_dto.dart';
 import '../../../../model/pcm/accepted_worklist_dto.dart';
+import '../../../../service/intake/address_service.dart';
 import '../../../../service/intake/look_up_service.dart';
 import '../../../../service/intake/person_service.dart';
 import '../../../../util/shared/apierror.dart';
@@ -34,6 +37,7 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
   late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
   final PersonService personServiceClient = PersonService();
   final LookUpService lookUpServiceClient = LookUpService();
+  final AddressService addressServiceClient = AddressService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
   late PersonDto personDto = PersonDto();
@@ -48,7 +52,10 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
   late List<MaritalStatusDto> maritalStatusesDto = [];
   final List<Map<String, dynamic>> maritalStatusItemsDto = [];
   late List<IdentificationTypeDto> identificationTypesDto = [];
+  late List<PersonAddressDto> previousAddressDto = [];
   final List<Map<String, dynamic>> identificationTypeItemsDto = [];
+  late List<AddressTypeDto> addressTypesDto = [];
+  final List<Map<String, dynamic>> addressTypeItemsDto = [];
 
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
@@ -65,6 +72,11 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
       DropdownEditingController();
   DropdownEditingController<Map<String, dynamic>>? languageController =
       DropdownEditingController();
+  DropdownEditingController<Map<String, dynamic>>? addressTypeController =
+      DropdownEditingController();
+  TextEditingController addressLine1Controller = TextEditingController();
+  TextEditingController addressLine2Controller = TextEditingController();
+  TextEditingController postalCodeController = TextEditingController();
 
   @override
   void initState() {
@@ -80,6 +92,7 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
           loadNationalities();
           loadMaritalStatus();
           loadIdentificationTypes();
+          loadAddressTypes();
           loadChildDetailsByPersonId(acceptedWorklistDto.personId);
         });
       });
@@ -94,6 +107,7 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
       overlay.hide();
       setState(() {
         personDto = (apiResponse.Data as PersonDto);
+        //previousAddressDto = personDto.previousAddress!;
         assignControlValues(personDto);
       });
     } else {
@@ -229,6 +243,25 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
             "description": '${identificationType.description}'
           };
           identificationTypeItemsDto.add(identificationTypeItem);
+        }
+      });
+    }
+    overlay.hide();
+  }
+
+  loadAddressTypes() async {
+    final overlay = LoadingOverlay.of(context);
+    overlay.show();
+    apiResponse = await addressServiceClient.getAddressTypes();
+    if ((apiResponse.ApiError) == null) {
+      setState(() {
+        addressTypesDto = (apiResponse.Data as List<AddressTypeDto>);
+        for (var addressType in addressTypesDto) {
+          Map<String, dynamic> addressTypeItem = {
+            "addressTypeId": addressType.addressTypeId,
+            "description": '${addressType.description}'
+          };
+          addressTypeItemsDto.add(addressTypeItem);
         }
       });
     }
@@ -669,13 +702,218 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
           Container(
             padding: const EdgeInsets.all(8),
             child: const Text(
-              'Address',
+              'Updated Address',
               style: TextStyle(
                   color: Colors.blue,
                   fontWeight: FontWeight.w200,
                   fontSize: 21),
             ),
           ),
+
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  child: DropdownFormField<Map<String, dynamic>>(
+                    controller: addressTypeController,
+                    onEmptyActionPressed: () async {},
+                    decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        suffixIcon: Icon(Icons.arrow_drop_down),
+                        labelText: "Address Type"),
+                    onSaved: (dynamic str) {},
+                    onChanged: (dynamic str) {},
+                    //validator: (dynamic str) {},
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Address Type';
+                      }
+                      return null;
+                    },
+                    displayItemFn: (dynamic item) => Text(
+                      (item ?? {})['description'] ?? '',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    findFn: (dynamic str) async => addressTypeItemsDto,
+                    selectedFn: (dynamic item1, dynamic item2) {
+                      if (item1 != null && item2 != null) {
+                        return item1['addressTypeId'] == item2['addressTypeId'];
+                      }
+                      return false;
+                    },
+                    filterFn: (dynamic item, str) =>
+                        item['description']
+                            .toLowerCase()
+                            .indexOf(str.toLowerCase()) >=
+                        0,
+                    dropdownItemFn: (dynamic item, int position, bool focused,
+                            bool selected, Function() onTap) =>
+                        ListTile(
+                      title: Text(item['description']),
+                      subtitle: Text(
+                        item['description'] ?? '',
+                      ),
+                      tileColor: focused
+                          ? const Color.fromARGB(20, 0, 0, 0)
+                          : Colors.transparent,
+                      onTap: onTap,
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  child: TextFormField(
+                    controller: addressLine1Controller,
+                    enableInteractiveSelection: false,
+                    maxLines: 1,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Address Line 1',
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  child: TextFormField(
+                    controller: addressLine2Controller,
+                    enableInteractiveSelection: false,
+                    maxLines: 1,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Address Line 2',
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  child: TextFormField(
+                    controller: postalCodeController,
+                    enableInteractiveSelection: false,
+                    maxLines: 1,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Postal Code',
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Container(
+                    height: 70,
+                    padding: const EdgeInsets.all(10),
+                    child: ElevatedButton(
+                      child: const Text('Address Add'),
+                      onPressed: () {
+                        updateChildDetails();
+                      },
+                    )),
+              ),
+            ],
+          ),
+
+          if (personDto.currentAddress != null)
+            Container(
+              padding: const EdgeInsets.all(8),
+              child: const Text(
+                'Current Address',
+                style: TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.w200,
+                    fontSize: 21),
+              ),
+            ),
+
+          if (personDto.currentAddress != null)
+            Row(
+              children: [
+                Expanded(
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: 1,
+                    itemBuilder: (context, int index) {
+                      return ListTile(
+                          title: Text(
+                              'Type : ${personDto.currentAddress!.addressDto?.addressType ?? ''}'),
+                          subtitle: Text(
+                              'Address : ${personDto.currentAddress!.addressDto?.addressLine1 ?? ''} ${personDto.currentAddress!.addressDto?.addressLine2 ?? ''}  ',
+                              style: const TextStyle(color: Colors.grey)),
+                          trailing: Text(personDto
+                                  .currentAddress!.addressDto?.postalCode ??
+                              ''));
+                    },
+                    separatorBuilder: (context, index) {
+                      return const Divider(thickness: 1);
+                    },
+                  ),
+                ),
+              ],
+            ),
+
+          if (personDto.previousAddress != null)
+            Container(
+              padding: const EdgeInsets.all(8),
+              child: const Text(
+                'Previous Address',
+                style: TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.w200,
+                    fontSize: 21),
+              ),
+            ),
+          if (personDto.previousAddress != null)
+            Row(
+              children: [
+                Expanded(
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: personDto.previousAddress!.length,
+                    itemBuilder: (context, int index) {
+                      if (personDto.previousAddress!.isEmpty) {
+                        return const Center(
+                            child: Text('No Previous Address.'));
+                      }
+                      return ListTile(
+                          title: Text(
+                              'Type : ${personDto.previousAddress![index].addressDto?.addressType ?? ''}'),
+                          subtitle: Text(
+                              'Address : ${personDto.previousAddress![index].addressDto?.addressLine1 ?? ''}  ${personDto.previousAddress![index].addressDto?.addressLine2 ?? ''}  ',
+                              style: const TextStyle(color: Colors.grey)),
+                          trailing: Text(personDto.previousAddress![index]
+                                  .addressDto?.postalCode ??
+                              ''));
+                    },
+                    separatorBuilder: (context, index) {
+                      return const Divider(thickness: 1);
+                    },
+                  ),
+                ),
+              ],
+            ),
 
           Row(
             children: [

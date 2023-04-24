@@ -4,6 +4,7 @@ import 'identification_type_dto.dart';
 import 'language_dto.dart';
 import 'marital_status_dto.dart';
 import 'nationality_dto.dart';
+import 'person_address_dto.dart';
 
 class PersonDto {
   PersonDto({
@@ -39,6 +40,9 @@ class PersonDto {
     LanguageDto? languageDto,
     MaritalStatusDto? maritalStatusDto,
     IdentificationTypeDto? identificationTypeDto,
+    List<PersonAddressDto>? personAddressDto,
+    PersonAddressDto? currentAddress,
+    List<PersonAddressDto>? previousAddress,
   }) {
     _personId = personId;
     _firstName = firstName;
@@ -72,6 +76,9 @@ class PersonDto {
     _languageDto = languageDto;
     _maritalStatusDto = maritalStatusDto;
     _identificationTypeDto = identificationTypeDto;
+    _personAddressDto = personAddressDto;
+    _currentAddress = currentAddress;
+    _previousAddress = previousAddress;
   }
 
   PersonDto.fromJson(dynamic json) {
@@ -81,10 +88,8 @@ class PersonDto {
     _knownAs = json['knownAs'];
     _identificationTypeId = json['identificationTypeId'];
     _identificationNumber = json['identificationNumber'];
-
     _isPivaValidated = json['isPivaValidated'];
     _pivaTransactionId = json['pivaTransactionId'];
-
     _dateOfBirth = json['dateOfBirth'];
     _age = json['age'];
     _isEstimatedAge = json['isEstimatedAge'];
@@ -122,7 +127,26 @@ class PersonDto {
     _identificationTypeDto = json['identificationTypeDto'] != null
         ? IdentificationTypeDto.fromJson(json['identificationTypeDto'])
         : null;
+
+    if (json['personAddressDto'] != null) {
+      _personAddressDto = [];
+      json['personAddressDto'].forEach((v) {
+        _personAddressDto?.add(PersonAddressDto.fromJson(v));
+      });
+    }
+
+    _currentAddress = json['currentAddress'] != null
+        ? PersonAddressDto.fromJson(json['currentAddress'])
+        : null;
+
+    if (json['previousAddress'] != null) {
+      _previousAddress = [];
+      json['previousAddress'].forEach((v) {
+        _previousAddress?.add(PersonAddressDto.fromJson(v));
+      });
+    }
   }
+
   int? _personId;
   String? _firstName;
   String? _lastName;
@@ -156,6 +180,9 @@ class PersonDto {
   NationalityDto? _nationalityDto;
   MaritalStatusDto? _maritalStatusDto;
   IdentificationTypeDto? _identificationTypeDto;
+  List<PersonAddressDto>? _personAddressDto;
+  PersonAddressDto? _currentAddress;
+  List<PersonAddressDto>? _previousAddress;
 
   int? get personId => _personId;
   String? get firstName => _firstName;
@@ -190,6 +217,9 @@ class PersonDto {
   NationalityDto? get nationalityDto => _nationalityDto;
   MaritalStatusDto? get maritalStatusDto => _maritalStatusDto;
   IdentificationTypeDto? get identificationTypeDto => _identificationTypeDto;
+  List<PersonAddressDto>? get personAddressDto => _personAddressDto;
+  PersonAddressDto? get currentAddress => _currentAddress;
+  List<PersonAddressDto>? get previousAddress => _previousAddress;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -238,6 +268,16 @@ class PersonDto {
     if (_identificationTypeDto != null) {
       map['identificationTypeDto'] = _identificationTypeDto?.toJson();
     }
+    if (_personAddressDto != null) {
+      map['personAddressDto'] =
+          _personAddressDto?.map((v) => v.toJson()).toList();
+    }
+
+    if (_previousAddress != null) {
+      map['previousAddress'] =
+          _previousAddress?.map((v) => v.toJson()).toList();
+    }
+
     return map;
   }
 }
