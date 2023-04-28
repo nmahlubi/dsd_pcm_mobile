@@ -1,17 +1,21 @@
+import 'package:dropdown_plus/dropdown_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
 
 import '../../../../model/intake/gender_dto.dart';
+import '../../../../widgets/dropdown_widget.dart';
 
 class CaptureVictimDetailPage extends StatelessWidget {
   final addNewVictim;
-  final List<GenderDto>? gendersDto;
-  CaptureVictimDetailPage({super.key, this.gendersDto, this.addNewVictim});
+  final List<Map<String, dynamic>> genderItemsDto;
+  CaptureVictimDetailPage(
+      {super.key, required this.genderItemsDto, this.addNewVictim});
 //controls
   final TextEditingController nameController = TextEditingController();
   final TextEditingController surnameController = TextEditingController();
   final TextEditingController ageController = TextEditingController();
-  final TextEditingController genderController = TextEditingController();
+  final DropdownEditingController<Map<String, dynamic>>? genderController =
+      DropdownEditingController();
   final TextEditingController isVictimIndividualController =
       TextEditingController();
   final TextEditingController victimOccupationController =
@@ -114,17 +118,16 @@ class CaptureVictimDetailPage extends StatelessWidget {
                         ),
                         Expanded(
                           child: Container(
-                            padding: const EdgeInsets.all(10),
-                            child: TextFormField(
-                              controller: genderController,
-                              enableInteractiveSelection: false,
-                              maxLines: 1,
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: 'Gender',
-                              ),
-                            ),
-                          ),
+                              padding: const EdgeInsets.all(10),
+                              child: dynamicDropdownWidget(
+                                  dropdownEditingName: genderController,
+                                  labelTextValue: 'Gender',
+                                  displayItemFnValue: 'description',
+                                  itemsCollection: genderItemsDto,
+                                  selectedFnValue: 'genderId',
+                                  filterFnValue: 'description',
+                                  titleValue: 'description',
+                                  subtitleValue: '')),
                         ),
                       ],
                     ),
@@ -270,8 +273,10 @@ class CaptureVictimDetailPage extends StatelessWidget {
                                     addNewVictim(
                                         nameController.text.toString(),
                                         surnameController.text.toString(),
-                                        ageController.text.toString(),
-                                        genderController.text.toString(),
+                                        int.parse(
+                                            ageController.text.toString()),
+                                        GenderDto.fromJson(
+                                            genderController!.value),
                                         victimOccupationController.text
                                             .toString(),
                                         isVictimIndividualController.text

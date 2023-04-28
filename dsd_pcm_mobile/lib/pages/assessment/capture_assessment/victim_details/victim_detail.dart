@@ -43,6 +43,7 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
       VictimOrganisationDetailDto();
   late List<VictimOrganisationDetailDto> victimOrganisationDetailsDto = [];
   late List<GenderDto> gendersDto = [];
+  final List<Map<String, dynamic>> genderItemsDto = [];
   late PersonDto personDtoResponse = PersonDto();
 
   @override
@@ -53,6 +54,7 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
         setState(() {
           acceptedWorklistDto =
               ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
+          loadGenders();
           loadVictimDetailsByIntakeAssessmentId(
               acceptedWorklistDto.intakeAssessmentId);
           loadVictimOrganisationDetailsByIntakeAssessmentId(
@@ -69,6 +71,13 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
     if ((apiResponse.ApiError) == null) {
       setState(() {
         gendersDto = (apiResponse.Data as List<GenderDto>);
+        for (var gender in gendersDto) {
+          Map<String, dynamic> genderItem = {
+            "genderId": gender.genderId,
+            "description": '${gender.description}'
+          };
+          genderItemsDto.add(genderItem);
+        }
       });
     }
     overlay.hide();
@@ -111,8 +120,8 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
   captureVictim(
       String? name,
       String? surname,
-      String? age,
-      String? gender,
+      int? age,
+      GenderDto genderDto,
       String? victimOccupation,
       String? isVictimIndividual,
       String? victimCareGiverNames,
@@ -122,14 +131,15 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
     overlay.show();
-    apiResponse = await addPerson(name, surname, age, gender);
+    apiResponse = await addPerson(name, surname, age, genderDto);
     if ((apiResponse.ApiError) == null) {
       apiResults = (apiResponse.Data as ApiResults);
+      PersonDto victimPerson = PersonDto.fromJson(apiResults.data);
       VictimDetailDto victimDetailDto = VictimDetailDto(
           victimId: 0,
           intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
           isVictimIndividual: isVictimIndividual,
-          personId: 335371, // personDtoResponse.personId,
+          personId: victimPerson.personId,
           victimOccupation: victimOccupation,
           victimCareGiverNames: victimCareGiverNames,
           addressLine1: addressLine1,
@@ -157,15 +167,15 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
   }
 
   Future<ApiResponse> addPerson(
-      String? name, String? surname, String? age, String? gender) async {
+      String? name, String? surname, int? age, GenderDto genderDto) async {
     PersonDto personDto = PersonDto(
         personId: 0,
         isEstimatedAge: true,
         isPivaValidated: true,
         firstName: name,
         lastName: surname,
-        age: 17,
-        genderId: 1,
+        age: age,
+        genderId: genderDto.genderId,
         createdBy: preferences!.getString('username')!);
     apiResponse = await personServiceClient.addPerson(personDto);
     return apiResponse;
@@ -260,7 +270,7 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
       body: ListView(
         children: [
           CaptureVictimDetailPage(
-              gendersDto: gendersDto, addNewVictim: captureVictim),
+              genderItemsDto: genderItemsDto, addNewVictim: captureVictim),
           ViewVictimDetailPage(victimDetailsDto: victimDetailsDto),
           CaptureVictimOrganisationDetailPage(
               addNewVictimOrganisation: captureVictimOrganisation),

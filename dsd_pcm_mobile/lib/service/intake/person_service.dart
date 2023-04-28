@@ -58,6 +58,30 @@ class PersonService {
     return apiResponse;
   }
 
+  Future<ApiResponse> updatePerson(PersonDto personDto) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      final response = await client.post(
+          Uri.parse("${AppUrl.intakeURL}/Person/Update"),
+          body: json.encode(personDto),
+          headers: {'Content-Type': 'application/json'});
+
+      switch (response.statusCode) {
+        case 200:
+          ApiResults apiResults =
+              ApiResults.fromJson(json.decode(response.body));
+          apiResponse.Data = apiResults;
+          break;
+        default:
+          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+          break;
+      }
+    } on SocketException {
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
+  }
+
   Future<ApiResponse> getEducationByPersonId(int? personId) async {
     ApiResponse apiResponse = ApiResponse();
     try {

@@ -3,15 +3,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../model/intake/health_status_dto.dart';
 import '../../../../model/pcm/accepted_worklist_dto.dart';
-import '../../../../model/pcm/general_detail_dto.dart';
 import '../../../../model/pcm/medical_health_detail_dto.dart';
 import '../../../../service/intake/look_up_service.dart';
-import '../../../../service/pcm/general_detail_service.dart';
 import '../../../../service/pcm/medical_health_details_service.dart';
 import '../../../../util/shared/apierror.dart';
 import '../../../../util/shared/apiresponse.dart';
 import '../../../../util/shared/apiresults.dart';
 import '../../../../util/shared/loading_overlay.dart';
+import '../../../../widgets/alert_dialog_messege_widget.dart';
 import 'capture_medical_health.dart';
 import 'view_medical_health.dart';
 
@@ -91,7 +90,43 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
     }
   }
 
-  captureMedicalHealth() {}
+  captureMedicalHealth(String? injuries, String? medication, String? allergies,
+      String? medicalAppointment, HealthStatusDto healthStatus) async {
+    final overlay = LoadingOverlay.of(context);
+    final navigator = Navigator.of(context);
+    overlay.show();
+    MedicalHealthDetailDto requestAddmedicalHealthDetailDto =
+        MedicalHealthDetailDto(
+            healthDetailsId: 0,
+            healthStatusId: healthStatus.healthStatusId,
+            injuries: injuries,
+            medication: medication,
+            allergies: allergies,
+            medicalAppointments: medicalAppointment,
+            intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
+            createdBy: preferences!.getInt('userId'));
+
+    apiResponse = await medicalHealthDetailsServiceClient
+        .addMedicalHealthDetail(requestAddmedicalHealthDetailDto);
+
+    if ((apiResponse.ApiError) == null) {
+      overlay.hide();
+      apiResults = (apiResponse.Data as ApiResults);
+      if (!mounted) return;
+      alertDialogMessageWidget(context, "Successfull", apiResults.message!);
+      navigator.push(
+        MaterialPageRoute(
+            builder: (context) => const HealthDetailPage(),
+            settings: RouteSettings(
+              arguments: acceptedWorklistDto,
+            )),
+      );
+    } else {
+      showDialogMessage((apiResponse.ApiError as ApiError));
+      overlay.hide();
+      return;
+    }
+  }
 
   showDialogMessage(ApiError apiError) {
     final messageDialog = ScaffoldMessenger.of(context);
@@ -126,7 +161,7 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('General Details'),
+        title: const Text('Medical Information'),
       ),
       body: ListView(
         children: [

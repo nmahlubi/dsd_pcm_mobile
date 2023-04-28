@@ -9,12 +9,12 @@ import '../../../../util/shared/loading_overlay.dart';
 import '../../../model/pcm/query/assessment_count_query_dto.dart';
 import '../../../service/pcm/assessment_service.dart';
 import '../view_child_details.dart';
-import 'capture_recommendation/capture_recommendation_detail.dart';
 import 'child_detail/update_child_detail.dart';
 import 'family/family.dart';
 import 'general_details/general_detail.dart';
 import 'health_detail/health_detail.dart';
 import 'offence_details/capture_offence_detail.dart';
+import 'recommendation/recommendation.dart';
 import 'socio_economic/socio_economic.dart';
 import 'victim_details/victim_detail.dart';
 
@@ -242,7 +242,7 @@ class _CaptureAssessmentPageState extends State<CaptureAssessmentPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const CaptureRecommendationDetail(),
+                    builder: (context) => const RecommandationPage(),
                     settings: RouteSettings(
                       arguments: acceptedWorklistDto,
                     ),

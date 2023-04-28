@@ -7,7 +7,7 @@ import '../../service/pcm/worklist_service.dart';
 import '../../util/shared/apierror.dart';
 import '../../util/shared/apiresponse.dart';
 import '../../util/shared/loading_overlay.dart';
-import '../assessment/view_child_details.dart';
+import '../assessment/capture_assessment/capture_assessment.dart';
 
 class AcceptedWorklistPage extends StatefulWidget {
   const AcceptedWorklistPage({Key? key}) : super(key: key);
@@ -113,12 +113,27 @@ class _AcceptedWorklistPageState extends State<AcceptedWorklistPage> {
                                 .arrestTime
                                 .toString(),
                             style: const TextStyle(color: Colors.red)),*/
+                        /*
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
                                   const ViewChildDetailsPage(),
+                              settings: RouteSettings(
+                                arguments: acceptedWorklistDto[index],
+                              ),
+                            ),
+                          );
+                        }
+                        
+                        */
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const CaptureAssessmentPage(),
                               settings: RouteSettings(
                                 arguments: acceptedWorklistDto[index],
                               ),

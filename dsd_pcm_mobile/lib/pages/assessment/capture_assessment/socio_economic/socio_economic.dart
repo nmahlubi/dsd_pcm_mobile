@@ -8,7 +8,6 @@ import '../../../../util/shared/apierror.dart';
 import '../../../../util/shared/apiresponse.dart';
 import '../../../../util/shared/apiresults.dart';
 import '../../../../util/shared/loading_overlay.dart';
-import 'capture_socio_economic.dart';
 import 'view_socio_economic.dart';
 
 class SocioEconomicPage extends StatefulWidget {

@@ -1,18 +1,21 @@
 import 'package:dropdown_plus/dropdown_plus.dart';
+
 import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
 
+import '../../../../model/intake/gender_dto.dart';
 import '../../../../model/intake/relationship_type_dto.dart';
+import '../../../../widgets/dropdown_widget.dart';
 
 class CaptureFamilyMemberPage extends StatelessWidget {
   final addNewFamilyMember;
 
-  final List<Map<String, dynamic>>? genderItemsDto;
-  final List<Map<String, dynamic>>? relationshipTypeItemsDto;
+  final List<Map<String, dynamic>> genderItemsDto;
+  final List<Map<String, dynamic>> relationshipTypeItemsDto;
   CaptureFamilyMemberPage(
       {super.key,
-      this.genderItemsDto,
-      this.relationshipTypeItemsDto,
+      required this.genderItemsDto,
+      required this.relationshipTypeItemsDto,
       this.addNewFamilyMember});
 //controls
   final TextEditingController nameController = TextEditingController();
@@ -115,56 +118,16 @@ class CaptureFamilyMemberPage extends StatelessWidget {
                         ),
                         Expanded(
                           child: Container(
-                            padding: const EdgeInsets.all(10),
-                            child: DropdownFormField<Map<String, dynamic>>(
-                              controller: genderController,
-                              onEmptyActionPressed: () async {},
-                              decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  suffixIcon: Icon(Icons.arrow_drop_down),
-                                  labelText: "Select Gender"),
-                              onSaved: (dynamic str) {},
-                              onChanged: (dynamic str) {},
-                              //validator: (dynamic str) {},
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Select Gender';
-                                }
-                                return null;
-                              },
-                              displayItemFn: (dynamic item) => Text(
-                                (item ?? {})['description'] ?? '',
-                                style: const TextStyle(fontSize: 16),
-                              ),
-                              findFn: (dynamic str) async => genderItemsDto!,
-                              selectedFn: (dynamic item1, dynamic item2) {
-                                if (item1 != null && item2 != null) {
-                                  return item1['description'] ==
-                                      item2['description'];
-                                }
-                                return false;
-                              },
-                              filterFn: (dynamic item, str) =>
-                                  item['description']
-                                      .toLowerCase()
-                                      .indexOf(str.toLowerCase()) >=
-                                  0,
-                              dropdownItemFn: (dynamic item,
-                                      int position,
-                                      bool focused,
-                                      bool selected,
-                                      Function() onTap) =>
-                                  ListTile(
-                                subtitle: Text(
-                                  item['description'] ?? '',
-                                ),
-                                tileColor: focused
-                                    ? const Color.fromARGB(20, 0, 0, 0)
-                                    : Colors.transparent,
-                                onTap: onTap,
-                              ),
-                            ),
-                          ),
+                              padding: const EdgeInsets.all(10),
+                              child: dynamicDropdownWidget(
+                                  dropdownEditingName: genderController,
+                                  labelTextValue: 'Gender',
+                                  displayItemFnValue: 'description',
+                                  itemsCollection: genderItemsDto,
+                                  selectedFnValue: 'genderId',
+                                  filterFnValue: 'description',
+                                  titleValue: 'description',
+                                  subtitleValue: '')),
                         ),
                       ],
                     ),
@@ -181,59 +144,22 @@ class CaptureFamilyMemberPage extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            child: DropdownFormField<Map<String, dynamic>>(
-                              controller: relationshipTypeController,
-                              onEmptyActionPressed: () async {},
-                              decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  suffixIcon: Icon(Icons.arrow_drop_down),
-                                  labelText: "Select Relationship Type"),
-                              onSaved: (dynamic str) {},
-                              onChanged: (dynamic str) {},
-                              //validator: (dynamic str) {},
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Select Relattionship Type';
-                                }
-                                return null;
-                              },
-                              displayItemFn: (dynamic item) => Text(
-                                (item ?? {})['description'] ?? '',
-                                style: const TextStyle(fontSize: 16),
-                              ),
-                              findFn: (dynamic str) async =>
-                                  relationshipTypeItemsDto!,
-                              selectedFn: (dynamic item1, dynamic item2) {
-                                if (item1 != null && item2 != null) {
-                                  return item1['description'] ==
-                                      item2['description'];
-                                }
-                                return false;
-                              },
-                              filterFn: (dynamic item, str) =>
-                                  item['description']
-                                      .toLowerCase()
-                                      .indexOf(str.toLowerCase()) >=
-                                  0,
-                              dropdownItemFn: (dynamic item,
-                                      int position,
-                                      bool focused,
-                                      bool selected,
-                                      Function() onTap) =>
-                                  ListTile(
-                                subtitle: Text(
-                                  item['description'] ?? '',
-                                ),
-                                tileColor: focused
-                                    ? const Color.fromARGB(20, 0, 0, 0)
-                                    : Colors.transparent,
-                                onTap: onTap,
-                              ),
-                            ),
-                          ),
-                        ),
+                            child: Container(
+                                padding: const EdgeInsets.all(10),
+                                child: dynamicDropdownWidget(
+                                    dropdownEditingName:
+                                        relationshipTypeController,
+                                    labelTextValue: 'Relationship Type',
+                                    displayItemFnValue: 'description',
+                                    itemsCollection: relationshipTypeItemsDto,
+                                    selectedFnValue: 'relationshipTypeId',
+                                    filterFnValue: 'description',
+                                    titleValue: 'description',
+                                    subtitleValue: ''))),
+                        Expanded(
+                            child: Container(
+                          padding: const EdgeInsets.all(10),
+                        ))
                       ],
                     ),
                     Row(
@@ -260,9 +186,10 @@ class CaptureFamilyMemberPage extends StatelessWidget {
                                         nameController.text.toString(),
                                         surnameController.text.toString(),
                                         int.parse(ageController.text),
-                                        genderController!.value.toString(),
-                                        relationshipTypeController!.value
-                                            .toString());
+                                        GenderDto.fromJson(
+                                            genderController!.value),
+                                        RelationshipTypeDto.fromJson(
+                                            relationshipTypeController!.value));
                                   },
                                 ))),
                       ],

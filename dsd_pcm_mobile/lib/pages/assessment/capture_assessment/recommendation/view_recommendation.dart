@@ -1,12 +1,10 @@
 import 'package:dsd_pcm_mobile/model/pcm/recommendations_dto.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 
-class ViewRecommendationDetails extends StatelessWidget {
-  final List<RecommendationDto>? recommendationDto;
-  const ViewRecommendationDetails({super.key, this.recommendationDto});
+class ViewRecommendation extends StatelessWidget {
+  final List<RecommendationDto>? recommendationsDto;
+  const ViewRecommendation({super.key, this.recommendationsDto});
 
   @override
   Widget build(BuildContext context) {
@@ -40,25 +38,24 @@ class ViewRecommendationDetails extends StatelessWidget {
                 expanded: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    if (recommendationDto!.isNotEmpty)
+                    if (recommendationsDto!.isNotEmpty)
                       Row(
                         children: [
                           Expanded(
                             child: ListView.separated(
                               shrinkWrap: true,
-                              itemCount: recommendationDto!.length,
+                              itemCount: recommendationsDto!.length,
                               itemBuilder: (context, int index) {
-                                if (recommendationDto!.isEmpty) {
+                                if (recommendationsDto!.isEmpty) {
                                   return const Center(
                                       child: Text('No recommendations.'));
                                 }
                                 return ListTile(
                                     title: Text(
-                                        'Comments : ${recommendationDto![index].commentsForRecommendation}'),
+                                        'Type : ${recommendationsDto![index].recommendationTypeDto?.description ?? ''}'),
                                     subtitle: Text(
-                                        'Date Created: ${recommendationDto![index].dateCreated}.\n'
-                                        'Date Modified  :  ${recommendationDto![index].dateModified}.\n'
-                                        'Modifies By  :  ${recommendationDto![index].modifiedBy}',
+                                        'Placement Type ${recommendationsDto![index].placementTypeDto?.description ?? ''}'
+                                        'Comments  :  ${recommendationsDto![index].commentsForRecommendation ?? ''}',
                                         style: const TextStyle(
                                             color: Colors.grey)),
                                     trailing: const Icon(Icons.edit,

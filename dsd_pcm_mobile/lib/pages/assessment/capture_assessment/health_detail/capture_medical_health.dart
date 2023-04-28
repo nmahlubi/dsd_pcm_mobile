@@ -1,25 +1,34 @@
 import 'package:dropdown_plus/dropdown_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../model/intake/health_status_dto.dart';
+import '../../../../widgets/dropdown_widget.dart';
 
 class CaptureMedicalHealthPage extends StatelessWidget {
   final addNewMedicalHealth;
-  final List<Map<String, dynamic>>? healthStatusItemsDto;
+  final List<Map<String, dynamic>> healthStatusItemsDto;
   CaptureMedicalHealthPage(
-      {super.key, this.healthStatusItemsDto, this.addNewMedicalHealth});
+      {super.key,
+      required this.healthStatusItemsDto,
+      this.addNewMedicalHealth});
 //controls
-  final TextEditingController consultedSourcesController =
+  final TextEditingController injuriesController = TextEditingController();
+  final TextEditingController medicationController = TextEditingController();
+  final TextEditingController allergiesController = TextEditingController();
+  final TextEditingController medicalAppointmentsController =
       TextEditingController();
-  final TextEditingController traceEffortsController = TextEditingController();
-  final TextEditingController commentsBySupervisorController =
-      TextEditingController();
-  final TextEditingController additionalInfoController =
-      TextEditingController();
-
   final DropdownEditingController<Map<String, dynamic>>?
       healthStatusController = DropdownEditingController();
+
+  void dispose() {
+    injuriesController.dispose();
+    medicationController.dispose();
+    allergiesController.dispose();
+    medicalAppointmentsController.dispose();
+    //super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +50,7 @@ class CaptureMedicalHealthPage extends StatelessWidget {
                 header: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Text(
-                      "Capture General Detail",
+                      "Capture Medical Information",
                       style: Theme.of(context).textTheme.bodyLarge,
                     )),
                 collapsed: const Text(
@@ -56,7 +65,7 @@ class CaptureMedicalHealthPage extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       child: const Text(
-                        'Comments',
+                        'Medical Details',
                         style: TextStyle(
                             color: Colors.blue,
                             fontWeight: FontWeight.w200,
@@ -69,26 +78,12 @@ class CaptureMedicalHealthPage extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              controller: consultedSourcesController,
+                              controller: allergiesController,
                               enableInteractiveSelection: false,
                               maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
-                                labelText: 'Consulted Sources',
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            child: TextFormField(
-                              controller: traceEffortsController,
-                              enableInteractiveSelection: false,
-                              maxLines: 1,
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: 'Trace Efforts',
+                                labelText: 'Allergies',
                               ),
                             ),
                           ),
@@ -101,13 +96,12 @@ class CaptureMedicalHealthPage extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              controller: commentsBySupervisorController,
+                              controller: medicationController,
                               enableInteractiveSelection: false,
-                              maxLines: 3,
-                              readOnly: true,
+                              maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
-                                labelText: 'Supervisor Comments',
+                                labelText: 'Medication',
                               ),
                             ),
                           ),
@@ -120,15 +114,66 @@ class CaptureMedicalHealthPage extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              controller: additionalInfoController,
+                              controller: injuriesController,
                               enableInteractiveSelection: false,
-                              maxLines: 3,
+                              maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
-                                labelText: 'Additional Information',
+                                labelText: 'Injuries',
                               ),
                             ),
                           ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            child: TextFormField(
+                              controller: medicalAppointmentsController,
+                              enableInteractiveSelection: false,
+                              maxLines: 1,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Medical Appointment',
+                              ),
+                              readOnly: true, // when true user cannot edit text
+                              onTap: () async {
+                                DateTime? pickedDate = await showDatePicker(
+                                    context: context,
+                                    initialDate:
+                                        DateTime.now(), //get today's date
+                                    firstDate: DateTime(
+                                        2000), //DateTime.now() - not to allow to choose before today.
+                                    lastDate: DateTime(2101));
+
+                                if (pickedDate != null) {
+                                  String formattedDate =
+                                      DateFormat('yyyy-MM-dd').format(
+                                          pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
+                                  medicalAppointmentsController.text =
+                                      formattedDate;
+                                  //You can format date as per your need
+
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                              padding: const EdgeInsets.all(10),
+                              child: dynamicDropdownWidget(
+                                  dropdownEditingName: healthStatusController,
+                                  labelTextValue: 'Health Status',
+                                  displayItemFnValue: 'description',
+                                  itemsCollection: healthStatusItemsDto,
+                                  selectedFnValue: 'healthStatusId',
+                                  filterFnValue: 'description',
+                                  titleValue: 'description',
+                                  subtitleValue: '')),
                         ),
                       ],
                     ),
@@ -150,16 +195,16 @@ class CaptureMedicalHealthPage extends StatelessWidget {
                                 padding:
                                     const EdgeInsets.fromLTRB(10, 20, 10, 2),
                                 child: ElevatedButton(
-                                  child: const Text('Add'),
+                                  child: const Text('Save'),
                                   onPressed: () {
                                     addNewMedicalHealth(
-                                        consultedSourcesController.text
+                                        injuriesController.text.toString(),
+                                        medicationController.text.toString(),
+                                        allergiesController.text.toString(),
+                                        medicalAppointmentsController.text
                                             .toString(),
-                                        traceEffortsController.text.toString(),
-                                        commentsBySupervisorController.text
-                                            .toString(),
-                                        additionalInfoController.text
-                                            .toString());
+                                        HealthStatusDto.fromJson(
+                                            healthStatusController!.value));
                                   },
                                 ))),
                       ],

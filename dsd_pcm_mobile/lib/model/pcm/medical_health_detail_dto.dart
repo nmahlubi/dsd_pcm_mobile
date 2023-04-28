@@ -7,12 +7,12 @@ class MedicalHealthDetailDto {
     String? injuries,
     String? medication,
     String? allergies,
-    DateTime? medicalAppointments,
+    String? medicalAppointments,
     int? intakeAssessmentId,
-    String? createdBy,
-    DateTime? dateCreated,
+    int? createdBy,
+    String? dateCreated,
     int? modifiedBy,
-    DateTime? dateModified,
+    String? dateModified,
     HealthStatusDto? healthStatusDto,
   }) {
     _healthDetailsId = healthDetailsId;
@@ -50,12 +50,12 @@ class MedicalHealthDetailDto {
   String? _injuries;
   String? _medication;
   String? _allergies;
-  DateTime? _medicalAppointments;
+  String? _medicalAppointments;
   int? _intakeAssessmentId;
-  String? _createdBy;
-  DateTime? _dateCreated;
+  int? _createdBy;
+  String? _dateCreated;
   int? _modifiedBy;
-  DateTime? _dateModified;
+  String? _dateModified;
   HealthStatusDto? _healthStatusDto;
 
   int? get healthDetailsId => _healthDetailsId;
@@ -63,12 +63,12 @@ class MedicalHealthDetailDto {
   String? get injuries => _injuries;
   String? get medication => _medication;
   String? get allergies => _allergies;
-  DateTime? get medicalAppointments => _medicalAppointments;
+  String? get medicalAppointments => _medicalAppointments;
   int? get intakeAssessmentId => _intakeAssessmentId;
-  String? get createdBy => _createdBy;
-  DateTime? get dateCreated => _dateCreated;
+  int? get createdBy => _createdBy;
+  String? get dateCreated => _dateCreated;
   int? get modifiedBy => _modifiedBy;
-  DateTime? get dateModified => _dateModified;
+  String? get dateModified => _dateModified;
   HealthStatusDto? get healthStatusDto => _healthStatusDto;
 
   Map<String, dynamic> toJson() {

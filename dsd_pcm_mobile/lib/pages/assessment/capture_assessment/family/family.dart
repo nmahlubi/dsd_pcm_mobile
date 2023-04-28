@@ -7,16 +7,14 @@ import '../../../../model/intake/relationship_type_dto.dart';
 import '../../../../model/pcm/accepted_worklist_dto.dart';
 import '../../../../model/pcm/family_information_dto.dart';
 import '../../../../model/pcm/family_member_dto.dart';
-import '../../../../model/pcm/victim_detail_dto.dart';
-import '../../../../model/pcm/victim_organisation_detail_dto.dart';
 import '../../../../service/intake/look_up_service.dart';
 import '../../../../service/intake/person_service.dart';
 import '../../../../service/pcm/family_service.dart';
-import '../../../../service/pcm/victim_service.dart';
 import '../../../../util/shared/apierror.dart';
 import '../../../../util/shared/apiresponse.dart';
 import '../../../../util/shared/apiresults.dart';
 import '../../../../util/shared/loading_overlay.dart';
+import '../../../../widgets/alert_dialog_messege_widget.dart';
 import 'capture_family_member.dart';
 import 'capture_family_information.dart';
 import 'view_family_member.dart';
@@ -140,31 +138,30 @@ class _FamilyPageState extends State<FamilyPage> {
     }
   }
 
-  captureFamilyMember(String? name, String? surname, int? age, String? gender,
-      String? relationshipType) async {
-    //GenderDto genderValue = GenderDto.fromJson(gender);
-    //RelationshipTypeDto relationshipTypeValue =
-    // RelationshipTypeDto.fromJson(relationshipType);
-
+  captureFamilyMember(String? name, String? surname, int? age,
+      GenderDto genderValue, RelationshipTypeDto relationshipTypeValue) async {
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
     overlay.show();
-    apiResponse = await addPerson(name, surname, age, 1);
+    apiResponse = await addPerson(name, surname, age, genderValue.genderId);
     if ((apiResponse.ApiError) == null) {
       apiResults = (apiResponse.Data as ApiResults);
+      PersonDto familyMemberPerson = PersonDto.fromJson(apiResults.data);
       FamilyMemberDto familyMemberDto = FamilyMemberDto(
           familyMemberId: 0,
           intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
-          personId: 335371, // personDtoResponse.personId,
-          relationshipTypeId: 1, // relationshipTypeValue.relationshipTypeId,
+          personId: familyMemberPerson.personId,
+          relationshipTypeId: relationshipTypeValue.relationshipTypeId,
           createdBy: preferences!.getInt('userId')!);
 
       apiResponse = await familyServiceClient.addFamilyMember(familyMemberDto);
       if ((apiResponse.ApiError) == null) {
         apiResults = (apiResponse.Data as ApiResults);
         overlay.hide();
-        await showAlertDialogMessage(
-            "Successfull", (apiResponse.Data as ApiResults).message!);
+        if (!mounted) return;
+        alertDialogMessageWidget(
+            context, "Successfull", (apiResponse.Data as ApiResults).message!);
+
         navigator.push(
           MaterialPageRoute(
               builder: (context) => const FamilyPage(),
@@ -193,8 +190,9 @@ class _FamilyPageState extends State<FamilyPage> {
         await familyServiceClient.addFamilyInformation(familyInformationDto);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
-      await showAlertDialogMessage(
-          "Successfull", (apiResponse.Data as ApiResults).message!);
+      if (!mounted) return;
+      alertDialogMessageWidget(
+          context, "Successfull", (apiResponse.Data as ApiResults).message!);
       navigator.push(
         MaterialPageRoute(
             builder: (context) => const FamilyPage(),
@@ -222,144 +220,11 @@ class _FamilyPageState extends State<FamilyPage> {
     apiResponse = await personServiceClient.addPerson(personDto);
     return apiResponse;
   }
-//family information
-
-/*
-  captureVictim(
-      String? name,
-      String? surname,
-      String? age,
-      String? gender,
-      String? victimOccupation,
-      String? isVictimIndividual,
-      String? victimCareGiverNames,
-      String? addressLine1,
-      String? addressLine2,
-      String? postalCode) async {
-    final overlay = LoadingOverlay.of(context);
-    final navigator = Navigator.of(context);
-    overlay.show();
-    apiResponse = await addPerson(name, surname, age, gender);
-    if ((apiResponse.ApiError) == null) {
-      apiResults = (apiResponse.Data as ApiResults);
-      VictimDetailDto victimDetailDto = VictimDetailDto(
-          victimId: 0,
-          intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
-          isVictimIndividual: isVictimIndividual,
-          personId: 335371, // personDtoResponse.personId,
-          victimOccupation: victimOccupation,
-          victimCareGiverNames: victimCareGiverNames,
-          addressLine1: addressLine1,
-          addressLine2: addressLine2,
-          postalCode: postalCode,
-          createdBy: preferences!.getInt('userId')!);
-
-      apiResponse = await victimServiceClient.addVictimDetail(victimDetailDto);
-      if ((apiResponse.ApiError) == null) {
-        overlay.hide();
-        await showAlertDialogMessage(
-            "Successfull", (apiResponse.Data as ApiResults).message!);
-        navigator.push(
-          MaterialPageRoute(
-              builder: (context) => const VictimDetailPage(),
-              settings: RouteSettings(
-                arguments: acceptedWorklistDto,
-              )),
-        );
-      } else {
-        showDialogMessage((apiResponse.ApiError as ApiError));
-        overlay.hide();
-      }
-    }
-  }
-
-  */
-
-  /*
-
-  
-
-  */
-
-/*
-  captureVictimOrganisation(
-      String? organisationName,
-      String? contactPersonFirstName,
-      String? contactPersonLastName,
-      String? telephone,
-      String? cellNo,
-      String? interventionserviceReferrals,
-      String? otherContacts,
-      String? contactPersonOccupation,
-      String? addressLine1,
-      String? addressLine2,
-      String? postalCode) async {
-    VictimOrganisationDetailDto victimOrganisationDetailDto =
-        VictimOrganisationDetailDto(
-            victimOrganisationId: 0,
-            intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
-            organisationName: organisationName,
-            contactPersonFirstName: contactPersonFirstName,
-            contactPersonLastName: contactPersonLastName,
-            telephone: telephone,
-            cellNo: cellNo,
-            interventionserviceReferrals: interventionserviceReferrals,
-            otherContacts: otherContacts,
-            contactPersonOccupation: contactPersonOccupation,
-            addressLine1: addressLine1,
-            addressLine2: addressLine2,
-            postalCode: postalCode,
-            createdBy: preferences!.getInt('userId')!);
-
-    final overlay = LoadingOverlay.of(context);
-    final navigator = Navigator.of(context);
-    overlay.show();
-    apiResponse = await victimServiceClient
-        .addVictimOrganisation(victimOrganisationDetailDto);
-    if ((apiResponse.ApiError) == null) {
-      overlay.hide();
-      await showAlertDialogMessage(
-          "Successfull", (apiResponse.Data as ApiResults).message!);
-      navigator.push(
-        MaterialPageRoute(
-            builder: (context) => const VictimDetailPage(),
-            settings: RouteSettings(
-              arguments: acceptedWorklistDto,
-            )),
-      );
-    } else {
-      showDialogMessage((apiResponse.ApiError as ApiError));
-      overlay.hide();
-    }
-  }
-  */
 
   showDialogMessage(ApiError apiError) {
     final messageDialog = ScaffoldMessenger.of(context);
     messageDialog.showSnackBar(
       SnackBar(content: Text(apiError.error!), backgroundColor: Colors.red),
-    );
-  }
-
-  showAlertDialogMessage(String? headerMessage, String? message) async {
-    await showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(headerMessage!),
-        content: Text(message!),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-            },
-            child: Container(
-              //color: Colors.green,
-              padding: const EdgeInsets.all(14),
-              child: const Text("okay"),
-            ),
-          ),
-        ],
-      ),
     );
   }
 

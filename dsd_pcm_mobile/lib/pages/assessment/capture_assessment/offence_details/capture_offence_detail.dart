@@ -3,12 +3,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../model/pcm/accepted_worklist_dto.dart';
 import '../../../../model/pcm/offence_detail_dto.dart';
-import '../../../../navigation_drawer/navigation_drawer.dart';
 import '../../../../service/pcm/offence_detail_service.dart';
 import '../../../../util/shared/apierror.dart';
 import '../../../../util/shared/apiresponse.dart';
 import '../../../../util/shared/loading_overlay.dart';
-import '../victim_details/capture_victim_detail.dart';
 import 'view_offence_detail.dart';
 
 class CaptureOffenceDetailPage extends StatefulWidget {
