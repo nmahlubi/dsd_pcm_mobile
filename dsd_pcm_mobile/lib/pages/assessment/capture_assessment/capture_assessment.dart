@@ -10,6 +10,8 @@ import '../../../model/pcm/query/assessment_count_query_dto.dart';
 import '../../../service/pcm/assessment_service.dart';
 import '../view_child_details.dart';
 import 'child_detail/update_child_detail.dart';
+import 'complete_assessment.dart';
+import 'development_assessment/development_assessment.dart';
 import 'family/family.dart';
 import 'general_details/general_detail.dart';
 import 'health_detail/health_detail.dart';
@@ -53,8 +55,8 @@ class _CaptureAssessmentPageState extends State<CaptureAssessmentPage> {
   }
 
   initializeControlValues(AcceptedWorklistDto acceptedWorklistDto) async {
-    await loadAssessmentCountByIntakeAssessmentId(
-        acceptedWorklistDto.intakeAssessmentId, acceptedWorklistDto.personId);
+    //await loadAssessmentCountByIntakeAssessmentId(
+    //   acceptedWorklistDto.intakeAssessmentId, acceptedWorklistDto.personId);
   }
 
   loadAssessmentCountByIntakeAssessmentId(
@@ -106,7 +108,7 @@ class _CaptureAssessmentPageState extends State<CaptureAssessmentPage> {
             },
           ),
           const Divider(thickness: 1),
-          ListTile(
+          /*ListTile(
             title: const Text('Assessment Details'),
             trailing: assessmentCountQueryDto.socioEconomicDetails == 0 ||
                     assessmentCountQueryDto.socioEconomicDetails == null
@@ -114,13 +116,15 @@ class _CaptureAssessmentPageState extends State<CaptureAssessmentPage> {
                 : const Icon(Icons.check, color: Colors.green),
             onTap: () {},
           ),
-          const Divider(thickness: 1),
+          const Divider(thickness: 1),*/
           ListTile(
               title: const Text('Medical Information'),
-              trailing: assessmentCountQueryDto.familyMember == 0 ||
-                      assessmentCountQueryDto.familyMember == null
-                  ? const Icon(Icons.question_mark, color: Colors.red)
-                  : const Icon(Icons.check, color: Colors.green),
+              trailing: const Icon(Icons.check, color: Colors.green),
+              /*trailing: assessmentCountQueryDto.socioEconomicDetails == 0 ||
+                    assessmentCountQueryDto.socioEconomicDetails == null
+                ? const Icon(Icons.close, color: Colors.red)
+                : const Icon(Icons.check, color: Colors.green),
+                */
               onTap: () {
                 Navigator.push(
                   context,
@@ -133,7 +137,7 @@ class _CaptureAssessmentPageState extends State<CaptureAssessmentPage> {
                 );
               }),
           const Divider(thickness: 1),
-          ListTile(
+          /*ListTile(
             title: const Text('Education Information'),
             trailing: assessmentCountQueryDto.educationInformation == 0 ||
                     assessmentCountQueryDto.educationInformation == null
@@ -141,13 +145,15 @@ class _CaptureAssessmentPageState extends State<CaptureAssessmentPage> {
                 : const Icon(Icons.check, color: Colors.green),
             onTap: () {},
           ),
-          const Divider(thickness: 1),
+          const Divider(thickness: 1),*/
           ListTile(
               title: const Text('Family'),
-              trailing: assessmentCountQueryDto.familyMember == 0 ||
-                      assessmentCountQueryDto.familyMember == null
-                  ? const Icon(Icons.close, color: Colors.red)
-                  : const Icon(Icons.check, color: Colors.green),
+              trailing: const Icon(Icons.check, color: Colors.green),
+              /*trailing: assessmentCountQueryDto.socioEconomicDetails == 0 ||
+                    assessmentCountQueryDto.socioEconomicDetails == null
+                ? const Icon(Icons.close, color: Colors.red)
+                : const Icon(Icons.check, color: Colors.green),
+                */
               onTap: () {
                 Navigator.push(
                   context,
@@ -160,7 +166,7 @@ class _CaptureAssessmentPageState extends State<CaptureAssessmentPage> {
                 );
               }),
           const Divider(thickness: 1),
-          ListTile(
+          /* ListTile(
             title: const Text('Care Given Details'),
             trailing: assessmentCountQueryDto.socioEconomicDetails == 0 ||
                     assessmentCountQueryDto.socioEconomicDetails == null
@@ -168,13 +174,10 @@ class _CaptureAssessmentPageState extends State<CaptureAssessmentPage> {
                 : const Icon(Icons.check, color: Colors.green),
             onTap: () {},
           ),
-          const Divider(thickness: 1),
+          const Divider(thickness: 1),*/
           ListTile(
             title: const Text('Socio-Economic Details'),
-            trailing: assessmentCountQueryDto.socioEconomicDetails == 0 ||
-                    assessmentCountQueryDto.socioEconomicDetails == null
-                ? const Icon(Icons.close, color: Colors.red)
-                : const Icon(Icons.check, color: Colors.green),
+            trailing: const Icon(Icons.check, color: Colors.green),
             onTap: () {
               Navigator.push(
                 context,
@@ -188,7 +191,7 @@ class _CaptureAssessmentPageState extends State<CaptureAssessmentPage> {
             },
           ),
           const Divider(thickness: 1),
-          ListTile(
+          /*ListTile(
               title: const Text('Offence Details'),
               trailing: assessmentCountQueryDto.offenceDetails == 0 ||
                       assessmentCountQueryDto.offenceDetails == null
@@ -205,13 +208,10 @@ class _CaptureAssessmentPageState extends State<CaptureAssessmentPage> {
                   ),
                 );
               }),
-          const Divider(thickness: 1),
+          const Divider(thickness: 1),*/
           ListTile(
               title: const Text('Victim Details'),
-              trailing: assessmentCountQueryDto.victimDetails == 0 ||
-                      assessmentCountQueryDto.victimDetails == null
-                  ? const Icon(Icons.close, color: Colors.red)
-                  : const Icon(Icons.check, color: Colors.green),
+              trailing: const Icon(Icons.check, color: Colors.green),
               onTap: () {
                 Navigator.push(
                   context,
@@ -226,18 +226,22 @@ class _CaptureAssessmentPageState extends State<CaptureAssessmentPage> {
           const Divider(thickness: 1),
           ListTile(
               title: const Text('Development Assessment'),
-              trailing: assessmentCountQueryDto.developmentAssessment == 0 ||
-                      assessmentCountQueryDto.developmentAssessment == null
-                  ? const Icon(Icons.close, color: Colors.red)
-                  : const Icon(Icons.check, color: Colors.green),
-              onTap: () {}),
+              trailing: const Icon(Icons.check, color: Colors.green),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DevelopmentAssessmentPage(),
+                    settings: RouteSettings(
+                      arguments: acceptedWorklistDto,
+                    ),
+                  ),
+                );
+              }),
           const Divider(thickness: 1),
           ListTile(
               title: const Text('Recommandation'),
-              trailing: assessmentCountQueryDto.recommendation == 0 ||
-                      assessmentCountQueryDto.recommendation == null
-                  ? const Icon(Icons.close, color: Colors.red)
-                  : const Icon(Icons.check, color: Colors.green),
+              trailing: const Icon(Icons.check, color: Colors.green),
               onTap: () {
                 Navigator.push(
                   context,
@@ -252,10 +256,7 @@ class _CaptureAssessmentPageState extends State<CaptureAssessmentPage> {
           const Divider(thickness: 1),
           ListTile(
               title: const Text('General Details'),
-              trailing: assessmentCountQueryDto.generalDetails == 0 ||
-                      assessmentCountQueryDto.generalDetails == null
-                  ? const Icon(Icons.close, color: Colors.red)
-                  : const Icon(Icons.check, color: Colors.green),
+              trailing: const Icon(Icons.check, color: Colors.green),
               onTap: () {
                 Navigator.push(
                   context,
@@ -271,13 +272,13 @@ class _CaptureAssessmentPageState extends State<CaptureAssessmentPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        label: const Text("Back"),
-        icon: const Icon(Icons.arrow_back),
+        label: const Text("Complete"),
+        icon: const Icon(Icons.arrow_forward),
         onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const ViewChildDetailsPage(),
+              builder: (context) => const CompleteAssessmentPage(),
               settings: RouteSettings(
                 arguments: acceptedWorklistDto,
               ),

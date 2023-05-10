@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
 
-class CaptureGeneralDetailPage extends StatelessWidget {
-  final addNewGeneralDetail;
-  CaptureGeneralDetailPage({super.key, this.addNewGeneralDetail});
+class CaptureDevelopmentAssessmentPage extends StatelessWidget {
+  final addDevelopmentAssessment;
+  CaptureDevelopmentAssessmentPage({super.key, this.addDevelopmentAssessment});
 //controls
-  final TextEditingController consultedSourcesController =
-      TextEditingController();
-  final TextEditingController traceEffortsController = TextEditingController();
-  final TextEditingController commentsBySupervisorController =
-      TextEditingController();
-  final TextEditingController additionalInfoController =
-      TextEditingController();
+  final TextEditingController belongingController = TextEditingController();
+  final TextEditingController masteryController = TextEditingController();
+  final TextEditingController independenceController = TextEditingController();
+  final TextEditingController generosityController = TextEditingController();
+  final TextEditingController evaluationController = TextEditingController();
   final _captureGeneralDetailFormKey = GlobalKey<FormState>();
 
   @override
@@ -36,7 +34,7 @@ class CaptureGeneralDetailPage extends StatelessWidget {
                   header: Padding(
                       padding: const EdgeInsets.all(10),
                       child: Text(
-                        "Capture General Detail",
+                        "Capture Development Assessment",
                         style: Theme.of(context).textTheme.bodyLarge,
                       )),
                   collapsed: const Text(
@@ -51,7 +49,7 @@ class CaptureGeneralDetailPage extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(8),
                         child: const Text(
-                          'Comments',
+                          'Development Assessment',
                           style: TextStyle(
                               color: Colors.blue,
                               fontWeight: FontWeight.w200,
@@ -64,36 +62,16 @@ class CaptureGeneralDetailPage extends StatelessWidget {
                             child: Container(
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
-                                controller: consultedSourcesController,
+                                controller: belongingController,
                                 enableInteractiveSelection: false,
                                 maxLines: 1,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
-                                  labelText: 'Consulted Sources',
+                                  labelText: 'Belonging',
                                 ),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Enter Consulted Sources';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              child: TextFormField(
-                                controller: traceEffortsController,
-                                enableInteractiveSelection: false,
-                                maxLines: 1,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  labelText: 'Trace Efforts',
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Enter Trace Efforts';
+                                    return 'Enter Belonging';
                                   }
                                   return null;
                                 },
@@ -108,14 +86,19 @@ class CaptureGeneralDetailPage extends StatelessWidget {
                             child: Container(
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
-                                controller: commentsBySupervisorController,
+                                controller: masteryController,
                                 enableInteractiveSelection: false,
-                                maxLines: 3,
-                                readOnly: true,
+                                maxLines: 1,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
-                                  labelText: 'Supervisor Comments',
+                                  labelText: 'Mastery',
                                 ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Enter Mastery';
+                                  }
+                                  return null;
+                                },
                               ),
                             ),
                           ),
@@ -127,16 +110,64 @@ class CaptureGeneralDetailPage extends StatelessWidget {
                             child: Container(
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
-                                controller: additionalInfoController,
+                                controller: independenceController,
                                 enableInteractiveSelection: false,
-                                maxLines: 3,
+                                maxLines: 1,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
-                                  labelText: 'Additional Information',
+                                  labelText: 'Independence',
                                 ),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Enter Additional Information';
+                                    return 'Enter Independence';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              child: TextFormField(
+                                controller: generosityController,
+                                enableInteractiveSelection: false,
+                                maxLines: 1,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Generosity',
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Enter Generosity';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              child: TextFormField(
+                                controller: evaluationController,
+                                enableInteractiveSelection: false,
+                                maxLines: 1,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Evaluation',
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Enter Evaluation';
                                   }
                                   return null;
                                 },
@@ -168,15 +199,19 @@ class CaptureGeneralDetailPage extends StatelessWidget {
                                       if (_captureGeneralDetailFormKey
                                           .currentState!
                                           .validate()) {
-                                        addNewGeneralDetail(
-                                            consultedSourcesController.text
+                                        addDevelopmentAssessment(
+                                            belongingController.text.toString(),
+                                            masteryController.text.toString(),
+                                            independenceController.text
                                                 .toString(),
-                                            traceEffortsController.text
+                                            generosityController.text
                                                 .toString(),
-                                            commentsBySupervisorController.text
-                                                .toString(),
-                                            additionalInfoController.text
+                                            evaluationController.text
                                                 .toString());
+
+                                        /*
+                                                
+    */
                                       }
                                     },
                                   ))),

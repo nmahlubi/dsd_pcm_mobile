@@ -2,23 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../model/pcm/accepted_worklist_dto.dart';
-import '../../../../model/pcm/socio_economic_dto.dart';
-import '../../../../service/pcm/socio_economic_service.dart';
+import '../../../../model/pcm/development_assessment_dto.dart';
+import '../../../../service/pcm/development_assessment_service.dart';
 import '../../../../util/shared/apierror.dart';
 import '../../../../util/shared/apiresponse.dart';
 import '../../../../util/shared/apiresults.dart';
 import '../../../../util/shared/loading_overlay.dart';
-import 'capture_socio_economic.dart';
-import 'view_socio_economic.dart';
+import 'capture_development_assessment.dart';
+import 'view_development_assessment.dart';
 
-class SocioEconomicPage extends StatefulWidget {
-  const SocioEconomicPage({Key? key}) : super(key: key);
+class DevelopmentAssessmentPage extends StatefulWidget {
+  const DevelopmentAssessmentPage({Key? key}) : super(key: key);
 
   @override
-  State<SocioEconomicPage> createState() => _SocioEconomicPageState();
+  State<DevelopmentAssessmentPage> createState() =>
+      _DevelopmentAssessmentPagetate();
 }
 
-class _SocioEconomicPageState extends State<SocioEconomicPage> {
+class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
   SharedPreferences? preferences;
 
   Future<void> initializePreference() async {
@@ -26,11 +27,11 @@ class _SocioEconomicPageState extends State<SocioEconomicPage> {
   }
 
   late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
-  final SocioEconomicService socioEconomicServiceClient =
-      SocioEconomicService();
+  final DevelopmentAssessmentService developmentAssessmentServiceClient =
+      DevelopmentAssessmentService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
-  late List<SocioEconomicDto> socioEconomicsDto = [];
+  late List<DevelopmentAssessmentDto> developmentAssessmentsDto = [];
 
   @override
   void initState() {
@@ -40,22 +41,23 @@ class _SocioEconomicPageState extends State<SocioEconomicPage> {
         setState(() {
           acceptedWorklistDto =
               ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
-          loadSocioEconomicsByIntakeAssessmentId(
+          loadDevelopmentAssessmentByIntakeAssessmentId(
               acceptedWorklistDto.intakeAssessmentId);
         });
       });
     });
   }
 
-  loadSocioEconomicsByIntakeAssessmentId(int? intakeAssessmentId) async {
+  loadDevelopmentAssessmentByIntakeAssessmentId(int? intakeAssessmentId) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await socioEconomicServiceClient
-        .getsocioEconomicsByAssessmentId(intakeAssessmentId);
+    apiResponse = await developmentAssessmentServiceClient
+        .getDevelopmentAssessmentsByIntakeAssessmentId(intakeAssessmentId);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        socioEconomicsDto = (apiResponse.Data as List<SocioEconomicDto>);
+        developmentAssessmentsDto =
+            (apiResponse.Data as List<DevelopmentAssessmentDto>);
       });
     } else {
       showDialogMessage((apiResponse.ApiError as ApiError));
@@ -63,46 +65,31 @@ class _SocioEconomicPageState extends State<SocioEconomicPage> {
     }
   }
 
-  captureSocioEconomic(
-      String? familyBackgroundComment,
-      String? financeWorkRecord,
-      String? housing,
-      String? socialCircumsances,
-      String? previousIntervention,
-      String? interPersonalRelationship,
-      String? peerPresure,
-      String? substanceAbuse,
-      String? religiousInvolve,
-      String? childBehavior,
-      String? other) async {
-    SocioEconomicDto socioEconomicDto = SocioEconomicDto(
-        socioEconomyid: 0,
-        intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
-        createdBy: preferences!.getInt('userId')!,
-        familyBackgroundComment: familyBackgroundComment,
-        financeWorkRecord: financeWorkRecord,
-        housing: housing,
-        socialCircumsances: socialCircumsances,
-        previousIntervention: previousIntervention,
-        interPersonalRelationship: interPersonalRelationship,
-        peerPresure: peerPresure,
-        substanceAbuse: substanceAbuse,
-        religiousInvolve: religiousInvolve,
-        childBehavior: childBehavior,
-        other: other);
+  captureDevelopmentAssessment(String? belonging, String? mastery,
+      String? independence, String? generosity, String? evaluation) async {
+    DevelopmentAssessmentDto addDevelopmentAssessment =
+        DevelopmentAssessmentDto(
+            developmentId: 0,
+            intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
+            createdBy: preferences!.getInt('userId')!,
+            belonging: belonging,
+            mastery: mastery,
+            independence: independence,
+            generosity: generosity,
+            evaluation: evaluation);
 
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
     overlay.show();
-    apiResponse =
-        await socioEconomicServiceClient.addSocioEconomic(socioEconomicDto);
+    apiResponse = await developmentAssessmentServiceClient
+        .addDevelopmentAssessment(addDevelopmentAssessment);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       await showAlertDialogMessage(
           "Successfull", (apiResponse.Data as ApiResults).message!);
       navigator.push(
         MaterialPageRoute(
-            builder: (context) => const SocioEconomicPage(),
+            builder: (context) => const DevelopmentAssessmentPage(),
             settings: RouteSettings(
               arguments: acceptedWorklistDto,
             )),
@@ -146,12 +133,14 @@ class _SocioEconomicPageState extends State<SocioEconomicPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Socio Economic'),
+        title: const Text('Development Assessment'),
       ),
       body: ListView(
         children: [
-          CaptureSocioEconomicPage(addNewSocioEconomic: captureSocioEconomic),
-          ViewSocioEconomicPage(socioEconomicsDto: socioEconomicsDto)
+          CaptureDevelopmentAssessmentPage(
+              addDevelopmentAssessment: captureDevelopmentAssessment),
+          ViewDevelopmentAssessmentPage(
+              developmentAssessmentsDto: developmentAssessmentsDto)
         ],
       ),
     );

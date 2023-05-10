@@ -43,10 +43,8 @@ class _AcceptedWorklistPageState extends State<AcceptedWorklistPage> {
   loadAllocatedCasesByProbationOfficer() async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-
     apiResponse = await worklistServiceClient
         .getAcceptedWorklistByProbationOfficer(preferences!.getInt('userId')!);
-
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {

@@ -950,7 +950,10 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
                               child: ElevatedButton(
                                 child: const Text('Update'),
                                 onPressed: () {
+                                  //if (_updateChildFormKey.currentState!
+                                  // .validate()) {
                                   updateChildDetails();
+                                  // }
                                 },
                               )),
                         ),
