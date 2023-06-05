@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:dropdown_plus/dropdown_plus.dart';
 import 'package:flutter/material.dart';
 
-Widget dynamicDropdownWidget(
+Widget dynamicDropdownWidgetV(
     {DropdownEditingController<Map<String, dynamic>>? dropdownEditingName,
     final String? labelTextValue,
     required String displayItemFnValue,
@@ -11,7 +11,8 @@ Widget dynamicDropdownWidget(
     required String selectedFnValue,
     required String filterFnValue,
     String? titleValue,
-    String? subtitleValue}) {
+    String? subtitleValue,
+    dynamic defaultItemValue}) {
   return DropdownFormField<Map<String, dynamic>>(
       controller: dropdownEditingName,
       onEmptyActionPressed: () async {},
@@ -30,9 +31,8 @@ Widget dynamicDropdownWidget(
  validator: (dynamic str) {},
       */
       validator: (dynamic str) {
-        if (dropdownEditingName?.value == null) {
-          return labelTextValue;
-          //'Example Is Required';
+        if (selectedFnValue == null || selectedFnValue.isEmpty) {
+          return 'Example Is Required';
         }
         return null;
       },
@@ -44,9 +44,17 @@ Widget dynamicDropdownWidget(
       },*/
       //validator: (value) => value == null || value.isEmpty ? 'required' : null,
       displayItemFn: (dynamic item) => Text(
+            ((item ?? defaultItemValue) ?? {})[displayItemFnValue] ?? '',
+            style: const TextStyle(fontSize: 16),
+          ),
+/*
+displayItemFn: (dynamic item) => Text(
             (item ?? {})[displayItemFnValue] ?? '',
             style: const TextStyle(fontSize: 16),
           ),
+*/
+
+      //defaultItemValue
       findFn: (dynamic str) async => itemsCollection,
       selectedFn: (dynamic item1, dynamic item2) {
         if (item1 != null && item2 != null) {

@@ -26,6 +26,7 @@ import '../../../../util/shared/apiresults.dart';
 import '../../../../util/shared/loading_overlay.dart';
 import '../../../../widgets/alert_dialog_messege_widget.dart';
 import '../../../../widgets/dropdown_widget.dart';
+import '../../../../widgets/dropdown_widget_v.dart';
 
 class UpdateChildDetailPage extends StatefulWidget {
   const UpdateChildDetailPage({Key? key}) : super(key: key);
@@ -52,6 +53,7 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
   late List<DisabilityTypeDto> disabilityTypesDto = [];
   final List<Map<String, dynamic>> disabilityTypeItemsDto = [];
   late List<GenderDto> gendersDto = [];
+  late dynamic genderValue11 = {"genderId": null, "description": null};
   final List<Map<String, dynamic>> genderItemsDto = [];
   late List<PreferredContactTypeDto> preferredContactTypesDto = [];
   final List<Map<String, dynamic>> preferredContactTypeItemsDto = [];
@@ -141,6 +143,23 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
     emailAddressController.text = personDto.emailAddress ?? '';
     mobileNumberController.text = personDto.mobilePhoneNumber ?? '';
     phoneNumberController.text = personDto.phoneNumber ?? '';
+    if (personDto.genderDto != null) {
+      genderValue11 = {
+        "genderId": personDto.genderDto!.genderId,
+        "description": '${personDto.genderDto!.description}'
+      };
+
+      genderController!.value = genderItemsDto[0];
+
+      //genderController.value.;
+      setState(() {});
+      //GenderDto.fromJson(personDto.genderDto!) as Map<String, dynamic>?;
+      /*Map<String, dynamic> genderValue = {
+        "genderId": personDto.genderDto!.genderId,
+        "description": '${personDto.genderDto!.description}'
+      };
+      genderController!.value = genderValue;*/
+    }
 
     generateDateOfBirth();
     //genderController!.value =
@@ -350,10 +369,19 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
   }
 
   updateChildDetails() async {
+    /*
+ GenderDto? genderItemValue = genderController!.value != null
+        ? GenderDto.fromJson(genderController!.value)
+        : null;
+   */
+
+    //return;
+
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-
-    GenderDto genderItemValue = GenderDto.fromJson(genderController!.value);
+    GenderDto? genderItemValue = genderController!.value != null
+        ? GenderDto.fromJson(genderController!.value)
+        : null;
     DisabilityTypeDto disabilityTypeItemValue =
         DisabilityTypeDto.fromJson(disabilityController!.value);
     NationalityDto nationalityItemValue =
@@ -376,7 +404,7 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
         dateOfBirth: dateOfBirthController.text,
         age: int.parse(ageController.text),
         languageId: languageItemValue.languageId,
-        genderId: genderItemValue.genderId,
+        genderId: genderItemValue!.genderId,
         maritalStatusId: maritalStatusItemValue.maritalStatusId,
         preferredContactTypeId:
             preferredContactTypeItemValue.preferredContactTypeId,
@@ -950,10 +978,10 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
                               child: ElevatedButton(
                                 child: const Text('Update'),
                                 onPressed: () {
-                                  //if (_updateChildFormKey.currentState!
-                                  // .validate()) {
-                                  updateChildDetails();
-                                  // }
+                                  if (_updateChildFormKey.currentState!
+                                      .validate()) {
+                                    updateChildDetails();
+                                  }
                                 },
                               )),
                         ),

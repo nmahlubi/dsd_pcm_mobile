@@ -2,27 +2,27 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http_interceptor/http/intercepted_client.dart';
 
-import '../../model/pcm/offence_detail_dto.dart';
+import '../../model/intake/care_giver_details_dto.dart';
 import '../../util/app_url.dart';
 import '../../util/auth_intercept/authorization_interceptor.dart';
 import '../../util/shared/apierror.dart';
 import '../../util/shared/apiresponse.dart';
 import '../../util/shared/apiresults.dart';
 
-class OffenceDetailService {
+class CareGiverDetailService {
   final client =
       InterceptedClient.build(interceptors: [AuthorizationInterceptor()]);
 
-  Future<ApiResponse> getOffenceDetailIntakeAssessmentId(
-      int? intakeAssessmentId) async {
+  Future<ApiResponse> getCareGiverDetailsByClientId(int? clientId) async {
     ApiResponse apiResponse = ApiResponse();
     try {
-      final response = await client.get(Uri.parse(
-          "${AppUrl.pcmURL}/OffenceDetail/GetAll/$intakeAssessmentId"));
+      final response = await client.get(
+          Uri.parse("${AppUrl.intakeURL}/CareGiverDetails/GetAll/$clientId"));
+
       switch (response.statusCode) {
         case 200:
           apiResponse.Data = (json.decode(response.body) as List)
-              .map((data) => OffenceDetailDto.fromJson(data))
+              .map((data) => CareGiverDetailsDto.fromJson(data))
               .toList();
           break;
         default:
@@ -35,13 +35,13 @@ class OffenceDetailService {
     return apiResponse;
   }
 
-  Future<ApiResponse> addOffenceDetail(
-      OffenceDetailDto offenceDetailDto) async {
+  Future<ApiResponse> addCareGiverDetail(
+      CareGiverDetailsDto careGiverDetailsDto) async {
     ApiResponse apiResponse = ApiResponse();
     try {
       final response = await client.post(
-          Uri.parse("${AppUrl.pcmURL}/OffenceDetail/Add"),
-          body: json.encode(offenceDetailDto),
+          Uri.parse("${AppUrl.intakeURL}/CareGiverDetails/Add"),
+          body: json.encode(careGiverDetailsDto),
           headers: {'Content-Type': 'application/json'});
       switch (response.statusCode) {
         case 200:

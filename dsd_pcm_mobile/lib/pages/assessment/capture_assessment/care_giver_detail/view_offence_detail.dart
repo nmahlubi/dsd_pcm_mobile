@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
 
-import '../../../../model/pcm/offence_detail_dto.dart';
+import '../../../../model/intake/care_giver_details_dto.dart';
 
-class ViewOffenceDetailPage extends StatelessWidget {
-  final List<OffenceDetailDto>? offenceDetailsDto;
-  const ViewOffenceDetailPage({super.key, this.offenceDetailsDto});
+class ViewCareGiverDetailPage extends StatelessWidget {
+  final List<CareGiverDetailsDto>? careGiverDetailsDto;
+  const ViewCareGiverDetailPage({super.key, this.careGiverDetailsDto});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class ViewOffenceDetailPage extends StatelessWidget {
                 header: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Text(
-                      "View Offence Details",
+                      "View Care Giver Details",
                       style: Theme.of(context).textTheme.bodyLarge,
                     )),
                 collapsed: const Text(
@@ -39,26 +39,24 @@ class ViewOffenceDetailPage extends StatelessWidget {
                 expanded: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    if (offenceDetailsDto!.isNotEmpty)
+                    if (careGiverDetailsDto!.isNotEmpty)
                       Row(
                         children: [
                           Expanded(
                             child: ListView.separated(
                               shrinkWrap: true,
-                              itemCount: offenceDetailsDto!.length,
+                              itemCount: careGiverDetailsDto!.length,
                               itemBuilder: (context, int index) {
-                                if (offenceDetailsDto!.isEmpty) {
+                                if (careGiverDetailsDto!.isEmpty) {
                                   return const Center(
                                       child: Text('No Accused Found.'));
                                 }
                                 return ListTile(
                                     title: Text(
-                                        'Category : ${offenceDetailsDto![index].offenceCategoryDto?.description ?? ''}'),
+                                        'Name : ${careGiverDetailsDto![index].personDto!.firstName ?? ''} '
+                                        ' ${careGiverDetailsDto![index].personDto!.lastName ?? ''}'),
                                     subtitle: Text(
-                                        'Type : ${offenceDetailsDto![index].offenceTypeDto?.description ?? ''} '
-                                        'Responsibility details : ${offenceDetailsDto![index].responsibilityDetails ?? ''} '
-                                        'Value of goods : ${offenceDetailsDto![index].valueOfGoods ?? ''}.'
-                                        'Value Recoverd ${offenceDetailsDto![index].valueRecovered ?? ''}',
+                                        'Identity Number : ${careGiverDetailsDto![index].personDto!.identificationNumber ?? ''} ',
                                         style: const TextStyle(
                                             color: Colors.grey)),
                                     trailing: const Icon(Icons.edit,

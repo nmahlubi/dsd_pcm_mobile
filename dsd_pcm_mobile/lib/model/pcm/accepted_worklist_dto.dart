@@ -9,6 +9,7 @@ class AcceptedWorklistDto {
     String? childName,
     String? dateAccepted,
     String? childNameAbbr,
+    int? clientId,
   }) {
     _assessmentStatus = assessmentStatus;
     _assessmentRegisterId = assessmentRegisterId;
@@ -19,6 +20,7 @@ class AcceptedWorklistDto {
     _childName = childName;
     _dateAccepted = dateAccepted;
     _childNameAbbr = childNameAbbr;
+    _clientId = clientId;
   }
 
   AcceptedWorklistDto.fromJson(dynamic json) {
@@ -31,6 +33,7 @@ class AcceptedWorklistDto {
     _childName = json['childName'];
     _dateAccepted = json['dateAccepted'];
     _childNameAbbr = json['childNameAbbr'];
+    _clientId = json['clientId'];
   }
 
   String? _assessmentStatus;
@@ -42,6 +45,7 @@ class AcceptedWorklistDto {
   String? _childName;
   String? _dateAccepted;
   String? _childNameAbbr;
+  int? _clientId;
 
   String? get assessmentStatus => _assessmentStatus;
   int? get assessmentRegisterId => _assessmentRegisterId;
@@ -52,6 +56,7 @@ class AcceptedWorklistDto {
   String? get childName => _childName;
   String? get dateAccepted => _dateAccepted;
   String? get childNameAbbr => _childNameAbbr;
+  int? get clientId => _clientId;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -64,6 +69,7 @@ class AcceptedWorklistDto {
     map['personId'] = _personId;
     map['dateAccepted'] = _dateAccepted;
     map['childNameAbbr'] = _childNameAbbr;
+    map['clientId'] = _clientId;
     return map;
   }
 }
