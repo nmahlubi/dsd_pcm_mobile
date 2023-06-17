@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
 
 class CaptureFamilyInformationPage extends StatelessWidget {
+  // ignore: prefer_typing_uninitialized_variables
   final addNewFamilyInformation;
   CaptureFamilyInformationPage({super.key, this.addNewFamilyInformation});
 //controls
@@ -76,22 +77,24 @@ class CaptureFamilyInformationPage extends StatelessWidget {
                           padding: const EdgeInsets.fromLTRB(10, 20, 10, 2),
                         )),
                         Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                          ),
-                        ),
-                        Expanded(
                             child: Container(
                                 height: 70,
                                 padding:
                                     const EdgeInsets.fromLTRB(10, 20, 10, 2),
-                                child: ElevatedButton(
-                                  child: const Text('Add'),
+                                child: OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    backgroundColor:
+                                        const Color.fromARGB(255, 23, 22, 22),
+                                    shape: const StadiumBorder(),
+                                    side: const BorderSide(
+                                        width: 2, color: Colors.blue),
+                                  ),
                                   onPressed: () {
                                     addNewFamilyInformation(
                                         familyBackgroundController.text
                                             .toString());
                                   },
+                                  child: const Text('Add Information'),
                                 ))),
                       ],
                     ),

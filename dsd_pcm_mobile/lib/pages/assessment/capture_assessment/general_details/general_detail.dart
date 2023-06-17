@@ -3,11 +3,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../model/pcm/accepted_worklist_dto.dart';
 import '../../../../model/pcm/general_detail_dto.dart';
+import '../../../../navigation_drawer/go_to_assessment_drawer.dart';
 import '../../../../service/pcm/general_detail_service.dart';
 import '../../../../util/shared/apierror.dart';
 import '../../../../util/shared/apiresponse.dart';
 import '../../../../util/shared/apiresults.dart';
 import '../../../../util/shared/loading_overlay.dart';
+import '../../../../util/shared/randon_generator.dart';
+import '../../../probation_officer/accepted_worklist.dart';
 import 'capture_general_detail.dart';
 import 'view_general_detail.dart';
 
@@ -20,14 +23,15 @@ class GeneralDetailPage extends StatefulWidget {
 
 class _GeneralDetailPageState extends State<GeneralDetailPage> {
   SharedPreferences? preferences;
+  final scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future<void> initializePreference() async {
     preferences = await SharedPreferences.getInstance();
   }
 
   late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
-  final GeneralDetailService generalDetailServiceClient =
-      GeneralDetailService();
+  final _randomGenerator = RandomGenerator();
+  final _generalDetailServiceClient = GeneralDetailService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
   late List<GeneralDetailDto> generalDetailsDto = [];
@@ -50,7 +54,7 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
   loadGeneralDetailsByIntakeAssessmentId(int? intakeAssessmentId) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await generalDetailServiceClient
+    apiResponse = await _generalDetailServiceClient
         .getGeneralDetailByIntakeAssessmentId(intakeAssessmentId);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
@@ -66,7 +70,8 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
   captureGeneralDetail(String? consultedSources, String? traceEfforts,
       String? commentsBySupervisor, String? additionalInfo) async {
     GeneralDetailDto generalDetailDto = GeneralDetailDto(
-        generalDetailsId: 0,
+        generalDetailsId: _randomGenerator.getRandomGeneratedNumber(),
+        dateCreated: _randomGenerator.getCurrentDateGenerated(),
         intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
         createdBy: preferences!.getInt('userId')!,
         consultedSources: consultedSources,
@@ -78,11 +83,11 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
     final navigator = Navigator.of(context);
     overlay.show();
     apiResponse =
-        await generalDetailServiceClient.addGeneralDetail(generalDetailDto);
+        await _generalDetailServiceClient.addGeneralDetail(generalDetailDto);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       await showAlertDialogMessage(
-          "Successfull", (apiResponse.Data as ApiResults).message!);
+          "Successfull", "General details successfully created.");
       navigator.push(
         MaterialPageRoute(
             builder: (context) => const GeneralDetailPage(),
@@ -127,16 +132,78 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('General Details'),
-      ),
-      body: ListView(
-        children: [
-          CaptureGeneralDetailPage(addNewGeneralDetail: captureGeneralDetail),
-          ViewGeneralDetailPage(generalDetailsDto: generalDetailsDto)
-        ],
-      ),
-    );
+    return WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: Scaffold(
+          key: scaffoldKey,
+          appBar: AppBar(
+            title: const Text("Offence Details"),
+            leading: IconButton(
+              icon: const Icon(Icons.offline_pin_rounded),
+              onPressed: () {
+                if (scaffoldKey.currentState!.isDrawerOpen) {
+                  scaffoldKey.currentState!.closeDrawer();
+                  //close drawer, if drawer is open
+                } else {
+                  scaffoldKey.currentState!.openDrawer();
+                  //open drawer, if drawer is closed
+                }
+              },
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.home),
+                tooltip: 'Accepted Worklist',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AcceptedWorklistPage()),
+                  );
+                },
+              ),
+            ],
+          ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
+          floatingActionButton: Container(
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                FloatingActionButton(
+                    onPressed: () {
+                      /*Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SocioEconomicPage(),
+                          settings: RouteSettings(
+                            arguments: acceptedWorklistDto,
+                          ),
+                        ),
+                      );*/
+                    },
+                    heroTag: null,
+                    child: const Icon(Icons.arrow_back)),
+                FloatingActionButton(
+                    onPressed: () {},
+                    heroTag: null,
+                    child: const Icon(Icons.arrow_forward)),
+              ],
+            ),
+          ),
+          drawer: GoToAssessmentDrawer(
+              acceptedWorklistDto: acceptedWorklistDto, isCompleted: true),
+          body: ListView(
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 70),
+            children: [
+              CaptureGeneralDetailPage(
+                  addNewGeneralDetail: captureGeneralDetail),
+              ViewGeneralDetailPage(generalDetailsDto: generalDetailsDto)
+            ],
+          ),
+        ));
   }
 }

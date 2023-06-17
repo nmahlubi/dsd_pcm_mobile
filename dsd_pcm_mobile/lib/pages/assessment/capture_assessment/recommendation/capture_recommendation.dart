@@ -76,22 +76,24 @@ class CaptureRecommendationPage extends StatelessWidget {
                             fontSize: 21),
                       ),
                     ),
+                    Row(children: [
+                      Expanded(
+                        child: Container(
+                            padding: const EdgeInsets.all(10),
+                            child: dynamicDropdownWidget(
+                                dropdownEditingName:
+                                    recommendationTypeController,
+                                labelTextValue: 'Recommandation Type',
+                                displayItemFnValue: 'description',
+                                itemsCollection: recommendationTypeItemsDto,
+                                selectedFnValue: 'recommendationTypeId',
+                                filterFnValue: 'description',
+                                titleValue: 'description',
+                                subtitleValue: '')),
+                      ),
+                    ]),
                     Row(
                       children: [
-                        Expanded(
-                          child: Container(
-                              padding: const EdgeInsets.all(10),
-                              child: dynamicDropdownWidget(
-                                  dropdownEditingName:
-                                      recommendationTypeController,
-                                  labelTextValue: 'Recommandation Type',
-                                  displayItemFnValue: 'description',
-                                  itemsCollection: recommendationTypeItemsDto,
-                                  selectedFnValue: 'recommendationTypeId',
-                                  filterFnValue: 'description',
-                                  titleValue: 'description',
-                                  subtitleValue: '')),
-                        ),
                         Expanded(
                           child: Container(
                               padding: const EdgeInsets.all(10),

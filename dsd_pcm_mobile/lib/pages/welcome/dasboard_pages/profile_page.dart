@@ -72,8 +72,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Padding(
+    return WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: Padding(
             padding: const EdgeInsets.all(0),
             child: Form(
                 child: ListView(

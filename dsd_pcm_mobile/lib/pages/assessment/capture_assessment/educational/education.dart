@@ -127,16 +127,21 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('General Details'),
-      ),
-      body: ListView(
-        children: [
-          CaptureGeneralDetailPage(addNewGeneralDetail: captureGeneralDetail),
-          ViewGeneralDetailPage(generalDetailsDto: generalDetailsDto)
-        ],
-      ),
-    );
+    return WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('General Details'),
+          ),
+          body: ListView(
+            children: [
+              CaptureGeneralDetailPage(
+                  addNewGeneralDetail: captureGeneralDetail),
+              ViewGeneralDetailPage(generalDetailsDto: generalDetailsDto)
+            ],
+          ),
+        ));
   }
 }

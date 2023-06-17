@@ -128,7 +128,9 @@ class _RecommandationPageState extends State<RecommandationPage> {
         placementTypeId: placementTypeDto.placementTypeId,
         commentsForRecommendation: commentsForRecommendation,
         createdBy: preferences!.getInt('userId')!,
-        intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId);
+        intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
+        recommendationTypeDto: recommendationTypeDto,
+        placementTypeDto: placementTypeDto);
 
     apiResponse = await recommendationsServiceClient
         .addRecommendations(requestRecommendationDto);
@@ -181,19 +183,23 @@ class _RecommandationPageState extends State<RecommandationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Recommendation'),
-      ),
-      body: ListView(
-        children: [
-          CaptureRecommendationPage(
-              recommendationTypeItemsDto: recommendationTypeItemsDto,
-              placementTypeItemsDto: placementTypeItemsDto,
-              addNewRecommandation: captureRecommandation),
-          ViewRecommendation(recommendationsDto: recommendationsDto),
-        ],
-      ),
-    );
+    return WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Recommendation'),
+          ),
+          body: ListView(
+            children: [
+              CaptureRecommendationPage(
+                  recommendationTypeItemsDto: recommendationTypeItemsDto,
+                  placementTypeItemsDto: placementTypeItemsDto,
+                  addNewRecommandation: captureRecommandation),
+              ViewRecommendation(recommendationsDto: recommendationsDto),
+            ],
+          ),
+        ));
   }
 }

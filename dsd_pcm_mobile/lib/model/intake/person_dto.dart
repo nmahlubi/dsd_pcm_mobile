@@ -19,6 +19,8 @@ class PersonDto {
     String? dateOfBirth,
     int? age,
     bool? isEstimatedAge,
+    bool? isActive,
+    bool? isDeleted,
     int? sexualOrientationId,
     int? languageId,
     int? genderId,
@@ -35,14 +37,15 @@ class PersonDto {
     String? dateLastModified,
     String? modifiedBy,
     String? createdBy,
+    String? dateCreated,
     DisabilityTypeDto? disabilityTypeDto,
     GenderDto? genderDto,
     LanguageDto? languageDto,
     MaritalStatusDto? maritalStatusDto,
     IdentificationTypeDto? identificationTypeDto,
-    List<PersonAddressDto>? personAddressDto,
+    /* List<PersonAddressDto>? personAddressDto,
     PersonAddressDto? currentAddress,
-    List<PersonAddressDto>? previousAddress,
+    List<PersonAddressDto>? previousAddress,*/
   }) {
     _personId = personId;
     _firstName = firstName;
@@ -51,6 +54,8 @@ class PersonDto {
     _identificationTypeId = identificationTypeId;
     _identificationNumber = identificationNumber;
     _isPivaValidated = isPivaValidated;
+    _isActive = isActive;
+    _isDeleted = isDeleted;
     _pivaTransactionId = pivaTransactionId;
     _dateOfBirth = dateOfBirth;
     _age = age;
@@ -71,14 +76,15 @@ class PersonDto {
     _dateLastModified = dateLastModified;
     _modifiedBy = modifiedBy;
     _createdBy = createdBy;
+    _dateCreated = dateCreated;
     _disabilityTypeDto = disabilityTypeDto;
     _genderDto = genderDto;
     _languageDto = languageDto;
     _maritalStatusDto = maritalStatusDto;
     _identificationTypeDto = identificationTypeDto;
-    _personAddressDto = personAddressDto;
+    /*_personAddressDto = personAddressDto;
     _currentAddress = currentAddress;
-    _previousAddress = previousAddress;
+    _previousAddress = previousAddress;*/
   }
 
   PersonDto.fromJson(dynamic json) {
@@ -89,6 +95,8 @@ class PersonDto {
     _identificationTypeId = json['identificationTypeId'];
     _identificationNumber = json['identificationNumber'];
     _isPivaValidated = json['isPivaValidated'];
+    _isActive = json['isPivaValidated'];
+    _isDeleted = json['isDeleted'];
     _pivaTransactionId = json['pivaTransactionId'];
     _dateOfBirth = json['dateOfBirth'];
     _age = json['age'];
@@ -109,6 +117,7 @@ class PersonDto {
     _dateLastModified = json['dateLastModified'];
     _modifiedBy = json['modifiedBy'];
     _createdBy = json['createdBy'];
+    _dateCreated = json['dateCreated'];
     _disabilityTypeDto = json['disabilityTypeDto'] != null
         ? DisabilityTypeDto.fromJson(json['disabilityTypeDto'])
         : null;
@@ -128,7 +137,7 @@ class PersonDto {
         ? IdentificationTypeDto.fromJson(json['identificationTypeDto'])
         : null;
 
-    if (json['personAddressDto'] != null) {
+    /*if (json['personAddressDto'] != null) {
       _personAddressDto = [];
       json['personAddressDto'].forEach((v) {
         _personAddressDto?.add(PersonAddressDto.fromJson(v));
@@ -144,7 +153,7 @@ class PersonDto {
       json['previousAddress'].forEach((v) {
         _previousAddress?.add(PersonAddressDto.fromJson(v));
       });
-    }
+    }*/
   }
 
   int? _personId;
@@ -158,6 +167,8 @@ class PersonDto {
   String? _dateOfBirth;
   int? _age;
   bool? _isEstimatedAge;
+  bool? _isActive;
+  bool? _isDeleted;
   int? _sexualOrientationId;
   int? _languageId;
   int? _genderId;
@@ -174,15 +185,16 @@ class PersonDto {
   String? _dateLastModified;
   String? _modifiedBy;
   String? _createdBy;
+  String? _dateCreated;
   DisabilityTypeDto? _disabilityTypeDto;
   GenderDto? _genderDto;
   LanguageDto? _languageDto;
   NationalityDto? _nationalityDto;
   MaritalStatusDto? _maritalStatusDto;
   IdentificationTypeDto? _identificationTypeDto;
-  List<PersonAddressDto>? _personAddressDto;
+  /* List<PersonAddressDto>? _personAddressDto;
   PersonAddressDto? _currentAddress;
-  List<PersonAddressDto>? _previousAddress;
+  List<PersonAddressDto>? _previousAddress;*/
 
   int? get personId => _personId;
   String? get firstName => _firstName;
@@ -191,6 +203,8 @@ class PersonDto {
   int? get identificationTypeId => _identificationTypeId;
   String? get identificationNumber => _identificationNumber;
   bool? get isPivaValidated => _isPivaValidated;
+  bool? get isActive => _isActive;
+  bool? get isDeleted => _isDeleted;
   String? get pivaTransactionId => _pivaTransactionId;
   String? get dateOfBirth => _dateOfBirth;
   int? get age => _age;
@@ -211,15 +225,16 @@ class PersonDto {
   String? get dateLastModified => _dateLastModified;
   String? get modifiedBy => _modifiedBy;
   String? get createdBy => _createdBy;
+  String? get dateCreated => _dateCreated;
   DisabilityTypeDto? get disabilityTypeDto => _disabilityTypeDto;
   GenderDto? get genderDto => _genderDto;
   LanguageDto? get languageDto => _languageDto;
   NationalityDto? get nationalityDto => _nationalityDto;
   MaritalStatusDto? get maritalStatusDto => _maritalStatusDto;
   IdentificationTypeDto? get identificationTypeDto => _identificationTypeDto;
-  List<PersonAddressDto>? get personAddressDto => _personAddressDto;
+  /*List<PersonAddressDto>? get personAddressDto => _personAddressDto;
   PersonAddressDto? get currentAddress => _currentAddress;
-  List<PersonAddressDto>? get previousAddress => _previousAddress;
+  List<PersonAddressDto>? get previousAddress => _previousAddress;*/
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -234,6 +249,8 @@ class PersonDto {
     map['dateOfBirth'] = _dateOfBirth;
     map['age'] = _age;
     map['isEstimatedAge'] = _isEstimatedAge;
+    map['isActive'] = _isActive;
+    map['isDeleted'] = _isDeleted;
     map['sexualOrientationId'] = _sexualOrientationId;
     map['languageId'] = _languageId;
     map['genderId'] = _genderId;
@@ -250,6 +267,7 @@ class PersonDto {
     map['dateLastModified'] = _dateLastModified;
     map['modifiedBy'] = _modifiedBy;
     map['createdBy'] = _createdBy;
+    map['dateCreated'] = _dateCreated;
     if (_disabilityTypeDto != null) {
       map['disabilityTypeDto'] = _disabilityTypeDto?.toJson();
     }
@@ -268,7 +286,7 @@ class PersonDto {
     if (_identificationTypeDto != null) {
       map['identificationTypeDto'] = _identificationTypeDto?.toJson();
     }
-    if (_personAddressDto != null) {
+    /* if (_personAddressDto != null) {
       map['personAddressDto'] =
           _personAddressDto?.map((v) => v.toJson()).toList();
     }
@@ -276,8 +294,7 @@ class PersonDto {
     if (_previousAddress != null) {
       map['previousAddress'] =
           _previousAddress?.map((v) => v.toJson()).toList();
-    }
-
+    }*/
     return map;
   }
 }

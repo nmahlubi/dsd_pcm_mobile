@@ -22,9 +22,8 @@ class _HomePageState extends State<HomePage> {
     preferences = await SharedPreferences.getInstance();
   }
 
-  final MobileDashboardService mobileDashboardServiceClient =
-      MobileDashboardService();
-  final NotificationService notificationServiceClient = NotificationService();
+  final _mobileDashboardServiceClient = MobileDashboardService();
+  final _notificationServiceClient = NotificationService();
   late ApiResponse apiResponse = ApiResponse();
   late MobileDashboardDto mobileDashboardDto = MobileDashboardDto();
   late int overdueCases = 0;
@@ -35,8 +34,12 @@ class _HomePageState extends State<HomePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
         setState(() {
+          mobileDashboardDto = MobileDashboardDto(
+              reAssignedCases: 0, newPropationOfficerInbox: 0, newWorklist: 0);
           loadDashboardbyUser();
-          loadCountedOverdueCasesBySupervisor();
+          if (preferences?.getBool('supervisor') == true) {
+            loadCountedOverdueCasesBySupervisor();
+          }
         });
       });
     });
@@ -45,7 +48,7 @@ class _HomePageState extends State<HomePage> {
   loadDashboardbyUser() async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await mobileDashboardServiceClient
+    apiResponse = await _mobileDashboardServiceClient
         .getMobileDashboardByUser(preferences!.getInt('userId')!);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
@@ -62,7 +65,7 @@ class _HomePageState extends State<HomePage> {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
     apiResponse =
-        await notificationServiceClient.getCountedOverdueCasesBySupervisor(
+        await _notificationServiceClient.getCountedOverdueCasesBySupervisor(
             preferences!.getString('username')!);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
@@ -84,8 +87,11 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Padding(
+    return WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: Padding(
             padding: const EdgeInsets.all(10),
             child: Form(
                 child: ListView(
@@ -106,12 +112,6 @@ class _HomePageState extends State<HomePage> {
                               children: const <Widget>[
                                 Text('Inbox (notification cases)',
                                     style: TextStyle(color: Colors.green)),
-                                /*Text('incoming cases',
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 34.0)
-                                        )*/
                               ],
                             ),
                             Material(
@@ -278,6 +278,40 @@ class _HomePageState extends State<HomePage> {
                                   child: Padding(
                                 padding: EdgeInsets.all(16.0),
                                 child: Icon(Icons.timeline,
+                                    color: Colors.white, size: 30.0),
+                              )))
+                        ]),
+                  ),
+                ),
+
+                Container(
+                  padding: const EdgeInsets.all(10),
+                ),
+                // if (preferences?.getBool('supervisor') == false)
+                _buildTile(
+                  onTap: () => Navigator.pushReplacementNamed(
+                      context, '/sync-manual-offline'),
+                  Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: const <Widget>[
+                              Text('Sync(Offline)',
+                                  style: TextStyle(color: Colors.red)),
+                            ],
+                          ),
+                          Material(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(24.0),
+                              child: const Center(
+                                  child: Padding(
+                                padding: EdgeInsets.all(16.0),
+                                child: Icon(Icons.sync,
                                     color: Colors.white, size: 30.0),
                               )))
                         ]),

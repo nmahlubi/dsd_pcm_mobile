@@ -53,10 +53,10 @@ class ViewCareGiverDetailPage extends StatelessWidget {
                                 }
                                 return ListTile(
                                     title: Text(
-                                        'Name : ${careGiverDetailsDto![index].personDto!.firstName ?? ''} '
-                                        ' ${careGiverDetailsDto![index].personDto!.lastName ?? ''}'),
+                                        'Relationship : ${careGiverDetailsDto![index].relationshipTypeDto!.description ?? ''} '),
                                     subtitle: Text(
-                                        'Identity Number : ${careGiverDetailsDto![index].personDto!.identificationNumber ?? ''} ',
+                                        'Name : ${careGiverDetailsDto![index].personDto!.firstName ?? ''} '
+                                        ' ${careGiverDetailsDto![index].personDto!.lastName ?? ''}',
                                         style: const TextStyle(
                                             color: Colors.grey)),
                                     trailing: const Icon(Icons.edit,

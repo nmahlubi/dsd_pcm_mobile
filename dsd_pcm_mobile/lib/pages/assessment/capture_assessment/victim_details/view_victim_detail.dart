@@ -27,7 +27,7 @@ class ViewVictimDetailPage extends StatelessWidget {
                 header: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Text(
-                      "View Victims Details",
+                      "View Individual Victims Details",
                       style: Theme.of(context).textTheme.bodyLarge,
                     )),
                 collapsed: const Text(

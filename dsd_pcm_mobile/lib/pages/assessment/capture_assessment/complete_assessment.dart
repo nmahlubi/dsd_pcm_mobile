@@ -5,11 +5,9 @@ import '../../../../model/pcm/accepted_worklist_dto.dart';
 import '../../../../navigation_drawer/navigation_drawer.dart';
 import '../../../../util/shared/apierror.dart';
 import '../../../../util/shared/apiresponse.dart';
-import '../../../service/pcm/assessment_service.dart';
 import '../../../service/pcm/worklist_service.dart';
 import '../../../util/shared/apiresults.dart';
 import '../../../util/shared/loading_overlay.dart';
-import 'child_detail/update_child_detail.dart';
 
 class CompleteAssessmentPage extends StatefulWidget {
   const CompleteAssessmentPage({Key? key}) : super(key: key);
@@ -95,28 +93,32 @@ class _CompleteAssessmentPageState extends State<CompleteAssessmentPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Complete Assessment'),
-      ),
-      drawer: const NavigationDrawer(),
-      body: Column(
-        children: <Widget>[
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15.0),
+    return WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Complete Assessment'),
           ),
-          Container(
-            padding: const EdgeInsets.all(8),
-            child: const Text(
-              'Complete Assessment',
-              style: TextStyle(
-                  color: Colors.blue,
-                  fontWeight: FontWeight.w200,
-                  fontSize: 21),
-            ),
+          drawer: const NavigationDrawer(),
+          body: Column(
+            children: <Widget>[
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15.0),
+              ),
+              Container(
+                padding: const EdgeInsets.all(8),
+                child: const Text(
+                  'Complete Assessment',
+                  style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.w200,
+                      fontSize: 21),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 }

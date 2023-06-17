@@ -153,32 +153,30 @@ class CaptureGeneralDetailPage extends StatelessWidget {
                             padding: const EdgeInsets.fromLTRB(10, 20, 10, 2),
                           )),
                           Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                            ),
-                          ),
-                          Expanded(
                               child: Container(
                                   height: 70,
                                   padding:
                                       const EdgeInsets.fromLTRB(10, 20, 10, 2),
-                                  child: ElevatedButton(
-                                    child: const Text('Add'),
+                                  child: OutlinedButton(
+                                    style: OutlinedButton.styleFrom(
+                                      backgroundColor:
+                                          const Color.fromARGB(255, 23, 22, 22),
+                                      shape: const StadiumBorder(),
+                                      side: const BorderSide(
+                                          width: 2, color: Colors.blue),
+                                    ),
                                     onPressed: () {
-                                      if (_captureGeneralDetailFormKey
-                                          .currentState!
-                                          .validate()) {
-                                        addNewGeneralDetail(
-                                            consultedSourcesController.text
-                                                .toString(),
-                                            traceEffortsController.text
-                                                .toString(),
-                                            commentsBySupervisorController.text
-                                                .toString(),
-                                            additionalInfoController.text
-                                                .toString());
-                                      }
+                                      addNewGeneralDetail(
+                                          consultedSourcesController.text
+                                              .toString(),
+                                          traceEffortsController.text
+                                              .toString(),
+                                          commentsBySupervisorController.text
+                                              .toString(),
+                                          additionalInfoController.text
+                                              .toString());
                                     },
+                                    child: const Text('Add General Info'),
                                   ))),
                         ],
                       ),

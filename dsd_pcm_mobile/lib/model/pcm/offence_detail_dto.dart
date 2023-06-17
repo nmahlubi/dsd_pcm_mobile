@@ -1,4 +1,5 @@
 import '../intake/offence_category_dto.dart';
+import '../intake/offence_schedule_dto.dart';
 import '../intake/offence_type_dto.dart';
 
 class OffenceDetailDto {
@@ -20,6 +21,7 @@ class OffenceDetailDto {
     String? dateModified,
     OffenceTypeDto? offenceTypeDto,
     OffenceCategoryDto? offenceCategoryDto,
+    OffenceScheduleDto? offenceScheduleDto,
   }) {
     _pcmOffenceId = pcmOffenceId;
     _pcmCaseId = pcmCaseId;
@@ -38,6 +40,7 @@ class OffenceDetailDto {
     _dateModified = dateModified;
     _offenceTypeDto = offenceTypeDto;
     _offenceCategoryDto = offenceCategoryDto;
+    offenceScheduleDto = _offenceScheduleDto;
   }
 
   OffenceDetailDto.fromJson(dynamic json) {
@@ -62,6 +65,10 @@ class OffenceDetailDto {
     _offenceCategoryDto = json['offenceCategoryDto'] != null
         ? OffenceCategoryDto.fromJson(json['offenceCategoryDto'])
         : null;
+
+    _offenceScheduleDto = json['offenceScheduleDto'] != null
+        ? OffenceScheduleDto.fromJson(json['offenceScheduleDto'])
+        : null;
   }
 
   int? _pcmOffenceId;
@@ -81,6 +88,7 @@ class OffenceDetailDto {
   String? _dateModified;
   OffenceTypeDto? _offenceTypeDto;
   OffenceCategoryDto? _offenceCategoryDto;
+  OffenceScheduleDto? _offenceScheduleDto;
 
   int? get pcmOffenceId => _pcmOffenceId;
   int? get pcmCaseId => _pcmCaseId;
@@ -99,6 +107,7 @@ class OffenceDetailDto {
   String? get dateModified => _dateModified;
   OffenceTypeDto? get offenceTypeDto => _offenceTypeDto;
   OffenceCategoryDto? get offenceCategoryDto => _offenceCategoryDto;
+  OffenceScheduleDto? get offenceScheduleDto => _offenceScheduleDto;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -122,6 +131,10 @@ class OffenceDetailDto {
     }
     if (_offenceCategoryDto != null) {
       map['offenceCategoryDto'] = _offenceCategoryDto?.toJson();
+    }
+
+    if (_offenceScheduleDto != null) {
+      map['offenceScheduleDto'] = _offenceScheduleDto?.toJson();
     }
 
     return map;

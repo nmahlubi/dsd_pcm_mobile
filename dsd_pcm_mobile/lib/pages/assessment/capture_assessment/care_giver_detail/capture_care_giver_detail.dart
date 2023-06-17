@@ -1,35 +1,28 @@
-import 'package:dropdown_plus/dropdown_plus.dart';
-import 'package:dsd_pcm_mobile/model/static_model/yes_no_dto.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../model/intake/gender_dto.dart';
-import '../../../../model/intake/offence_category_dto.dart';
-import '../../../../model/intake/offence_schedule_dto.dart';
-import '../../../../model/intake/offence_type_dto.dart';
 import '../../../../model/intake/relationship_type_dto.dart';
-import '../../../../widgets/dropdown_widget.dart';
 
+// ignore: must_be_immutable
 class CaptureCareGiverDetailPage extends StatelessWidget {
+  // ignore: prefer_typing_uninitialized_variables
   final addNewCareGiverDetail;
-
-  final List<Map<String, dynamic>> genderItemsDto;
-  final List<Map<String, dynamic>> relationshipTypeItemsDto;
+  final List<GenderDto> gendersDto;
+  final List<RelationshipTypeDto> relationshipTypesDto;
   CaptureCareGiverDetailPage(
       {super.key,
-      required this.genderItemsDto,
-      required this.relationshipTypeItemsDto,
+      required this.gendersDto,
+      required this.relationshipTypesDto,
       this.addNewCareGiverDetail});
 //controls
-
-  final DropdownEditingController<Map<String, dynamic>>? genderController =
-      DropdownEditingController();
-  final DropdownEditingController<Map<String, dynamic>>?
-      relationshipTypeController = DropdownEditingController();
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController identityNumberController =
-      TextEditingController();
+  final TextEditingController dateOfBirthController = TextEditingController();
+  final TextEditingController ageController = TextEditingController();
+  int? genderDropdownButtonFormField;
+  int? relationshipTypeDropdownButtonFormField;
 
   @override
   Widget build(BuildContext context) {
@@ -78,16 +71,34 @@ class CaptureCareGiverDetailPage extends StatelessWidget {
                         Expanded(
                             child: Container(
                                 padding: const EdgeInsets.all(10),
-                                child: dynamicDropdownWidget(
-                                    dropdownEditingName:
-                                        relationshipTypeController,
-                                    labelTextValue: 'Relationship Type',
-                                    displayItemFnValue: 'description',
-                                    itemsCollection: relationshipTypeItemsDto,
-                                    selectedFnValue: 'relationshipTypeId',
-                                    filterFnValue: 'description',
-                                    titleValue: 'description',
-                                    subtitleValue: ''))),
+                                child: DropdownButtonFormField(
+                                  value:
+                                      relationshipTypeDropdownButtonFormField,
+                                  decoration: const InputDecoration(
+                                    hintText: 'Relationship Type',
+                                    labelText: 'Relationship Type',
+                                    border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 1, color: Colors.green),
+                                    ),
+                                  ),
+                                  items:
+                                      relationshipTypesDto.map((relationship) {
+                                    return DropdownMenuItem(
+                                        value: relationship.relationshipTypeId,
+                                        child: Text(relationship.description
+                                            .toString()));
+                                  }).toList(),
+                                  onChanged: (selectedValue) {
+                                    relationshipTypeDropdownButtonFormField =
+                                        selectedValue;
+                                  },
+                                  validator: (value) {
+                                    if (value == null) {
+                                      return 'Relationship Type is required';
+                                    }
+                                  },
+                                ))),
                       ],
                     ),
                     Row(
@@ -95,15 +106,32 @@ class CaptureCareGiverDetailPage extends StatelessWidget {
                         Expanded(
                             child: Container(
                                 padding: const EdgeInsets.all(10),
-                                child: dynamicDropdownWidget(
-                                    dropdownEditingName: genderController,
-                                    labelTextValue: 'Gender',
-                                    displayItemFnValue: 'description',
-                                    itemsCollection: genderItemsDto,
-                                    selectedFnValue: 'genderId',
-                                    filterFnValue: 'description',
-                                    titleValue: 'description',
-                                    subtitleValue: ''))),
+                                child: DropdownButtonFormField(
+                                  value: genderDropdownButtonFormField,
+                                  decoration: const InputDecoration(
+                                    hintText: 'Gender',
+                                    labelText: 'Gender',
+                                    border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 1, color: Colors.green),
+                                    ),
+                                  ),
+                                  items: gendersDto.map((gender) {
+                                    return DropdownMenuItem(
+                                        value: gender.genderId,
+                                        child: Text(
+                                            gender.description.toString()));
+                                  }).toList(),
+                                  onChanged: (selectedValue) {
+                                    genderDropdownButtonFormField =
+                                        selectedValue;
+                                  },
+                                  validator: (value) {
+                                    if (value == null) {
+                                      return 'Gender is required';
+                                    }
+                                  },
+                                ))),
                         Expanded(
                             child: Container(
                           padding: const EdgeInsets.all(10),
@@ -148,12 +176,46 @@ class CaptureCareGiverDetailPage extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              controller: identityNumberController,
+                              controller: dateOfBirthController,
                               enableInteractiveSelection: false,
                               maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
-                                labelText: 'Identity Number',
+                                labelText: 'Date Of Birth',
+                              ),
+                              readOnly: true, // when true user cannot edit text
+                              onTap: () async {
+                                DateTime? pickedDate = await showDatePicker(
+                                    context: context,
+                                    initialDate:
+                                        DateTime.now(), //get today's date
+                                    firstDate: DateTime(
+                                        2000), //DateTime.now() - not to allow to choose before today.
+                                    lastDate: DateTime(2101));
+
+                                if (pickedDate != null) {
+                                  String formattedDate =
+                                      DateFormat('yyyy-MM-dd').format(
+                                          pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
+                                  dateOfBirthController.text = formattedDate;
+                                  //You can format date as per your need
+
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            child: TextFormField(
+                              controller: ageController,
+                              enableInteractiveSelection: false,
+                              maxLines: 1,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Age',
                               ),
                             ),
                           ),
@@ -168,28 +230,29 @@ class CaptureCareGiverDetailPage extends StatelessWidget {
                           padding: const EdgeInsets.fromLTRB(10, 20, 10, 2),
                         )),
                         Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                          ),
-                        ),
-                        Expanded(
                             child: Container(
                                 height: 70,
                                 padding:
                                     const EdgeInsets.fromLTRB(10, 20, 10, 2),
-                                child: ElevatedButton(
-                                  child: const Text('Add'),
+                                child: OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    backgroundColor:
+                                        const Color.fromARGB(255, 23, 22, 22),
+                                    shape: const StadiumBorder(),
+                                    side: const BorderSide(
+                                        width: 2, color: Colors.blue),
+                                  ),
                                   onPressed: () {
                                     addNewCareGiverDetail(
-                                        RelationshipTypeDto.fromJson(
-                                            relationshipTypeController!.value),
-                                        GenderDto.fromJson(
-                                            genderController!.value),
-                                        firstNameController.text.toString(),
-                                        lastNameController.text.toString(),
-                                        identityNumberController.text
-                                            .toString());
+                                      firstNameController.text.toString(),
+                                      lastNameController.text.toString(),
+                                      dateOfBirthController.text.toString(),
+                                      int.parse(ageController.text),
+                                      genderDropdownButtonFormField,
+                                      relationshipTypeDropdownButtonFormField,
+                                    );
                                   },
+                                  child: const Text('Add Care Giver'),
                                 ))),
                       ],
                     ),

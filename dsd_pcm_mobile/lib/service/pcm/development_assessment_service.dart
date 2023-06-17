@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:http_interceptor/http/intercepted_client.dart';
 
 import '../../model/pcm/development_assessment_dto.dart';
-import '../../model/pcm/general_detail_dto.dart';
 import '../../util/app_url.dart';
 import '../../util/auth_intercept/authorization_interceptor.dart';
 import '../../util/shared/apierror.dart';

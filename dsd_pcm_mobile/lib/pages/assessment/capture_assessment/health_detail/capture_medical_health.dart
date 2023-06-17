@@ -1,33 +1,29 @@
-import 'package:dropdown_plus/dropdown_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../model/intake/health_status_dto.dart';
-import '../../../../widgets/dropdown_widget.dart';
 
+// ignore: must_be_immutable
 class CaptureMedicalHealthPage extends StatelessWidget {
+  // ignore: prefer_typing_uninitialized_variables
   final addNewMedicalHealth;
-  final List<Map<String, dynamic>> healthStatusItemsDto;
+  final List<HealthStatusDto> healthStatusesDto;
   CaptureMedicalHealthPage(
-      {super.key,
-      required this.healthStatusItemsDto,
-      this.addNewMedicalHealth});
+      {super.key, required this.healthStatusesDto, this.addNewMedicalHealth});
 //controls
   final TextEditingController injuriesController = TextEditingController();
   final TextEditingController medicationController = TextEditingController();
   final TextEditingController allergiesController = TextEditingController();
   final TextEditingController medicalAppointmentsController =
       TextEditingController();
-  final DropdownEditingController<Map<String, dynamic>>?
-      healthStatusController = DropdownEditingController();
+  int? healthStatusDropdownButtonFormField;
 
   void dispose() {
     injuriesController.dispose();
     medicationController.dispose();
     allergiesController.dispose();
     medicalAppointmentsController.dispose();
-    //super.dispose();
   }
 
   @override
@@ -162,18 +158,39 @@ class CaptureMedicalHealthPage extends StatelessWidget {
                             ),
                           ),
                         ),
+                      ],
+                    ),
+                    Row(
+                      children: [
                         Expanded(
                           child: Container(
                               padding: const EdgeInsets.all(10),
-                              child: dynamicDropdownWidget(
-                                  dropdownEditingName: healthStatusController,
-                                  labelTextValue: 'Health Status',
-                                  displayItemFnValue: 'description',
-                                  itemsCollection: healthStatusItemsDto,
-                                  selectedFnValue: 'healthStatusId',
-                                  filterFnValue: 'description',
-                                  titleValue: 'description',
-                                  subtitleValue: '')),
+                              child: DropdownButtonFormField(
+                                value: healthStatusDropdownButtonFormField,
+                                decoration: const InputDecoration(
+                                  hintText: 'Health Status',
+                                  labelText: 'Health Status',
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 1, color: Colors.green),
+                                  ),
+                                ),
+                                items: healthStatusesDto.map((healthStatus) {
+                                  return DropdownMenuItem(
+                                      value: healthStatus.healthStatusId,
+                                      child: Text(
+                                          healthStatus.description.toString()));
+                                }).toList(),
+                                onChanged: (selectedValue) {
+                                  healthStatusDropdownButtonFormField =
+                                      selectedValue;
+                                },
+                                validator: (value) {
+                                  if (value == null) {
+                                    return 'Health Status is required';
+                                  }
+                                },
+                              )),
                         ),
                       ],
                     ),
@@ -185,17 +202,18 @@ class CaptureMedicalHealthPage extends StatelessWidget {
                           padding: const EdgeInsets.fromLTRB(10, 20, 10, 2),
                         )),
                         Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                          ),
-                        ),
-                        Expanded(
                             child: Container(
                                 height: 70,
                                 padding:
                                     const EdgeInsets.fromLTRB(10, 20, 10, 2),
-                                child: ElevatedButton(
-                                  child: const Text('Save'),
+                                child: OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    backgroundColor:
+                                        const Color.fromARGB(255, 23, 22, 22),
+                                    shape: const StadiumBorder(),
+                                    side: const BorderSide(
+                                        width: 2, color: Colors.blue),
+                                  ),
                                   onPressed: () {
                                     addNewMedicalHealth(
                                         injuriesController.text.toString(),
@@ -203,9 +221,9 @@ class CaptureMedicalHealthPage extends StatelessWidget {
                                         allergiesController.text.toString(),
                                         medicalAppointmentsController.text
                                             .toString(),
-                                        HealthStatusDto.fromJson(
-                                            healthStatusController!.value));
+                                        healthStatusDropdownButtonFormField);
                                   },
+                                  child: const Text('Add Medical'),
                                 ))),
                       ],
                     ),

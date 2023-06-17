@@ -55,11 +55,11 @@ class ViewSocioEconomicPage extends StatelessWidget {
                                   title: Text(
                                       'Date : ${socioEconomicsDto![index].dateCreated}'),
                                   subtitle: Text(
-                                      'Family Background Comments : ${socioEconomicsDto![index].familyBackgroundComment}. '
-                                      'Finance Work Record : ${socioEconomicsDto![index].financeWorkRecord}. '
-                                      'Peer Presure : ${socioEconomicsDto![index].peerPresure}. '
-                                      'Religious Involve : ${socioEconomicsDto![index].religiousInvolve}. '
-                                      'Substance Abuse : ${socioEconomicsDto![index].substanceAbuse}',
+                                      'Family Background Comments - ${socioEconomicsDto![index].familyBackgroundComment}. '
+                                      'Finance Work Record - ${socioEconomicsDto![index].financeWorkRecord}. '
+                                      'Peer Presure - ${socioEconomicsDto![index].peerPresure}. '
+                                      'Religious Involve - ${socioEconomicsDto![index].religiousInvolve}. '
+                                      'Substance Abuse - ${socioEconomicsDto![index].substanceAbuse}.',
                                       style:
                                           const TextStyle(color: Colors.grey)),
                                 );

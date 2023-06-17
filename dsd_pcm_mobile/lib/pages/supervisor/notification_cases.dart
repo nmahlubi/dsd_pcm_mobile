@@ -67,83 +67,90 @@ class _NotificationCasesPageState extends State<NotificationCasesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Notification Cases'),
-      ),
-      drawer: const NavigationDrawer(),
-      body: Column(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            child: TextField(
-              onChanged: (value) {
-                setState(() {
-                  searchString = value.toLowerCase();
-                });
-              },
-              decoration: const InputDecoration(
-                labelText: 'Search',
-                suffixIcon: Icon(Icons.search),
+    return WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Notification Cases'),
+          ),
+          drawer: const NavigationDrawer(),
+          body: Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      searchString = value.toLowerCase();
+                    });
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'Search',
+                    suffixIcon: Icon(Icons.search),
+                  ),
+                ),
               ),
-            ),
-          ),
-          Expanded(
-            child: ListView.separated(
-              shrinkWrap: true,
-              itemCount: notificationCasesDto.length,
-              itemBuilder: (context, int index) {
-                if (notificationCasesDto.isEmpty) {
-                  return const Center(child: Text('No Cases Found.'));
-                }
-                return notificationCasesDto[index]
-                        .childName!
-                        .toLowerCase()
-                        .contains(searchString)
-                    ? ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor:
-                              const Color.fromARGB(255, 194, 191, 199),
-                          child: Text(notificationCasesDto[index]
-                              .childNameAbbr
-                              .toString()),
-                        ),
-                        title: Text(
-                            notificationCasesDto[index].childName.toString()),
-                        subtitle: Text(
-                            notificationCasesDto[index]
-                                .notificationDateSet
-                                .toString(),
-                            style: const TextStyle(color: Colors.grey)),
-                        trailing: Text(
-                            notificationCasesDto[index].hoursLeft.toString(),
-                            style: const TextStyle(color: Colors.green)),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const CaseDetailsAssignPage(),
-                              settings: RouteSettings(
-                                arguments: notificationCasesDto[index],
-                              ),
+              Expanded(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: notificationCasesDto.length,
+                  itemBuilder: (context, int index) {
+                    if (notificationCasesDto.isEmpty) {
+                      return const Center(child: Text('No Cases Found.'));
+                    }
+                    return notificationCasesDto[index]
+                            .childName!
+                            .toLowerCase()
+                            .contains(searchString)
+                        ? ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 194, 191, 199),
+                              child: Text(notificationCasesDto[index]
+                                  .childNameAbbr
+                                  .toString()),
                             ),
-                          );
-                        })
-                    : Container();
-              },
-              separatorBuilder: (context, index) {
-                return notificationCasesDto[index]
-                        .childName!
-                        .toLowerCase()
-                        .contains(searchString)
-                    ? const Divider(thickness: 1)
-                    : Container();
-              },
-            ),
+                            title: Text(notificationCasesDto[index]
+                                .childName
+                                .toString()),
+                            subtitle: Text(
+                                notificationCasesDto[index]
+                                    .notificationDateSet
+                                    .toString(),
+                                style: const TextStyle(color: Colors.grey)),
+                            trailing: Text(
+                                notificationCasesDto[index]
+                                    .hoursLeft
+                                    .toString(),
+                                style: const TextStyle(color: Colors.green)),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CaseDetailsAssignPage(),
+                                  settings: RouteSettings(
+                                    arguments: notificationCasesDto[index],
+                                  ),
+                                ),
+                              );
+                            })
+                        : Container();
+                  },
+                  separatorBuilder: (context, index) {
+                    return notificationCasesDto[index]
+                            .childName!
+                            .toLowerCase()
+                            .contains(searchString)
+                        ? const Divider(thickness: 1)
+                        : Container();
+                  },
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 }

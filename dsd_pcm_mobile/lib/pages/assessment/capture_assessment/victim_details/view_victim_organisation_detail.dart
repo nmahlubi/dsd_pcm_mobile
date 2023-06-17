@@ -4,12 +4,9 @@ import 'package:expandable/expandable.dart';
 import '../../../../model/pcm/victim_organisation_detail_dto.dart';
 
 class ViewVictimOrganisationDetailPage extends StatelessWidget {
-  final VictimOrganisationDetailDto? victimOrganisationDetailDto;
   final List<VictimOrganisationDetailDto>? victimOrganisationDetailsDto;
   const ViewVictimOrganisationDetailPage(
-      {super.key,
-      this.victimOrganisationDetailsDto,
-      this.victimOrganisationDetailDto});
+      {super.key, this.victimOrganisationDetailsDto});
 
   @override
   Widget build(BuildContext context) {

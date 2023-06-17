@@ -213,83 +213,89 @@ class _CaseDetailsAssignPageState extends State<CaseDetailsAssignPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(childInformationDto.childName.toString()),
-      ),
-      body: ListView(
-        children: [
-          ChildDetailsPanel(
-              childInformationDto: childInformationDto,
-              genderDto: genderDto,
-              countryDto: countryDto,
-              raceDto: raceDto,
-              languageDto: languageDto),
-          SapsDetailsPanel(
-              caseInformationDto: caseInformationDto,
-              policeStationDto: policeStationDto),
-          SapsOfficialDetailsPanel(sapsInfoDto: sapsInfoDto),
-          OffenceDetailsPanel(offenseTypeDto: offenseTypeDto),
-          Container(
-            padding: const EdgeInsets.all(10),
-            child: DropdownFormField<Map<String, dynamic>>(
-              controller: probationOfficerController,
-              onEmptyActionPressed: () async {},
-              decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  suffixIcon: Icon(Icons.arrow_drop_down),
-                  labelText: "Probation Officer"),
-              onSaved: (dynamic str) {},
-              onChanged: (dynamic str) {},
-              //validator: (dynamic str) {},
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Select probation officer';
-                }
-                return null;
-              },
-              displayItemFn: (dynamic item) => Text(
-                (item ?? {})['fullNames'] ?? '',
-                style: const TextStyle(fontSize: 16),
-              ),
-              findFn: (dynamic str) async => probationOfficerItemsDto,
-              selectedFn: (dynamic item1, dynamic item2) {
-                if (item1 != null && item2 != null) {
-                  return item1['username'] == item2['username'];
-                }
-                return false;
-              },
-              filterFn: (dynamic item, str) =>
-                  item['username'].toLowerCase().indexOf(str.toLowerCase()) >=
-                  0,
-              dropdownItemFn: (dynamic item, int position, bool focused,
-                      bool selected, Function() onTap) =>
-                  ListTile(
-                title: Text(item['fullNames']),
-                subtitle: Text(
-                  item['usernameDesc'] ?? '',
+    return WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(childInformationDto.childName.toString()),
+          ),
+          body: ListView(
+            children: [
+              ChildDetailsPanel(
+                  childInformationDto: childInformationDto,
+                  genderDto: genderDto,
+                  countryDto: countryDto,
+                  raceDto: raceDto,
+                  languageDto: languageDto),
+              SapsDetailsPanel(
+                  caseInformationDto: caseInformationDto,
+                  policeStationDto: policeStationDto),
+              SapsOfficialDetailsPanel(sapsInfoDto: sapsInfoDto),
+              OffenceDetailsPanel(offenseTypeDto: offenseTypeDto),
+              Container(
+                padding: const EdgeInsets.all(10),
+                child: DropdownFormField<Map<String, dynamic>>(
+                  controller: probationOfficerController,
+                  onEmptyActionPressed: () async {},
+                  decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      suffixIcon: Icon(Icons.arrow_drop_down),
+                      labelText: "Probation Officer"),
+                  onSaved: (dynamic str) {},
+                  onChanged: (dynamic str) {},
+                  //validator: (dynamic str) {},
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Select probation officer';
+                    }
+                    return null;
+                  },
+                  displayItemFn: (dynamic item) => Text(
+                    (item ?? {})['fullNames'] ?? '',
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  findFn: (dynamic str) async => probationOfficerItemsDto,
+                  selectedFn: (dynamic item1, dynamic item2) {
+                    if (item1 != null && item2 != null) {
+                      return item1['username'] == item2['username'];
+                    }
+                    return false;
+                  },
+                  filterFn: (dynamic item, str) =>
+                      item['username']
+                          .toLowerCase()
+                          .indexOf(str.toLowerCase()) >=
+                      0,
+                  dropdownItemFn: (dynamic item, int position, bool focused,
+                          bool selected, Function() onTap) =>
+                      ListTile(
+                    title: Text(item['fullNames']),
+                    subtitle: Text(
+                      item['usernameDesc'] ?? '',
+                    ),
+                    tileColor: focused
+                        ? const Color.fromARGB(20, 0, 0, 0)
+                        : Colors.transparent,
+                    onTap: onTap,
+                  ),
                 ),
-                tileColor: focused
-                    ? const Color.fromARGB(20, 0, 0, 0)
-                    : Colors.transparent,
-                onTap: onTap,
               ),
-            ),
+              Container(
+                  height: 70,
+                  padding: const EdgeInsets.fromLTRB(10, 20, 10, 2),
+                  child: ElevatedButton(
+                    child: const Text('Assign Case To Probation Officer'),
+                    onPressed: () {
+                      assignCaseToProbationOfficer();
+                    },
+                  )),
+              Container(
+                padding: const EdgeInsets.all(10),
+              ),
+            ],
           ),
-          Container(
-              height: 70,
-              padding: const EdgeInsets.fromLTRB(10, 20, 10, 2),
-              child: ElevatedButton(
-                child: const Text('Assign Case To Probation Officer'),
-                onPressed: () {
-                  assignCaseToProbationOfficer();
-                },
-              )),
-          Container(
-            padding: const EdgeInsets.all(10),
-          ),
-        ],
-      ),
-    );
+        ));
   }
 }

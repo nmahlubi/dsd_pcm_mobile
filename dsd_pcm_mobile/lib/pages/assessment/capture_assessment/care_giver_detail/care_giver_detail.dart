@@ -6,15 +6,21 @@ import '../../../../model/intake/gender_dto.dart';
 import '../../../../model/intake/person_dto.dart';
 import '../../../../model/intake/relationship_type_dto.dart';
 import '../../../../model/pcm/accepted_worklist_dto.dart';
+import '../../../../navigation_drawer/go_to_assessment_drawer.dart';
 import '../../../../service/intake/care_giver_detail_service.dart';
-import '../../../../service/intake/look_up_service.dart';
 import '../../../../service/intake/person_service.dart';
+import '../../../../transform_dynamic/transform_lookup.dart';
 import '../../../../util/shared/apierror.dart';
 import '../../../../util/shared/apiresponse.dart';
 import '../../../../util/shared/apiresults.dart';
 import '../../../../util/shared/loading_overlay.dart';
+import '../../../../util/shared/randon_generator.dart';
+import '../../../../widgets/alert_dialog_messege_widget.dart';
+import '../../../probation_officer/accepted_worklist.dart';
+import '../family/family.dart';
+import '../health_detail/health_detail.dart';
 import 'capture_care_giver_detail.dart';
-import 'view_offence_detail.dart';
+import 'view_care_giver_detail.dart';
 
 class CareGiverDetailPage extends StatefulWidget {
   const CareGiverDetailPage({Key? key}) : super(key: key);
@@ -25,23 +31,23 @@ class CareGiverDetailPage extends StatefulWidget {
 
 class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
   SharedPreferences? preferences;
+  final scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future<void> initializePreference() async {
     preferences = await SharedPreferences.getInstance();
   }
 
   late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
-  final LookUpService lookUpServiceClient = LookUpService();
+  final _lookupTransform = LookupTransform();
+  final _randomGenerator = RandomGenerator();
   final PersonService personServiceClient = PersonService();
   final CareGiverDetailService careGiverDetailServiceClient =
       CareGiverDetailService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
   late List<GenderDto> gendersDto = [];
-  final List<Map<String, dynamic>> genderItemsDto = [];
   late List<CareGiverDetailsDto> careGiverDetailsDto = [];
   late List<RelationshipTypeDto> relationshipTypesDto = [];
-  final List<Map<String, dynamic>> relationshipTypeItemsDto = [];
 
   @override
   void initState() {
@@ -51,49 +57,19 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
         setState(() {
           acceptedWorklistDto =
               ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
-          loadGenders();
-          loadRelationshipTypes();
+          loadLookUpTransformer();
           loadCareGiverDetailsByClientId(acceptedWorklistDto.clientId);
         });
       });
     });
   }
 
-  loadGenders() async {
+  loadLookUpTransformer() async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await lookUpServiceClient.getGenders();
-    if ((apiResponse.ApiError) == null) {
-      setState(() {
-        gendersDto = (apiResponse.Data as List<GenderDto>);
-        for (var gender in gendersDto) {
-          Map<String, dynamic> genderItem = {
-            "genderId": gender.genderId,
-            "description": '${gender.description}'
-          };
-          genderItemsDto.add(genderItem);
-        }
-      });
-    }
-    overlay.hide();
-  }
-
-  loadRelationshipTypes() async {
-    final overlay = LoadingOverlay.of(context);
-    overlay.show();
-    apiResponse = await lookUpServiceClient.getRelationshipTypes();
-    if ((apiResponse.ApiError) == null) {
-      setState(() {
-        relationshipTypesDto = (apiResponse.Data as List<RelationshipTypeDto>);
-        for (var relation in relationshipTypesDto) {
-          Map<String, dynamic> relationshipType = {
-            "relationshipTypeId": relation.relationshipTypeId,
-            "description": '${relation.description}'
-          };
-          relationshipTypeItemsDto.add(relationshipType);
-        }
-      });
-    }
+    gendersDto = await _lookupTransform.transformGendersDto();
+    relationshipTypesDto =
+        await _lookupTransform.transformRelationshipTypeDto();
     overlay.hide();
   }
 
@@ -113,63 +89,60 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
     }
   }
 
-  captureCareGiverDetail(
-      RelationshipTypeDto relationshipTypeValue,
-      GenderDto genderValue,
-      String? firstName,
-      String? lastName,
-      String? identityNumber) async {
+  captureCareGiverDetail(String? name, String? surname, String? dateOfBirth,
+      int? age, int? genderId, int? relationshipTypeId) async {
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
-    overlay.show();
-    apiResponse = await addPerson(
-        firstName, lastName, identityNumber, genderValue.genderId);
-
-    if ((apiResponse.ApiError) == null) {
-      apiResults = (apiResponse.Data as ApiResults);
-      PersonDto relativeMember = PersonDto.fromJson(apiResults.data);
-      CareGiverDetailsDto requestAddCareGiverDetails = CareGiverDetailsDto(
-          clientCaregiverId: 0,
-          personId: relativeMember.personId,
-          clientId: acceptedWorklistDto.clientId,
-          relationshipTypeId: relationshipTypeValue.relationshipTypeId,
-          createdBy: preferences!.getString('username')!);
-
-      apiResponse = await careGiverDetailServiceClient
-          .addCareGiverDetail(requestAddCareGiverDetails);
-      if ((apiResponse.ApiError) == null) {
-        apiResults = (apiResponse.Data as ApiResults);
-        overlay.hide();
-        await showAlertDialogMessage(
-            "Successfull", (apiResponse.Data as ApiResults).message!);
-
-        navigator.push(
-          MaterialPageRoute(
-              builder: (context) => const CareGiverDetailPage(),
-              settings: RouteSettings(
-                arguments: acceptedWorklistDto,
-              )),
-        );
-      } else {
-        showDialogMessage((apiResponse.ApiError as ApiError));
-        overlay.hide();
-      }
-    }
-  }
-
-  Future<ApiResponse> addPerson(String? name, String? surname,
-      String? identityNumber, int? gender) async {
-    PersonDto personDto = PersonDto(
-        personId: 0,
-        isEstimatedAge: true,
-        isPivaValidated: true,
-        firstName: name,
-        lastName: surname,
-        identificationNumber: identityNumber,
-        genderId: gender,
+    int? localPersonId = _randomGenerator.getRandomGeneratedNumber();
+    CareGiverDetailsDto requestCareGiverDetailsDto = CareGiverDetailsDto(
+        clientCaregiverId: _randomGenerator.getRandomGeneratedNumber(),
+        clientId: acceptedWorklistDto.clientId,
+        personId: localPersonId,
+        dateCreated: _randomGenerator.getCurrentDateGenerated(),
+        personDto: PersonDto(
+          firstName: name,
+          lastName: surname,
+          dateOfBirth: dateOfBirth,
+          age: age,
+          personId: localPersonId,
+          genderId: genderId,
+          isEstimatedAge: true,
+          dateCreated: _randomGenerator.getCurrentDateGenerated(),
+          isActive: true,
+          isDeleted: false,
+          isPivaValidated: true,
+          createdBy: preferences!.getString('username'),
+          genderDto: genderId != null
+              ? gendersDto.where((i) => i.genderId == genderId).single
+              : null,
+        ),
+        relationshipTypeId: relationshipTypeId,
+        relationshipTypeDto: relationshipTypeId != null
+            ? relationshipTypesDto
+                .where((i) => i.relationshipTypeId == relationshipTypeId)
+                .single
+            : null,
         createdBy: preferences!.getString('username')!);
-    apiResponse = await personServiceClient.addPerson(personDto);
-    return apiResponse;
+    overlay.show();
+    apiResponse = await careGiverDetailServiceClient
+        .addCareGiverDetail(requestCareGiverDetailsDto);
+    if ((apiResponse.ApiError) == null) {
+      overlay.hide();
+      if (!mounted) return;
+      alertDialogMessageWidget(
+          context, 'Successfull', 'Care giver successfully created');
+
+      navigator.push(
+        MaterialPageRoute(
+            builder: (context) => const CareGiverDetailPage(),
+            settings: RouteSettings(
+              arguments: acceptedWorklistDto,
+            )),
+      );
+    } else {
+      showDialogMessage((apiResponse.ApiError as ApiError));
+      overlay.hide();
+    }
   }
 
   showDialogMessage(ApiError apiError) {
@@ -179,43 +152,92 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
     );
   }
 
-  showAlertDialogMessage(String? headerMessage, String? message) async {
-    await showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(headerMessage!),
-        content: Text(message!),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-            },
-            child: Container(
-              //color: Colors.green,
-              padding: const EdgeInsets.all(14),
-              child: const Text("okay"),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Care Giver Details'),
-      ),
-      body: ListView(
-        children: [
-          CaptureCareGiverDetailPage(
-              genderItemsDto: genderItemsDto,
-              relationshipTypeItemsDto: relationshipTypeItemsDto,
-              addNewCareGiverDetail: captureCareGiverDetail),
-          ViewCareGiverDetailPage(careGiverDetailsDto: careGiverDetailsDto)
-        ],
-      ),
-    );
+    return WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: Scaffold(
+          key: scaffoldKey,
+          appBar: AppBar(
+            title: const Text("Care Giver Details"),
+            leading: IconButton(
+              icon: const Icon(Icons.offline_pin_rounded),
+              onPressed: () {
+                if (scaffoldKey.currentState!.isDrawerOpen) {
+                  scaffoldKey.currentState!.closeDrawer();
+                  //close drawer, if drawer is open
+                } else {
+                  scaffoldKey.currentState!.openDrawer();
+                  //open drawer, if drawer is closed
+                }
+              },
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.home),
+                tooltip: 'Accepted Worklist',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AcceptedWorklistPage()),
+                  );
+                },
+              ),
+            ],
+          ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
+          floatingActionButton: Container(
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                FloatingActionButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HealthDetailPage(),
+                          settings: RouteSettings(
+                            arguments: acceptedWorklistDto,
+                          ),
+                        ),
+                      );
+                    },
+                    heroTag: null,
+                    child: const Icon(Icons.arrow_back)),
+                FloatingActionButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const FamilyPage(),
+                          settings: RouteSettings(
+                            arguments: acceptedWorklistDto,
+                          ),
+                        ),
+                      );
+                    },
+                    heroTag: null,
+                    child: const Icon(Icons.arrow_forward)),
+              ],
+            ),
+          ),
+          drawer: GoToAssessmentDrawer(
+              acceptedWorklistDto: acceptedWorklistDto, isCompleted: true),
+          body: ListView(
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 70),
+            children: [
+              CaptureCareGiverDetailPage(
+                  gendersDto: gendersDto,
+                  relationshipTypesDto: relationshipTypesDto,
+                  addNewCareGiverDetail: captureCareGiverDetail),
+              ViewCareGiverDetailPage(careGiverDetailsDto: careGiverDetailsDto)
+            ],
+          ),
+        ));
   }
 }

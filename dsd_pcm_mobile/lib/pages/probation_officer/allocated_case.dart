@@ -70,94 +70,78 @@ class _AllocatedCasesPageState extends State<AllocatedCasesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Incoming Cases'),
-      ),
-      drawer: const NavigationDrawer(),
-      body: Column(
-        children: <Widget>[
-          /*Row(
-            children: [
+    return WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Incoming Cases'),
+          ),
+          drawer: const NavigationDrawer(),
+          body: Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      searchString = value.toLowerCase();
+                    });
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'Search',
+                    suffixIcon: Icon(Icons.search),
+                  ),
+                ),
+              ),
               Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  child: Text('Assigned : $assignedCases',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: Colors.red)),
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: allocatedCasesProbationOfficer.length,
+                  itemBuilder: (context, int index) {
+                    if (allocatedCasesProbationOfficer.isEmpty) {
+                      return const Center(child: Text('No Cases Found.'));
+                    }
+                    return allocatedCasesProbationOfficer[index]
+                            .fullName!
+                            .toLowerCase()
+                            .contains(searchString)
+                        ? ListTile(
+                            title: Text(allocatedCasesProbationOfficer[index]
+                                .fullName
+                                .toString()),
+                            subtitle: Text(
+                                '${allocatedCasesProbationOfficer[index].arrestDetails} ${allocatedCasesProbationOfficer[index].allocatedInfo}',
+                                style: const TextStyle(color: Colors.grey)),
+                            trailing: const Icon(Icons.arrow_right,
+                                color: Colors.green),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const AcceptCasePage(),
+                                  settings: RouteSettings(
+                                    arguments:
+                                        allocatedCasesProbationOfficer[index],
+                                  ),
+                                ),
+                              );
+                            })
+                        : Container();
+                  },
+                  separatorBuilder: (context, index) {
+                    return allocatedCasesProbationOfficer[index]
+                            .fullName!
+                            .toLowerCase()
+                            .contains(searchString)
+                        ? const Divider(thickness: 1)
+                        : Container();
+                  },
                 ),
               ),
             ],
-          ),*/
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            child: TextField(
-              onChanged: (value) {
-                setState(() {
-                  searchString = value.toLowerCase();
-                });
-              },
-              decoration: const InputDecoration(
-                labelText: 'Search',
-                suffixIcon: Icon(Icons.search),
-              ),
-            ),
           ),
-          Expanded(
-            child: ListView.separated(
-              shrinkWrap: true,
-              itemCount: allocatedCasesProbationOfficer.length,
-              itemBuilder: (context, int index) {
-                if (allocatedCasesProbationOfficer.isEmpty) {
-                  return const Center(child: Text('No Cases Found.'));
-                }
-                return allocatedCasesProbationOfficer[index]
-                        .fullName!
-                        .toLowerCase()
-                        .contains(searchString)
-                    ? ListTile(
-                        /*leading: CircleAvatar(
-                          backgroundColor:
-                              const Color.fromARGB(255, 194, 191, 199),
-                          child: Text(allocatedCasesProbationOfficer[index]
-                              .childNameAbbr
-                              .toString()),
-                        ),
-                        */
-                        title: Text(allocatedCasesProbationOfficer[index]
-                            .fullName
-                            .toString()),
-                        subtitle: Text(
-                            '${allocatedCasesProbationOfficer[index].arrestDetails} ${allocatedCasesProbationOfficer[index].allocatedInfo}',
-                            style: const TextStyle(color: Colors.grey)),
-                        trailing:
-                            const Icon(Icons.arrow_right, color: Colors.green),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AcceptCasePage(),
-                              settings: RouteSettings(
-                                arguments:
-                                    allocatedCasesProbationOfficer[index],
-                              ),
-                            ),
-                          );
-                        })
-                    : Container();
-              },
-              separatorBuilder: (context, index) {
-                return allocatedCasesProbationOfficer[index]
-                        .fullName!
-                        .toLowerCase()
-                        .contains(searchString)
-                    ? const Divider(thickness: 1)
-                    : Container();
-              },
-            ),
-          ),
-        ],
-      ),
-    );
+        ));
   }
 }

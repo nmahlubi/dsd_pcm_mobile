@@ -4,13 +4,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../model/intake/health_status_dto.dart';
 import '../../../../model/pcm/accepted_worklist_dto.dart';
 import '../../../../model/pcm/medical_health_detail_dto.dart';
-import '../../../../service/intake/look_up_service.dart';
+import '../../../../navigation_drawer/go_to_assessment_drawer.dart';
 import '../../../../service/pcm/medical_health_details_service.dart';
+import '../../../../transform_dynamic/transform_lookup.dart';
 import '../../../../util/shared/apierror.dart';
 import '../../../../util/shared/apiresponse.dart';
 import '../../../../util/shared/apiresults.dart';
 import '../../../../util/shared/loading_overlay.dart';
+import '../../../../util/shared/randon_generator.dart';
 import '../../../../widgets/alert_dialog_messege_widget.dart';
+import '../../../probation_officer/accepted_worklist.dart';
+import '../care_giver_detail/care_giver_detail.dart';
+import '../child_detail/update_child_detail.dart';
 import 'capture_medical_health.dart';
 import 'view_medical_health.dart';
 
@@ -23,19 +28,20 @@ class HealthDetailPage extends StatefulWidget {
 
 class _HealthDetailPageState extends State<HealthDetailPage> {
   SharedPreferences? preferences;
+  final scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future<void> initializePreference() async {
     preferences = await SharedPreferences.getInstance();
   }
 
   late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
-  final LookUpService lookUpServiceClient = LookUpService();
+  final _lookupTransform = LookupTransform();
+  final _randomGenerator = RandomGenerator();
   final MedicalHealthDetailsService medicalHealthDetailsServiceClient =
       MedicalHealthDetailsService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
   late List<HealthStatusDto> healthStatusesDto = [];
-  final List<Map<String, dynamic>> healthStatusItemsDto = [];
   late List<MedicalHealthDetailDto> medicalHealthDetailsDto = [];
 
   @override
@@ -46,7 +52,7 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
         setState(() {
           acceptedWorklistDto =
               ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
-          loadHealthStatuses();
+          loadLookUpTransformer();
           loadMedicalHealthDetailsByIntakeAssessmentId(
               acceptedWorklistDto.intakeAssessmentId);
         });
@@ -54,22 +60,10 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
     });
   }
 
-  loadHealthStatuses() async {
+  loadLookUpTransformer() async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await lookUpServiceClient.getHealthStatuses();
-    if ((apiResponse.ApiError) == null) {
-      setState(() {
-        healthStatusesDto = (apiResponse.Data as List<HealthStatusDto>);
-        for (var health in healthStatusesDto) {
-          Map<String, dynamic> healthItem = {
-            "healthStatusId": health.healthStatusId,
-            "description": '${health.description}'
-          };
-          healthStatusItemsDto.add(healthItem);
-        }
-      });
-    }
+    healthStatusesDto = await _lookupTransform.transformHealthStatusesDto();
     overlay.hide();
   }
 
@@ -91,17 +85,23 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
   }
 
   captureMedicalHealth(String? injuries, String? medication, String? allergies,
-      String? medicalAppointment, HealthStatusDto healthStatus) async {
+      String? medicalAppointment, int? healthStatusId) async {
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
     overlay.show();
     MedicalHealthDetailDto requestAddmedicalHealthDetailDto =
         MedicalHealthDetailDto(
-            healthDetailsId: 0,
-            healthStatusId: healthStatus.healthStatusId,
+            healthDetailsId: _randomGenerator.getRandomGeneratedNumber(),
+            healthStatusId: healthStatusId,
+            healthStatusDto: healthStatusId != null
+                ? healthStatusesDto
+                    .where((h) => h.healthStatusId == healthStatusId)
+                    .single
+                : null,
             injuries: injuries,
             medication: medication,
             allergies: allergies,
+            dateCreated: _randomGenerator.getCurrentDateGenerated(),
             medicalAppointments: medicalAppointment,
             intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
             createdBy: preferences!.getInt('userId'));
@@ -111,9 +111,10 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
 
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
-      apiResults = (apiResponse.Data as ApiResults);
+      //apiResults = (apiResponse.Data as ApiResults);
       if (!mounted) return;
-      alertDialogMessageWidget(context, "Successfull", apiResults.message!);
+      alertDialogMessageWidget(
+          context, 'Successfull', 'Medical Health is successfully created.');
       navigator.push(
         MaterialPageRoute(
             builder: (context) => const HealthDetailPage(),
@@ -159,18 +160,90 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Medical Information'),
-      ),
-      body: ListView(
-        children: [
-          CaptureMedicalHealthPage(
-              healthStatusItemsDto: healthStatusItemsDto,
-              addNewMedicalHealth: captureMedicalHealth),
-          ViewMedicalHealth(medicalHealthDetailsDto: medicalHealthDetailsDto)
-        ],
-      ),
-    );
+    return WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: Scaffold(
+          key: scaffoldKey,
+          appBar: AppBar(
+            title: const Text("Medical Information"),
+            leading: IconButton(
+              icon: const Icon(Icons.offline_pin_rounded),
+              onPressed: () {
+                if (scaffoldKey.currentState!.isDrawerOpen) {
+                  scaffoldKey.currentState!.closeDrawer();
+                  //close drawer, if drawer is open
+                } else {
+                  scaffoldKey.currentState!.openDrawer();
+                  //open drawer, if drawer is closed
+                }
+              },
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.home),
+                tooltip: 'Accepted Worklist',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AcceptedWorklistPage()),
+                  );
+                },
+              ),
+            ],
+          ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
+          floatingActionButton: Container(
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                FloatingActionButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const UpdateChildDetailPage(),
+                          settings: RouteSettings(
+                            arguments: acceptedWorklistDto,
+                          ),
+                        ),
+                      );
+                    },
+                    heroTag: null,
+                    child: const Icon(Icons.arrow_back)),
+                FloatingActionButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CareGiverDetailPage(),
+                          settings: RouteSettings(
+                            arguments: acceptedWorklistDto,
+                          ),
+                        ),
+                      );
+                    },
+                    heroTag: null,
+                    child: const Icon(Icons.arrow_forward)),
+              ],
+            ),
+          ),
+          drawer: GoToAssessmentDrawer(
+              acceptedWorklistDto: acceptedWorklistDto, isCompleted: true),
+          body: ListView(
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 70),
+            children: [
+              CaptureMedicalHealthPage(
+                  healthStatusesDto: healthStatusesDto,
+                  addNewMedicalHealth: captureMedicalHealth),
+              ViewMedicalHealth(
+                  medicalHealthDetailsDto: medicalHealthDetailsDto)
+            ],
+          ),
+        ));
   }
 }

@@ -69,74 +69,79 @@ class _ReAssignedCasesPageState extends State<ReAssignedCasesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('ReAllocate Case'),
-      ),
-      drawer: const NavigationDrawer(),
-      body: Column(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            child: TextField(
-              onChanged: (value) {
-                setState(() {
-                  searchString = value.toLowerCase();
-                });
-              },
-              decoration: const InputDecoration(
-                labelText: 'Search',
-                suffixIcon: Icon(Icons.search),
+    return WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('ReAllocate Case'),
+          ),
+          drawer: const NavigationDrawer(),
+          body: Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      searchString = value.toLowerCase();
+                    });
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'Search',
+                    suffixIcon: Icon(Icons.search),
+                  ),
+                ),
               ),
-            ),
+              Expanded(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: allocatedCaseSupervisorDto.length,
+                  itemBuilder: (context, int index) {
+                    if (allocatedCaseSupervisorDto.isEmpty) {
+                      return const Center(child: Text('No Cases Found.'));
+                    }
+                    return allocatedCaseSupervisorDto[index]
+                            .childName!
+                            .toLowerCase()
+                            .contains(searchString)
+                        ? ListTile(
+                            title: Text(allocatedCaseSupervisorDto[index]
+                                .childName
+                                .toString()),
+                            subtitle: Text(
+                                '${allocatedCaseSupervisorDto[index].arrestDetails} .${allocatedCaseSupervisorDto[index].probationOfficer}',
+                                style: const TextStyle(color: Colors.grey)),
+                            trailing: const Icon(Icons.play_circle_fill_rounded,
+                                color: Colors.green),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CompleteReAssignedCasesPage(),
+                                  settings: RouteSettings(
+                                    arguments:
+                                        allocatedCaseSupervisorDto[index],
+                                  ),
+                                ),
+                              );
+                            })
+                        : Container();
+                  },
+                  separatorBuilder: (context, index) {
+                    return allocatedCaseSupervisorDto[index]
+                            .childName!
+                            .toLowerCase()
+                            .contains(searchString)
+                        ? const Divider(thickness: 1)
+                        : Container();
+                  },
+                ),
+              ),
+            ],
           ),
-          Expanded(
-            child: ListView.separated(
-              shrinkWrap: true,
-              itemCount: allocatedCaseSupervisorDto.length,
-              itemBuilder: (context, int index) {
-                if (allocatedCaseSupervisorDto.isEmpty) {
-                  return const Center(child: Text('No Cases Found.'));
-                }
-                return allocatedCaseSupervisorDto[index]
-                        .childName!
-                        .toLowerCase()
-                        .contains(searchString)
-                    ? ListTile(
-                        title: Text(allocatedCaseSupervisorDto[index]
-                            .childName
-                            .toString()),
-                        subtitle: Text(
-                            '${allocatedCaseSupervisorDto[index].arrestDetails} .${allocatedCaseSupervisorDto[index].probationOfficer}',
-                            style: const TextStyle(color: Colors.grey)),
-                        trailing: const Icon(Icons.play_circle_fill_rounded,
-                            color: Colors.green),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const CompleteReAssignedCasesPage(),
-                              settings: RouteSettings(
-                                arguments: allocatedCaseSupervisorDto[index],
-                              ),
-                            ),
-                          );
-                        })
-                    : Container();
-              },
-              separatorBuilder: (context, index) {
-                return allocatedCaseSupervisorDto[index]
-                        .childName!
-                        .toLowerCase()
-                        .contains(searchString)
-                    ? const Divider(thickness: 1)
-                    : Container();
-              },
-            ),
-          ),
-        ],
-      ),
-    );
+        ));
   }
 }

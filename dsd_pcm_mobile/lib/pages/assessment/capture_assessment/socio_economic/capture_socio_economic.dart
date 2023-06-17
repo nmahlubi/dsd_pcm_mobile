@@ -211,6 +211,10 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               ),
                             ),
                           ),
+                        ],
+                      ),
+                      Row(
+                        children: [
                           Expanded(
                             child: Container(
                               padding: const EdgeInsets.all(10),
@@ -337,16 +341,44 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                             padding: const EdgeInsets.fromLTRB(10, 20, 10, 2),
                           )),
                           Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                            ),
-                          ),
-                          Expanded(
                               child: Container(
                                   height: 70,
                                   padding:
                                       const EdgeInsets.fromLTRB(10, 20, 10, 2),
-                                  child: ElevatedButton(
+                                  child: OutlinedButton(
+                                    style: OutlinedButton.styleFrom(
+                                      backgroundColor:
+                                          const Color.fromARGB(255, 23, 22, 22),
+                                      shape: const StadiumBorder(),
+                                      side: const BorderSide(
+                                          width: 2, color: Colors.blue),
+                                    ),
+                                    onPressed: () {
+                                      addNewSocioEconomic(
+                                          familyBackgroundCommentController.text
+                                              .toString(),
+                                          financeWorkRecordController.text
+                                              .toString(),
+                                          housingController.text.toString(),
+                                          socialCircumsancesController.text
+                                              .toString(),
+                                          previousInterventionController.text
+                                              .toString(),
+                                          interPersonalRelationshipController
+                                              .text
+                                              .toString(),
+                                          peerPresureController.text.toString(),
+                                          substanceAbuseController.text
+                                              .toString(),
+                                          religiousInvolveController.text
+                                              .toString(),
+                                          childBehaviorController.text
+                                              .toString(),
+                                          otherController.text.toString());
+                                    },
+                                    child: const Text('Add Socio'),
+                                  )
+                                  /*child: ElevatedButton(
                                     child: const Text('Add'),
                                     onPressed: () {
                                       if (_captureGeneralDetailFormKey
@@ -377,7 +409,8 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                                             otherController.text.toString());
                                       }
                                     },
-                                  ))),
+                                  )*/
+                                  )),
                         ],
                       ),
                     ],

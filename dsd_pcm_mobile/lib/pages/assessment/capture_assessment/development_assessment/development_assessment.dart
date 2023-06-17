@@ -131,18 +131,22 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Development Assessment'),
-      ),
-      body: ListView(
-        children: [
-          CaptureDevelopmentAssessmentPage(
-              addDevelopmentAssessment: captureDevelopmentAssessment),
-          ViewDevelopmentAssessmentPage(
-              developmentAssessmentsDto: developmentAssessmentsDto)
-        ],
-      ),
-    );
+    return WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Development Assessment'),
+          ),
+          body: ListView(
+            children: [
+              CaptureDevelopmentAssessmentPage(
+                  addDevelopmentAssessment: captureDevelopmentAssessment),
+              ViewDevelopmentAssessmentPage(
+                  developmentAssessmentsDto: developmentAssessmentsDto)
+            ],
+          ),
+        ));
   }
 }

@@ -85,30 +85,34 @@ class _CaptureAssessmentPageState extends State<CaptureAssessmentPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Capture Assessment'),
-      ),
-      drawer: const NavigationDrawer(),
-      body: ListView(
-        children: <Widget>[
-          ListTile(
-            title: const Text('Child Details'),
-            trailing: const Icon(Icons.check, color: Colors.green),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const UpdateChildDetailPage(),
-                  settings: RouteSettings(
-                    arguments: acceptedWorklistDto,
-                  ),
-                ),
-              );
-            },
+    return WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Capture Assessment'),
           ),
-          const Divider(thickness: 1),
-          /*ListTile(
+          drawer: const NavigationDrawer(),
+          body: ListView(
+            children: <Widget>[
+              ListTile(
+                title: const Text('Child Details'),
+                trailing: const Icon(Icons.check, color: Colors.green),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const UpdateChildDetailPage(),
+                      settings: RouteSettings(
+                        arguments: acceptedWorklistDto,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const Divider(thickness: 1),
+              /*ListTile(
             title: const Text('Assessment Details'),
             trailing: assessmentCountQueryDto.socioEconomicDetails == 0 ||
                     assessmentCountQueryDto.socioEconomicDetails == null
@@ -117,27 +121,27 @@ class _CaptureAssessmentPageState extends State<CaptureAssessmentPage> {
             onTap: () {},
           ),
           const Divider(thickness: 1),*/
-          ListTile(
-              title: const Text('Medical Information'),
-              trailing: const Icon(Icons.check, color: Colors.green),
-              /*trailing: assessmentCountQueryDto.socioEconomicDetails == 0 ||
+              ListTile(
+                  title: const Text('Medical Information'),
+                  trailing: const Icon(Icons.check, color: Colors.green),
+                  /*trailing: assessmentCountQueryDto.socioEconomicDetails == 0 ||
                     assessmentCountQueryDto.socioEconomicDetails == null
                 ? const Icon(Icons.close, color: Colors.red)
                 : const Icon(Icons.check, color: Colors.green),
                 */
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const HealthDetailPage(),
-                    settings: RouteSettings(
-                      arguments: acceptedWorklistDto,
-                    ),
-                  ),
-                );
-              }),
-          const Divider(thickness: 1),
-          /*ListTile(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HealthDetailPage(),
+                        settings: RouteSettings(
+                          arguments: acceptedWorklistDto,
+                        ),
+                      ),
+                    );
+                  }),
+              const Divider(thickness: 1),
+              /*ListTile(
             title: const Text('Education Information'),
             trailing: assessmentCountQueryDto.educationInformation == 0 ||
                     assessmentCountQueryDto.educationInformation == null
@@ -146,150 +150,150 @@ class _CaptureAssessmentPageState extends State<CaptureAssessmentPage> {
             onTap: () {},
           ),
           const Divider(thickness: 1),*/
-          ListTile(
-              title: const Text('Family'),
-              trailing: const Icon(Icons.check, color: Colors.green),
-              /*trailing: assessmentCountQueryDto.socioEconomicDetails == 0 ||
+              ListTile(
+                  title: const Text('Family'),
+                  trailing: const Icon(Icons.check, color: Colors.green),
+                  /*trailing: assessmentCountQueryDto.socioEconomicDetails == 0 ||
                     assessmentCountQueryDto.socioEconomicDetails == null
                 ? const Icon(Icons.close, color: Colors.red)
                 : const Icon(Icons.check, color: Colors.green),
                 */
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const FamilyPage(),
-                    settings: RouteSettings(
-                      arguments: acceptedWorklistDto,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const FamilyPage(),
+                        settings: RouteSettings(
+                          arguments: acceptedWorklistDto,
+                        ),
+                      ),
+                    );
+                  }),
+              const Divider(thickness: 1),
+              ListTile(
+                title: const Text('Care Given Details'),
+                trailing: const Icon(Icons.check, color: Colors.green),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CareGiverDetailPage(),
+                      settings: RouteSettings(
+                        arguments: acceptedWorklistDto,
+                      ),
                     ),
-                  ),
-                );
-              }),
-          const Divider(thickness: 1),
-          ListTile(
-            title: const Text('Care Given Details'),
-            trailing: const Icon(Icons.check, color: Colors.green),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const CareGiverDetailPage(),
-                  settings: RouteSettings(
-                    arguments: acceptedWorklistDto,
-                  ),
-                ),
-              );
-            },
-          ),
-          const Divider(thickness: 1),
-          ListTile(
-            title: const Text('Socio-Economic Details'),
-            trailing: const Icon(Icons.check, color: Colors.green),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SocioEconomicPage(),
-                  settings: RouteSettings(
-                    arguments: acceptedWorklistDto,
-                  ),
-                ),
-              );
-            },
-          ),
-          const Divider(thickness: 1),
-          ListTile(
-              title: const Text('Offence Details'),
-              trailing: const Icon(Icons.check, color: Colors.green),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const OffenceDetailPage(),
-                    settings: RouteSettings(
-                      arguments: acceptedWorklistDto,
-                    ),
-                  ),
-                );
-              }),
-          const Divider(thickness: 1),
-          ListTile(
-              title: const Text('Victim Details'),
-              trailing: const Icon(Icons.check, color: Colors.green),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const VictimDetailPage(),
-                    settings: RouteSettings(
-                      arguments: acceptedWorklistDto,
-                    ),
-                  ),
-                );
-              }),
-          const Divider(thickness: 1),
-          ListTile(
-              title: const Text('Development Assessment'),
-              trailing: const Icon(Icons.check, color: Colors.green),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const DevelopmentAssessmentPage(),
-                    settings: RouteSettings(
-                      arguments: acceptedWorklistDto,
-                    ),
-                  ),
-                );
-              }),
-          const Divider(thickness: 1),
-          ListTile(
-              title: const Text('Recommandation'),
-              trailing: const Icon(Icons.check, color: Colors.green),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const RecommandationPage(),
-                    settings: RouteSettings(
-                      arguments: acceptedWorklistDto,
-                    ),
-                  ),
-                );
-              }),
-          const Divider(thickness: 1),
-          ListTile(
-              title: const Text('General Details'),
-              trailing: const Icon(Icons.check, color: Colors.green),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const GeneralDetailPage(),
-                    settings: RouteSettings(
-                      arguments: acceptedWorklistDto,
-                    ),
-                  ),
-                );
-              }),
-          const Divider(thickness: 1),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        label: const Text("Complete"),
-        icon: const Icon(Icons.arrow_forward),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const CompleteAssessmentPage(),
-              settings: RouteSettings(
-                arguments: acceptedWorklistDto,
+                  );
+                },
               ),
-            ),
-          );
-        },
-      ),
-    );
+              const Divider(thickness: 1),
+              ListTile(
+                title: const Text('Socio-Economic Details'),
+                trailing: const Icon(Icons.check, color: Colors.green),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SocioEconomicPage(),
+                      settings: RouteSettings(
+                        arguments: acceptedWorklistDto,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const Divider(thickness: 1),
+              ListTile(
+                  title: const Text('Offence Details'),
+                  trailing: const Icon(Icons.check, color: Colors.green),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const OffenceDetailPage(),
+                        settings: RouteSettings(
+                          arguments: acceptedWorklistDto,
+                        ),
+                      ),
+                    );
+                  }),
+              const Divider(thickness: 1),
+              ListTile(
+                  title: const Text('Victim Details'),
+                  trailing: const Icon(Icons.check, color: Colors.green),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const VictimDetailPage(),
+                        settings: RouteSettings(
+                          arguments: acceptedWorklistDto,
+                        ),
+                      ),
+                    );
+                  }),
+              const Divider(thickness: 1),
+              ListTile(
+                  title: const Text('Development Assessment'),
+                  trailing: const Icon(Icons.check, color: Colors.green),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DevelopmentAssessmentPage(),
+                        settings: RouteSettings(
+                          arguments: acceptedWorklistDto,
+                        ),
+                      ),
+                    );
+                  }),
+              const Divider(thickness: 1),
+              ListTile(
+                  title: const Text('Recommandation'),
+                  trailing: const Icon(Icons.check, color: Colors.green),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const RecommandationPage(),
+                        settings: RouteSettings(
+                          arguments: acceptedWorklistDto,
+                        ),
+                      ),
+                    );
+                  }),
+              const Divider(thickness: 1),
+              ListTile(
+                  title: const Text('General Details'),
+                  trailing: const Icon(Icons.check, color: Colors.green),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const GeneralDetailPage(),
+                        settings: RouteSettings(
+                          arguments: acceptedWorklistDto,
+                        ),
+                      ),
+                    );
+                  }),
+              const Divider(thickness: 1),
+            ],
+          ),
+          floatingActionButton: FloatingActionButton.extended(
+            label: const Text("Complete"),
+            icon: const Icon(Icons.arrow_forward),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CompleteAssessmentPage(),
+                  settings: RouteSettings(
+                    arguments: acceptedWorklistDto,
+                  ),
+                ),
+              );
+            },
+          ),
+        ));
   }
 }

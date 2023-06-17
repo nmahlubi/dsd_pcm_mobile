@@ -189,45 +189,39 @@ class _AcceptCasePageState extends State<AcceptCasePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Case For: ${childInformationDto.childName}'),
-      ),
-      body: ListView(
-        children: [
-          ChildDetailsPanel(
-              childInformationDto: childInformationDto,
-              genderDto: genderDto,
-              countryDto: countryDto,
-              raceDto: raceDto,
-              languageDto: languageDto),
-          SapsDetailsPanel(
-              caseInformationDto: caseInformationDto,
-              policeStationDto: policeStationDto),
-          SapsOfficialDetailsPanel(sapsInfoDto: sapsInfoDto),
-          OffenceDetailsPanel(offenseTypeDto: offenseTypeDto),
-          /*Container(
-              height: 70,
-              padding: const EdgeInsets.fromLTRB(10, 20, 10, 2),
-              child: ElevatedButton(
-                child: const Text('Accept Case'),
-                onPressed: () {
-                  acceptCaseToStartAssessment();
-                },
-              )),
-              */
-          Container(
-            padding: const EdgeInsets.all(3),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        label: const Text("Accept"),
-        icon: const Icon(Icons.add),
-        onPressed: () {
-          acceptCaseToStartAssessment();
+    return WillPopScope(
+        onWillPop: () async {
+          return false;
         },
-      ),
-    );
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('Case For: ${childInformationDto.childName}'),
+          ),
+          body: ListView(
+            children: [
+              ChildDetailsPanel(
+                  childInformationDto: childInformationDto,
+                  genderDto: genderDto,
+                  countryDto: countryDto,
+                  raceDto: raceDto,
+                  languageDto: languageDto),
+              SapsDetailsPanel(
+                  caseInformationDto: caseInformationDto,
+                  policeStationDto: policeStationDto),
+              SapsOfficialDetailsPanel(sapsInfoDto: sapsInfoDto),
+              OffenceDetailsPanel(offenseTypeDto: offenseTypeDto),
+              Container(
+                padding: const EdgeInsets.all(3),
+              ),
+            ],
+          ),
+          floatingActionButton: FloatingActionButton.extended(
+            label: const Text("Accept"),
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              acceptCaseToStartAssessment();
+            },
+          ),
+        ));
   }
 }

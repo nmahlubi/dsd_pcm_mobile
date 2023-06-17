@@ -7,14 +7,19 @@ import '../../../../model/intake/relationship_type_dto.dart';
 import '../../../../model/pcm/accepted_worklist_dto.dart';
 import '../../../../model/pcm/family_information_dto.dart';
 import '../../../../model/pcm/family_member_dto.dart';
-import '../../../../service/intake/look_up_service.dart';
+import '../../../../navigation_drawer/go_to_assessment_drawer.dart';
 import '../../../../service/intake/person_service.dart';
 import '../../../../service/pcm/family_service.dart';
+import '../../../../transform_dynamic/transform_lookup.dart';
 import '../../../../util/shared/apierror.dart';
 import '../../../../util/shared/apiresponse.dart';
 import '../../../../util/shared/apiresults.dart';
 import '../../../../util/shared/loading_overlay.dart';
+import '../../../../util/shared/randon_generator.dart';
 import '../../../../widgets/alert_dialog_messege_widget.dart';
+import '../../../probation_officer/accepted_worklist.dart';
+import '../care_giver_detail/care_giver_detail.dart';
+import '../socio_economic/socio_economic.dart';
 import 'capture_family_member.dart';
 import 'capture_family_information.dart';
 import 'view_family_member.dart';
@@ -29,22 +34,22 @@ class FamilyPage extends StatefulWidget {
 
 class _FamilyPageState extends State<FamilyPage> {
   SharedPreferences? preferences;
+  final scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future<void> initializePreference() async {
     preferences = await SharedPreferences.getInstance();
   }
 
   late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
+  final _lookupTransform = LookupTransform();
+  final _randomGenerator = RandomGenerator();
   final FamilyService familyServiceClient = FamilyService();
-  final LookUpService lookUpServiceClient = LookUpService();
   final PersonService personServiceClient = PersonService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
 
   late List<GenderDto> gendersDto = [];
-  final List<Map<String, dynamic>> genderItemsDto = [];
   late List<RelationshipTypeDto> relationshipTypesDto = [];
-  final List<Map<String, dynamic>> relationshipTypeItemsDto = [];
   late List<FamilyMemberDto> familyMembersDto = [];
   late List<FamilyInformationDto> familyInformationsDto = [];
 
@@ -56,8 +61,7 @@ class _FamilyPageState extends State<FamilyPage> {
         setState(() {
           acceptedWorklistDto =
               ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
-          loadGenders();
-          loadRelationshipTypes();
+          loadLookUpTransformer();
           loadFamilyMembersByIntakeAssessmentId(
               acceptedWorklistDto.intakeAssessmentId);
           loadFamilyInformationsByIntakeAssessmentId(
@@ -67,41 +71,12 @@ class _FamilyPageState extends State<FamilyPage> {
     });
   }
 
-  loadGenders() async {
+  loadLookUpTransformer() async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await lookUpServiceClient.getGenders();
-    if ((apiResponse.ApiError) == null) {
-      setState(() {
-        gendersDto = (apiResponse.Data as List<GenderDto>);
-        for (var gender in gendersDto) {
-          Map<String, dynamic> genderItem = {
-            "genderId": gender.genderId,
-            "description": '${gender.description}'
-          };
-          genderItemsDto.add(genderItem);
-        }
-      });
-    }
-    overlay.hide();
-  }
-
-  loadRelationshipTypes() async {
-    final overlay = LoadingOverlay.of(context);
-    overlay.show();
-    apiResponse = await lookUpServiceClient.getRelationshipTypes();
-    if ((apiResponse.ApiError) == null) {
-      setState(() {
-        relationshipTypesDto = (apiResponse.Data as List<RelationshipTypeDto>);
-        for (var relation in relationshipTypesDto) {
-          Map<String, dynamic> relationshipType = {
-            "relationshipTypeId": relation.relationshipTypeId,
-            "description": '${relation.description}'
-          };
-          relationshipTypeItemsDto.add(relationshipType);
-        }
-      });
-    }
+    gendersDto = await _lookupTransform.transformGendersDto();
+    relationshipTypesDto =
+        await _lookupTransform.transformRelationshipTypeDto();
     overlay.hide();
   }
 
@@ -138,61 +113,49 @@ class _FamilyPageState extends State<FamilyPage> {
     }
   }
 
-  captureFamilyMember(String? name, String? surname, int? age,
-      GenderDto genderValue, RelationshipTypeDto relationshipTypeValue) async {
+  captureFamilyMember(String? name, String? surname, String? dateOfBirth,
+      int? age, int? genderId, int? relationshipTypeId) async {
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
-    overlay.show();
-    apiResponse = await addPerson(name, surname, age, genderValue.genderId);
-    if ((apiResponse.ApiError) == null) {
-      apiResults = (apiResponse.Data as ApiResults);
-      PersonDto familyMemberPerson = PersonDto.fromJson(apiResults.data);
-      FamilyMemberDto familyMemberDto = FamilyMemberDto(
-          familyMemberId: 0,
-          intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
-          personId: familyMemberPerson.personId,
-          relationshipTypeId: relationshipTypeValue.relationshipTypeId,
-          createdBy: preferences!.getInt('userId')!);
-
-      apiResponse = await familyServiceClient.addFamilyMember(familyMemberDto);
-      if ((apiResponse.ApiError) == null) {
-        apiResults = (apiResponse.Data as ApiResults);
-        overlay.hide();
-        if (!mounted) return;
-        alertDialogMessageWidget(
-            context, "Successfull", (apiResponse.Data as ApiResults).message!);
-
-        navigator.push(
-          MaterialPageRoute(
-              builder: (context) => const FamilyPage(),
-              settings: RouteSettings(
-                arguments: acceptedWorklistDto,
-              )),
-        );
-      } else {
-        showDialogMessage((apiResponse.ApiError as ApiError));
-        overlay.hide();
-      }
-    }
-  }
-
-  captureFamilyInformation(String? familyBackground) async {
-    FamilyInformationDto familyInformationDto = FamilyInformationDto(
-        familyInformationId: 0,
+    int? localPersonId = _randomGenerator.getRandomGeneratedNumber();
+    FamilyMemberDto requestFamilyMemberDto = FamilyMemberDto(
+        familyMemberId: _randomGenerator.getRandomGeneratedNumber(),
         intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
-        familyBackground: familyBackground,
+        personId: localPersonId,
+        dateCreated: _randomGenerator.getCurrentDateGenerated(),
+        personDto: PersonDto(
+          firstName: name,
+          lastName: surname,
+          dateOfBirth: dateOfBirth,
+          age: age,
+          personId: localPersonId,
+          genderId: genderId,
+          isEstimatedAge: true,
+          dateCreated: _randomGenerator.getCurrentDateGenerated(),
+          isActive: true,
+          isDeleted: false,
+          isPivaValidated: true,
+          createdBy: preferences!.getString('username'),
+          genderDto: genderId != null
+              ? gendersDto.where((i) => i.genderId == genderId).single
+              : null,
+        ),
+        relationshipTypeId: relationshipTypeId,
+        relationshipTypeDto: relationshipTypeId != null
+            ? relationshipTypesDto
+                .where((i) => i.relationshipTypeId == relationshipTypeId)
+                .single
+            : null,
         createdBy: preferences!.getInt('userId')!);
-
-    final overlay = LoadingOverlay.of(context);
-    final navigator = Navigator.of(context);
     overlay.show();
     apiResponse =
-        await familyServiceClient.addFamilyInformation(familyInformationDto);
+        await familyServiceClient.addFamilyMember(requestFamilyMemberDto);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       if (!mounted) return;
       alertDialogMessageWidget(
-          context, "Successfull", (apiResponse.Data as ApiResults).message!);
+          context, 'Successfull', 'Family member successfully created');
+
       navigator.push(
         MaterialPageRoute(
             builder: (context) => const FamilyPage(),
@@ -206,19 +169,38 @@ class _FamilyPageState extends State<FamilyPage> {
     }
   }
 
-  Future<ApiResponse> addPerson(
-      String? name, String? surname, int? age, int? gender) async {
-    PersonDto personDto = PersonDto(
-        personId: 0,
-        isEstimatedAge: true,
-        isPivaValidated: true,
-        firstName: name,
-        lastName: surname,
-        age: age,
-        genderId: gender,
-        createdBy: preferences!.getString('username')!);
-    apiResponse = await personServiceClient.addPerson(personDto);
-    return apiResponse;
+  captureFamilyInformation(String? familyBackground) async {
+    DateTime dateToday = DateTime.now();
+    String date = dateToday.toString().substring(0, 10);
+
+    FamilyInformationDto familyInformationDto = FamilyInformationDto(
+        familyInformationId: _randomGenerator.getRandomGeneratedNumber(),
+        intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
+        familyBackground: familyBackground,
+        dateCreated: date,
+        createdBy: preferences!.getInt('userId')!);
+
+    final overlay = LoadingOverlay.of(context);
+    final navigator = Navigator.of(context);
+    overlay.show();
+    apiResponse =
+        await familyServiceClient.addFamilyInformation(familyInformationDto);
+    if ((apiResponse.ApiError) == null) {
+      overlay.hide();
+      if (!mounted) return;
+      alertDialogMessageWidget(
+          context, "Successfull", "Family Information Successfull Added");
+      navigator.push(
+        MaterialPageRoute(
+            builder: (context) => const FamilyPage(),
+            settings: RouteSettings(
+              arguments: acceptedWorklistDto,
+            )),
+      );
+    } else {
+      showDialogMessage((apiResponse.ApiError as ApiError));
+      overlay.hide();
+    }
   }
 
   showDialogMessage(ApiError apiError) {
@@ -230,23 +212,94 @@ class _FamilyPageState extends State<FamilyPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Family'),
-      ),
-      body: ListView(
-        children: [
-          CaptureFamilyMemberPage(
-              genderItemsDto: genderItemsDto,
-              relationshipTypeItemsDto: relationshipTypeItemsDto,
-              addNewFamilyMember: captureFamilyMember),
-          ViewFamilyMemberPage(familyMembersDto: familyMembersDto),
-          CaptureFamilyInformationPage(
-              addNewFamilyInformation: captureFamilyInformation),
-          ViewFamilyInformationPage(
-              familyInformationsDto: familyInformationsDto),
-        ],
-      ),
-    );
+    return WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: Scaffold(
+          key: scaffoldKey,
+          appBar: AppBar(
+            title: const Text("Family"),
+            leading: IconButton(
+              icon: const Icon(Icons.offline_pin_rounded),
+              onPressed: () {
+                if (scaffoldKey.currentState!.isDrawerOpen) {
+                  scaffoldKey.currentState!.closeDrawer();
+                  //close drawer, if drawer is open
+                } else {
+                  scaffoldKey.currentState!.openDrawer();
+                  //open drawer, if drawer is closed
+                }
+              },
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.home),
+                tooltip: 'Accepted Worklist',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AcceptedWorklistPage()),
+                  );
+                },
+              ),
+            ],
+          ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
+          floatingActionButton: Container(
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                FloatingActionButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CareGiverDetailPage(),
+                          settings: RouteSettings(
+                            arguments: acceptedWorklistDto,
+                          ),
+                        ),
+                      );
+                    },
+                    heroTag: null,
+                    child: const Icon(Icons.arrow_back)),
+                FloatingActionButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SocioEconomicPage(),
+                          settings: RouteSettings(
+                            arguments: acceptedWorklistDto,
+                          ),
+                        ),
+                      );
+                    },
+                    heroTag: null,
+                    child: const Icon(Icons.arrow_forward)),
+              ],
+            ),
+          ),
+          drawer: GoToAssessmentDrawer(
+              acceptedWorklistDto: acceptedWorklistDto, isCompleted: true),
+          body: ListView(
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 70),
+            children: [
+              CaptureFamilyMemberPage(
+                  gendersDto: gendersDto,
+                  relationshipTypesDto: relationshipTypesDto,
+                  addNewFamilyMember: captureFamilyMember),
+              ViewFamilyMemberPage(familyMembersDto: familyMembersDto),
+              CaptureFamilyInformationPage(
+                  addNewFamilyInformation: captureFamilyInformation),
+              ViewFamilyInformationPage(
+                  familyInformationsDto: familyInformationsDto),
+            ],
+          ),
+        ));
   }
 }

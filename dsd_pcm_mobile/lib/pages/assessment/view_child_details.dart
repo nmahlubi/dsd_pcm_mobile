@@ -86,7 +86,8 @@ class _ViewChildDetailsPageState extends State<ViewChildDetailsPage> {
   loadPersonDetailsById(int? personId) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await personServiceClient.getPersonById(personId);
+    apiResponse = await personServiceClient.getPersonById(
+        personId, preferences!.getInt('userId')!);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {

@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.dsd_pcm_mobile">
    <application
-        android:label="dsd_pcm_mobile"
+        android:label="Dsd PCM"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

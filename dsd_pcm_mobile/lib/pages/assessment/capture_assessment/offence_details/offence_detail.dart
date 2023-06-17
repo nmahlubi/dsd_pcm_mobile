@@ -7,12 +7,18 @@ import '../../../../model/intake/offence_type_dto.dart';
 import '../../../../model/pcm/accepted_worklist_dto.dart';
 import '../../../../model/pcm/offence_detail_dto.dart';
 import '../../../../model/static_model/yes_no_dto.dart';
+import '../../../../navigation_drawer/go_to_assessment_drawer.dart';
 import '../../../../service/intake/offence_service.dart';
 import '../../../../service/pcm/offence_detail_service.dart';
+import '../../../../transform_dynamic/transform_offence.dart';
 import '../../../../util/shared/apierror.dart';
 import '../../../../util/shared/apiresponse.dart';
 import '../../../../util/shared/apiresults.dart';
 import '../../../../util/shared/loading_overlay.dart';
+import '../../../../util/shared/randon_generator.dart';
+import '../../../probation_officer/accepted_worklist.dart';
+import '../socio_economic/socio_economic.dart';
+import '../victim_details/victim_detail.dart';
 import 'capture_offence_detail.dart';
 import 'view_offence_detail.dart';
 
@@ -25,25 +31,25 @@ class OffenceDetailPage extends StatefulWidget {
 
 class _OffenceDetailPageState extends State<OffenceDetailPage> {
   SharedPreferences? preferences;
+  final scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future<void> initializePreference() async {
     preferences = await SharedPreferences.getInstance();
   }
 
-  late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
+  final _randomGenerator = RandomGenerator();
+  final _offenceTransform = OffenceTransform();
   final OffenceService offenceServiceClient = OffenceService();
   final OffenceDetailService offenceDetailServiceClient =
       OffenceDetailService();
+  late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
 
   late List<OffenceTypeDto> offenceTypesDto = [];
-  final List<Map<String, dynamic>> offenceTypeItemsDto = [];
   late List<OffenceCategoryDto> offenceCategoriesDto = [];
-  final List<Map<String, dynamic>> offenceCategoryItemsDto = [];
   late List<OffenceScheduleDto> offenceSchedulesDto = [];
-  final List<Map<String, dynamic>> offenceScheduleItemsDto = [];
-  final List<Map<String, dynamic>> yesNoDtoItemsDto = [];
+  late List<YesNoDto> yesNoDtoItemsDto = [];
   late List<OffenceDetailDto> offenceDetailsDto = [];
 
   @override
@@ -54,10 +60,7 @@ class _OffenceDetailPageState extends State<OffenceDetailPage> {
         setState(() {
           acceptedWorklistDto =
               ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
-          loadYesNoStatus();
-          loadOffenceCategory();
-          loadOffenceSchedule();
-          loadOffenceTypes();
+          loadOffenceTransformer();
           loadOffenceDetailsByIntakeAssessmentId(
               acceptedWorklistDto.intakeAssessmentId);
         });
@@ -65,65 +68,15 @@ class _OffenceDetailPageState extends State<OffenceDetailPage> {
     });
   }
 
-  loadYesNoStatus() async {
-    yesNoDtoItemsDto.add({"value": 'Yes', "description": 'Yes'});
-    yesNoDtoItemsDto.add({"value": 'No', "description": 'No'});
-  }
-
-  loadOffenceCategory() async {
+  loadOffenceTransformer() async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await offenceServiceClient.getOffenceCategories();
-    if ((apiResponse.ApiError) == null) {
-      setState(() {
-        offenceCategoriesDto = (apiResponse.Data as List<OffenceCategoryDto>);
-        for (var offenceCategory in offenceCategoriesDto) {
-          Map<String, dynamic> offenceCategoryItem = {
-            "offenceCategoryId": offenceCategory.offenceCategoryId,
-            "description": '${offenceCategory.description}'
-          };
-          offenceCategoryItemsDto.add(offenceCategoryItem);
-        }
-      });
-    }
-    overlay.hide();
-  }
-
-  loadOffenceSchedule() async {
-    final overlay = LoadingOverlay.of(context);
-    overlay.show();
-    apiResponse = await offenceServiceClient.getOffenceSchedules();
-    if ((apiResponse.ApiError) == null) {
-      setState(() {
-        offenceSchedulesDto = (apiResponse.Data as List<OffenceScheduleDto>);
-        for (var offenceSchedule in offenceSchedulesDto) {
-          Map<String, dynamic> offenceScheduleItem = {
-            "offenceScheduleId": offenceSchedule.offenceScheduleId,
-            "description": '${offenceSchedule.description}'
-          };
-          offenceScheduleItemsDto.add(offenceScheduleItem);
-        }
-      });
-    }
-    overlay.hide();
-  }
-
-  loadOffenceTypes() async {
-    final overlay = LoadingOverlay.of(context);
-    overlay.show();
-    apiResponse = await offenceServiceClient.getOffenceTypes();
-    if ((apiResponse.ApiError) == null) {
-      setState(() {
-        offenceTypesDto = (apiResponse.Data as List<OffenceTypeDto>);
-        for (var offenceType in offenceTypesDto) {
-          Map<String, dynamic> offenceTypeItem = {
-            "offenceTypeId": offenceType.offenceTypeId,
-            "description": '${offenceType.description}'
-          };
-          offenceTypeItemsDto.add(offenceTypeItem);
-        }
-      });
-    }
+    offenceTypesDto = await _offenceTransform.transformOffenceTypeDto();
+    offenceCategoriesDto =
+        await _offenceTransform.transformOffenceCategoryDto();
+    offenceSchedulesDto = await _offenceTransform.transformOffenceScheduleDto();
+    yesNoDtoItemsDto.add(YesNoDto(value: 'Yes', description: 'Yes'));
+    yesNoDtoItemsDto.add(YesNoDto(value: 'No', description: 'No'));
     overlay.hide();
   }
 
@@ -144,26 +97,42 @@ class _OffenceDetailPageState extends State<OffenceDetailPage> {
   }
 
   captureOffenceDetails(
-      OffenceTypeDto offenceTypeDtoValue,
-      OffenceCategoryDto offenceCategoryDtoValue,
-      OffenceScheduleDto offenceScheduleDtoValue,
+      int? offenceTypeId,
+      int? offenceCategoryId,
+      int? offenceScheduleId,
       String? offenceCircumstance,
       String? valueOfGoods,
       String? valueRecovered,
-      YesNoDto isChildResponsible,
+      String isChildResponsible,
       String? responsibilityDetails) async {
     OffenceDetailDto addOffenceDetailDto = OffenceDetailDto(
-        pcmOffenceId: 0,
+        pcmOffenceId: _randomGenerator.getRandomGeneratedNumber(),
         pcmCaseId: acceptedWorklistDto.caseId,
         intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
         createdBy: preferences!.getInt('userId')!,
-        offenceTypeId: offenceTypeDtoValue.offenceTypeId,
-        offenceCategoryId: offenceCategoryDtoValue.offenceCategoryId,
-        offenceScheduleId: offenceScheduleDtoValue.offenceScheduleId,
+        dateCreated: _randomGenerator.getCurrentDateGenerated(),
+        offenceTypeId: offenceTypeId,
+        offenceTypeDto: offenceTypeId != null
+            ? offenceTypesDto
+                .where((o) => o.offenceTypeId == offenceTypeId)
+                .single
+            : null,
+        offenceCategoryId: offenceCategoryId,
+        offenceCategoryDto: offenceCategoryId != null
+            ? offenceCategoriesDto
+                .where((o) => o.offenceCategoryId == offenceCategoryId)
+                .single
+            : null,
+        offenceScheduleId: offenceScheduleId,
+        offenceScheduleDto: offenceScheduleId != null
+            ? offenceSchedulesDto
+                .where((o) => o.offenceScheduleId == offenceScheduleId)
+                .single
+            : null,
         offenceCircumstance: offenceCircumstance,
         valueOfGoods: valueOfGoods,
         valueRecovered: valueRecovered,
-        isChildResponsible: isChildResponsible.value,
+        isChildResponsible: isChildResponsible,
         responsibilityDetails: responsibilityDetails);
 
     final overlay = LoadingOverlay.of(context);
@@ -174,7 +143,7 @@ class _OffenceDetailPageState extends State<OffenceDetailPage> {
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       await showAlertDialogMessage(
-          "Successfull", (apiResponse.Data as ApiResults).message!);
+          "Successfull", 'Offence successfully created.');
       navigator.push(
         MaterialPageRoute(
             builder: (context) => const OffenceDetailPage(),
@@ -219,21 +188,92 @@ class _OffenceDetailPageState extends State<OffenceDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Offence Details'),
-      ),
-      body: ListView(
-        children: [
-          CaptureOffenceDetailPage(
-              yesNoDtoItemsDto: yesNoDtoItemsDto,
-              offenceTypeItemsDto: offenceTypeItemsDto,
-              offenceCategoryItemsDto: offenceCategoryItemsDto,
-              offenceScheduleItemsDto: offenceScheduleItemsDto,
-              addNewOffenceDetail: captureOffenceDetails),
-          ViewOffenceDetailPage(offenceDetailsDto: offenceDetailsDto)
-        ],
-      ),
-    );
+    return WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: Scaffold(
+          key: scaffoldKey,
+          appBar: AppBar(
+            title: const Text("Offence Details"),
+            leading: IconButton(
+              icon: const Icon(Icons.offline_pin_rounded),
+              onPressed: () {
+                if (scaffoldKey.currentState!.isDrawerOpen) {
+                  scaffoldKey.currentState!.closeDrawer();
+                  //close drawer, if drawer is open
+                } else {
+                  scaffoldKey.currentState!.openDrawer();
+                  //open drawer, if drawer is closed
+                }
+              },
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.home),
+                tooltip: 'Accepted Worklist',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AcceptedWorklistPage()),
+                  );
+                },
+              ),
+            ],
+          ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
+          floatingActionButton: Container(
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                FloatingActionButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SocioEconomicPage(),
+                          settings: RouteSettings(
+                            arguments: acceptedWorklistDto,
+                          ),
+                        ),
+                      );
+                    },
+                    heroTag: null,
+                    child: const Icon(Icons.arrow_back)),
+                FloatingActionButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const VictimDetailPage(),
+                          settings: RouteSettings(
+                            arguments: acceptedWorklistDto,
+                          ),
+                        ),
+                      );
+                    },
+                    heroTag: null,
+                    child: const Icon(Icons.arrow_forward)),
+              ],
+            ),
+          ),
+          drawer: GoToAssessmentDrawer(
+              acceptedWorklistDto: acceptedWorklistDto, isCompleted: true),
+          body: ListView(
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 70),
+            children: [
+              CaptureOffenceDetailPage(
+                  yesNoDtoItemsDto: yesNoDtoItemsDto,
+                  offenceTypesDto: offenceTypesDto,
+                  offenceCategoriesDto: offenceCategoriesDto,
+                  offenceSchedulesDto: offenceSchedulesDto,
+                  addNewOffenceDetail: captureOffenceDetails),
+              ViewOffenceDetailPage(offenceDetailsDto: offenceDetailsDto)
+            ],
+          ),
+        ));
   }
 }

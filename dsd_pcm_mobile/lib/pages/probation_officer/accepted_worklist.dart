@@ -8,6 +8,7 @@ import '../../util/shared/apierror.dart';
 import '../../util/shared/apiresponse.dart';
 import '../../util/shared/loading_overlay.dart';
 import '../assessment/capture_assessment/capture_assessment.dart';
+import '../assessment/capture_assessment/child_detail/update_child_detail.dart';
 
 class AcceptedWorklistPage extends StatefulWidget {
   const AcceptedWorklistPage({Key? key}) : super(key: key);
@@ -23,7 +24,7 @@ class _AcceptedWorklistPageState extends State<AcceptedWorklistPage> {
     preferences = await SharedPreferences.getInstance();
   }
 
-  final WorklistService worklistServiceClient = WorklistService();
+  final _worklistServiceClient = WorklistService();
   late ApiResponse apiResponse = ApiResponse();
   late List<AcceptedWorklistDto> acceptedWorklistDto = [];
   String searchString = "";
@@ -43,7 +44,7 @@ class _AcceptedWorklistPageState extends State<AcceptedWorklistPage> {
   loadAllocatedCasesByProbationOfficer() async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await worklistServiceClient
+    apiResponse = await _worklistServiceClient
         .getAcceptedWorklistByProbationOfficer(preferences!.getInt('userId')!);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
@@ -65,93 +66,80 @@ class _AcceptedWorklistPageState extends State<AcceptedWorklistPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Accepted Worklist'),
-      ),
-      drawer: const NavigationDrawer(),
-      body: Column(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            child: TextField(
-              onChanged: (value) {
-                setState(() {
-                  searchString = value.toLowerCase();
-                });
-              },
-              decoration: const InputDecoration(
-                labelText: 'Search',
-                suffixIcon: Icon(Icons.search),
+    return WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Accepted Worklist'),
+          ),
+          drawer: const NavigationDrawer(),
+          body: Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      searchString = value.toLowerCase();
+                    });
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'Search',
+                    suffixIcon: Icon(Icons.search),
+                  ),
+                ),
               ),
-            ),
+              Expanded(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: acceptedWorklistDto.length,
+                  itemBuilder: (context, int index) {
+                    if (acceptedWorklistDto.isEmpty) {
+                      return const Center(child: Text('No worklist Found.'));
+                    }
+                    return acceptedWorklistDto[index]
+                            .childName!
+                            .toLowerCase()
+                            .contains(searchString)
+                        ? ListTile(
+                            title: Text(acceptedWorklistDto[index]
+                                .childName
+                                .toString()),
+                            subtitle: Text(
+                                acceptedWorklistDto[index]
+                                    .dateAccepted
+                                    .toString(),
+                                style: const TextStyle(color: Colors.grey)),
+                            trailing: const Icon(Icons.play_circle_fill_rounded,
+                                color: Colors.green),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const UpdateChildDetailPage(),
+                                  settings: RouteSettings(
+                                    arguments: acceptedWorklistDto[index],
+                                  ),
+                                ),
+                              );
+                            })
+                        : Container();
+                  },
+                  separatorBuilder: (context, index) {
+                    return acceptedWorklistDto[index]
+                            .childName!
+                            .toLowerCase()
+                            .contains(searchString)
+                        ? const Divider(thickness: 1)
+                        : Container();
+                  },
+                ),
+              ),
+            ],
           ),
-          Expanded(
-            child: ListView.separated(
-              shrinkWrap: true,
-              itemCount: acceptedWorklistDto.length,
-              itemBuilder: (context, int index) {
-                if (acceptedWorklistDto.isEmpty) {
-                  return const Center(child: Text('No worklist Found.'));
-                }
-                return acceptedWorklistDto[index]
-                        .childName!
-                        .toLowerCase()
-                        .contains(searchString)
-                    ? ListTile(
-                        title: Text(
-                            acceptedWorklistDto[index].childName.toString()),
-                        subtitle: Text(
-                            acceptedWorklistDto[index].dateAccepted.toString(),
-                            style: const TextStyle(color: Colors.grey)),
-                        trailing: const Icon(Icons.play_circle_fill_rounded,
-                            color: Colors.green),
-                        /*trailing: Text(
-                            acceptedWorklistDto[index]
-                                .arrestTime
-                                .toString(),
-                            style: const TextStyle(color: Colors.red)),*/
-                        /*
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const ViewChildDetailsPage(),
-                              settings: RouteSettings(
-                                arguments: acceptedWorklistDto[index],
-                              ),
-                            ),
-                          );
-                        }
-                        
-                        */
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const CaptureAssessmentPage(),
-                              settings: RouteSettings(
-                                arguments: acceptedWorklistDto[index],
-                              ),
-                            ),
-                          );
-                        })
-                    : Container();
-              },
-              separatorBuilder: (context, index) {
-                return acceptedWorklistDto[index]
-                        .childName!
-                        .toLowerCase()
-                        .contains(searchString)
-                    ? const Divider(thickness: 1)
-                    : Container();
-              },
-            ),
-          ),
-        ],
-      ),
-    );
+        ));
   }
 }

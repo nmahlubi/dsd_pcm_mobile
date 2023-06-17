@@ -1,4 +1,5 @@
 import 'person_dto.dart';
+import 'relationship_type_dto.dart';
 
 class CareGiverDetailsDto {
   CareGiverDetailsDto({
@@ -10,6 +11,7 @@ class CareGiverDetailsDto {
     String? dateCreated,
     String? modifiedBy,
     String? dateModified,
+    RelationshipTypeDto? relationshipTypeDto,
     PersonDto? personDto,
   }) {
     _clientCaregiverId = clientCaregiverId;
@@ -20,6 +22,7 @@ class CareGiverDetailsDto {
     _dateCreated = dateCreated;
     _modifiedBy = modifiedBy;
     _dateModified = dateModified;
+    _relationshipTypeDto = relationshipTypeDto;
     _personDto = personDto;
   }
   CareGiverDetailsDto.fromJson(dynamic json) {
@@ -31,6 +34,9 @@ class CareGiverDetailsDto {
     _dateCreated = json['dateCreated'];
     _modifiedBy = json['modifiedBy'];
     _dateModified = json['dateModified'];
+    _relationshipTypeDto = json['relationshipTypeDto'] != null
+        ? RelationshipTypeDto.fromJson(json['relationshipTypeDto'])
+        : null;
     _personDto = json['personDto'] != null
         ? PersonDto.fromJson(json['personDto'])
         : null;
@@ -43,6 +49,7 @@ class CareGiverDetailsDto {
   String? _dateCreated;
   String? _modifiedBy;
   String? _dateModified;
+  RelationshipTypeDto? _relationshipTypeDto;
   PersonDto? _personDto;
 
   int? get clientCaregiverId => _clientCaregiverId;
@@ -53,6 +60,7 @@ class CareGiverDetailsDto {
   String? get dateCreated => _dateCreated;
   String? get modifiedBy => _modifiedBy;
   String? get dateModified => _dateModified;
+  RelationshipTypeDto? get relationshipTypeDto => _relationshipTypeDto;
   PersonDto? get personDto => _personDto;
 
   Map<String, dynamic> toJson() {
@@ -65,6 +73,9 @@ class CareGiverDetailsDto {
     map['dateCreated'] = _dateCreated;
     map['modifiedBy'] = _modifiedBy;
     map['dateModified'] = _dateModified;
+    if (_relationshipTypeDto != null) {
+      map['relationshipTypeDto'] = _relationshipTypeDto?.toJson();
+    }
     if (_personDto != null) {
       map['personDto'] = _personDto?.toJson();
     }

@@ -11,34 +11,31 @@ import '../../../../widgets/dropdown_widget.dart';
 class CaptureOffenceDetailPage extends StatelessWidget {
   final addNewOffenceDetail;
 
-  final List<Map<String, dynamic>> yesNoDtoItemsDto;
-  final List<Map<String, dynamic>> offenceTypeItemsDto;
-  final List<Map<String, dynamic>> offenceCategoryItemsDto;
-  final List<Map<String, dynamic>> offenceScheduleItemsDto;
+  final List<YesNoDto> yesNoDtoItemsDto;
+  final List<OffenceTypeDto> offenceTypesDto;
+  final List<OffenceCategoryDto> offenceCategoriesDto;
+  final List<OffenceScheduleDto> offenceSchedulesDto;
 
   CaptureOffenceDetailPage(
       {super.key,
       required this.yesNoDtoItemsDto,
-      required this.offenceTypeItemsDto,
-      required this.offenceCategoryItemsDto,
-      required this.offenceScheduleItemsDto,
+      required this.offenceTypesDto,
+      required this.offenceCategoriesDto,
+      required this.offenceSchedulesDto,
       this.addNewOffenceDetail});
 //controls
-  final DropdownEditingController<Map<String, dynamic>>? offenceTypeController =
-      DropdownEditingController();
-  final DropdownEditingController<Map<String, dynamic>>?
-      offenceCategoryController = DropdownEditingController();
-  final DropdownEditingController<Map<String, dynamic>>?
-      offenceScheduleController = DropdownEditingController();
+
   final TextEditingController offenceCircumstanceController =
       TextEditingController();
   final TextEditingController valueOfGoodsController = TextEditingController();
   final TextEditingController valueRecoveredController =
       TextEditingController();
-  final DropdownEditingController<Map<String, dynamic>>?
-      isChildResponsibleController = DropdownEditingController();
   final TextEditingController responsibilityDetailsController =
       TextEditingController();
+  String? childResponsibleDropdownButtonFormField;
+  int? offenceTypeDropdownButtonFormField;
+  int? offenceCategoryDropdownButtonFormField;
+  int? offenceScheduleDropdownButtonFormField;
 
   @override
   Widget build(BuildContext context) {
@@ -87,16 +84,32 @@ class CaptureOffenceDetailPage extends StatelessWidget {
                         Expanded(
                             child: Container(
                                 padding: const EdgeInsets.all(10),
-                                child: dynamicDropdownWidget(
-                                    dropdownEditingName:
-                                        offenceCategoryController,
-                                    labelTextValue: 'Offence Category',
-                                    displayItemFnValue: 'description',
-                                    itemsCollection: offenceCategoryItemsDto,
-                                    selectedFnValue: 'offenceCategoryId',
-                                    filterFnValue: 'description',
-                                    titleValue: 'description',
-                                    subtitleValue: ''))),
+                                child: DropdownButtonFormField(
+                                  value: offenceCategoryDropdownButtonFormField,
+                                  decoration: const InputDecoration(
+                                    hintText: 'Offence Category',
+                                    labelText: 'Offence Category',
+                                    border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 1, color: Colors.green),
+                                    ),
+                                  ),
+                                  items: offenceCategoriesDto.map((category) {
+                                    return DropdownMenuItem(
+                                        value: category.offenceCategoryId,
+                                        child: Text(
+                                            category.description.toString()));
+                                  }).toList(),
+                                  onChanged: (selectedValue) {
+                                    offenceCategoryDropdownButtonFormField =
+                                        selectedValue;
+                                  },
+                                  validator: (value) {
+                                    if (value == null) {
+                                      return 'Offence category is required';
+                                    }
+                                  },
+                                ))),
                       ],
                     ),
                     Row(
@@ -104,16 +117,32 @@ class CaptureOffenceDetailPage extends StatelessWidget {
                         Expanded(
                             child: Container(
                                 padding: const EdgeInsets.all(10),
-                                child: dynamicDropdownWidget(
-                                    dropdownEditingName:
-                                        offenceScheduleController,
-                                    labelTextValue: 'Offence Schedule',
-                                    displayItemFnValue: 'description',
-                                    itemsCollection: offenceScheduleItemsDto,
-                                    selectedFnValue: 'offenceScheduleId',
-                                    filterFnValue: 'description',
-                                    titleValue: 'description',
-                                    subtitleValue: ''))),
+                                child: DropdownButtonFormField(
+                                  value: offenceScheduleDropdownButtonFormField,
+                                  decoration: const InputDecoration(
+                                    hintText: 'Offence Schedule',
+                                    labelText: 'Offence Schedule',
+                                    border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 1, color: Colors.green),
+                                    ),
+                                  ),
+                                  items: offenceSchedulesDto.map((schedule) {
+                                    return DropdownMenuItem(
+                                        value: schedule.offenceScheduleId,
+                                        child: Text(
+                                            schedule.description.toString()));
+                                  }).toList(),
+                                  onChanged: (selectedValue) {
+                                    offenceScheduleDropdownButtonFormField =
+                                        selectedValue;
+                                  },
+                                  validator: (value) {
+                                    if (value == null) {
+                                      return 'Offence schedule is required';
+                                    }
+                                  },
+                                ))),
                       ],
                     ),
                     Row(
@@ -121,15 +150,34 @@ class CaptureOffenceDetailPage extends StatelessWidget {
                         Expanded(
                             child: Container(
                                 padding: const EdgeInsets.all(10),
-                                child: dynamicDropdownWidget(
-                                    dropdownEditingName: offenceTypeController,
-                                    labelTextValue: 'Offence Type',
-                                    displayItemFnValue: 'description',
-                                    itemsCollection: offenceTypeItemsDto,
-                                    selectedFnValue: 'offenceTypeId',
-                                    filterFnValue: 'description',
-                                    titleValue: 'description',
-                                    subtitleValue: ''))),
+                                child: DropdownButtonFormField(
+                                  //menuMaxHeight: 800,
+                                  //itemHeight: 300,
+                                  value: offenceTypeDropdownButtonFormField,
+                                  decoration: const InputDecoration(
+                                    hintText: 'Offence Type',
+                                    labelText: 'Offence Type',
+                                    border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 1, color: Colors.green),
+                                    ),
+                                  ),
+                                  items: offenceTypesDto.map((offenceType) {
+                                    return DropdownMenuItem(
+                                        value: offenceType.offenceTypeId,
+                                        child: Text(offenceType.description
+                                            .toString()));
+                                  }).toList(),
+                                  onChanged: (selectedValue) {
+                                    offenceTypeDropdownButtonFormField =
+                                        selectedValue;
+                                  },
+                                  validator: (value) {
+                                    if (value == null) {
+                                      return 'Offence type is required';
+                                    }
+                                  },
+                                ))),
                       ],
                     ),
                     Row(
@@ -186,21 +234,32 @@ class CaptureOffenceDetailPage extends StatelessWidget {
                       Expanded(
                           child: Container(
                               padding: const EdgeInsets.all(10),
-                              child: dynamicDropdownWidget(
-                                  dropdownEditingName:
-                                      isChildResponsibleController,
-                                  labelTextValue: 'Child Responsible',
-                                  displayItemFnValue: 'description',
-                                  itemsCollection: yesNoDtoItemsDto,
-                                  selectedFnValue: 'value',
-                                  filterFnValue: 'description',
-                                  titleValue: 'description',
-                                  subtitleValue: ''))),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                        ),
-                      )
+                              child: DropdownButtonFormField(
+                                value: childResponsibleDropdownButtonFormField,
+                                decoration: const InputDecoration(
+                                  hintText: 'Child Responsible',
+                                  labelText: 'Child Responsible',
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 1, color: Colors.green),
+                                  ),
+                                ),
+                                items: yesNoDtoItemsDto.map((yesNo) {
+                                  return DropdownMenuItem(
+                                      value: yesNo.value,
+                                      child:
+                                          Text(yesNo.description.toString()));
+                                }).toList(),
+                                onChanged: (selectedValue) {
+                                  childResponsibleDropdownButtonFormField =
+                                      selectedValue;
+                                },
+                                validator: (value) {
+                                  if (value == null) {
+                                    return 'Offence type is required';
+                                  }
+                                },
+                              ))),
                     ]),
                     Row(children: [
                       Expanded(
@@ -226,35 +285,33 @@ class CaptureOffenceDetailPage extends StatelessWidget {
                           padding: const EdgeInsets.fromLTRB(10, 20, 10, 2),
                         )),
                         Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                          ),
-                        ),
-                        Expanded(
                             child: Container(
                                 height: 70,
                                 padding:
                                     const EdgeInsets.fromLTRB(10, 20, 10, 2),
-                                child: ElevatedButton(
-                                  child: const Text('Add'),
+                                child: OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    backgroundColor:
+                                        const Color.fromARGB(255, 23, 22, 22),
+                                    shape: const StadiumBorder(),
+                                    side: const BorderSide(
+                                        width: 2, color: Colors.blue),
+                                  ),
                                   onPressed: () {
                                     addNewOffenceDetail(
-                                      OffenceTypeDto.fromJson(
-                                          offenceTypeController!.value),
-                                      OffenceCategoryDto.fromJson(
-                                          offenceCategoryController!.value),
-                                      OffenceScheduleDto.fromJson(
-                                          offenceScheduleController!.value),
+                                      offenceTypeDropdownButtonFormField,
+                                      offenceCategoryDropdownButtonFormField,
+                                      offenceScheduleDropdownButtonFormField,
                                       offenceCircumstanceController.text
                                           .toString(),
                                       valueOfGoodsController.text.toString(),
                                       valueRecoveredController.text.toString(),
-                                      YesNoDto.fromJson(
-                                          isChildResponsibleController!.value),
+                                      childResponsibleDropdownButtonFormField,
                                       responsibilityDetailsController.text
                                           .toString(),
                                     );
                                   },
+                                  child: const Text('Add Offence'),
                                 ))),
                       ],
                     ),

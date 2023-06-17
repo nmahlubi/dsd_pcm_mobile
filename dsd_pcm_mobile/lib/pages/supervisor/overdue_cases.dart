@@ -77,167 +77,175 @@ class _OverdueCasesPageState extends State<OverdueCasesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Overdue Cases'),
-      ),
-      drawer: const NavigationDrawer(),
-      body: Column(
-        children: <Widget>[
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  child: TextFormField(
-                    controller: overdueStartDateController,
-                    enableInteractiveSelection: false,
-                    maxLines: 1,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Start Date',
+    return WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Overdue Cases'),
+          ),
+          drawer: const NavigationDrawer(),
+          body: Column(
+            children: <Widget>[
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      child: TextFormField(
+                        controller: overdueStartDateController,
+                        enableInteractiveSelection: false,
+                        maxLines: 1,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Start Date',
+                        ),
+                        readOnly: true, // when true user cannot edit text
+                        onTap: () async {
+                          DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(), //get today's date
+                              firstDate: DateTime(
+                                  2000), //DateTime.now() - not to allow to choose before today.
+                              lastDate: DateTime(2101));
+
+                          if (pickedDate != null) {
+                            String formattedDate = DateFormat('yyyy-MM-dd').format(
+                                pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
+
+                            //You can format date as per your need
+                            setState(() {
+                              overdueStartDateController.text = formattedDate;
+                              loadNotificationCases(
+                                  overdueStartDateController.text,
+                                  overdueEndDateController
+                                      .text); //set foratted date to TextField value.
+                            });
+                          }
+                        },
+                      ),
                     ),
-                    readOnly: true, // when true user cannot edit text
-                    onTap: () async {
-                      DateTime? pickedDate = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(), //get today's date
-                          firstDate: DateTime(
-                              2000), //DateTime.now() - not to allow to choose before today.
-                          lastDate: DateTime(2101));
+                  ),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      child: TextFormField(
+                        controller: overdueEndDateController,
+                        enableInteractiveSelection: false,
+                        maxLines: 1,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'End Date',
+                        ),
+                        readOnly: true, // when true user cannot edit text
+                        onTap: () async {
+                          DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(), //get today's date
+                              firstDate: DateTime(
+                                  2000), //DateTime.now() - not to allow to choose before today.
+                              lastDate: DateTime(2101));
 
-                      if (pickedDate != null) {
-                        String formattedDate = DateFormat('yyyy-MM-dd').format(
-                            pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
+                          if (pickedDate != null) {
+                            String formattedDate = DateFormat('yyyy-MM-dd').format(
+                                pickedDate); // format date in required form here we use yyyy-MM-dd that means time is remov
 
-                        //You can format date as per your need
-                        setState(() {
-                          overdueStartDateController.text = formattedDate;
-                          loadNotificationCases(
-                              overdueStartDateController.text,
-                              overdueEndDateController
-                                  .text); //set foratted date to TextField value.
-                        });
-                      }
-                    },
+                            setState(() {
+                              overdueEndDateController.text =
+                                  formattedDate; //set foratted date to TextField value.
+                              loadNotificationCases(
+                                  overdueStartDateController.text,
+                                  overdueEndDateController.text);
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      searchString = value.toLowerCase();
+                    });
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'Search',
+                    suffixIcon: Icon(Icons.search),
                   ),
                 ),
               ),
               Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  child: TextFormField(
-                    controller: overdueEndDateController,
-                    enableInteractiveSelection: false,
-                    maxLines: 1,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'End Date',
-                    ),
-                    readOnly: true, // when true user cannot edit text
-                    onTap: () async {
-                      DateTime? pickedDate = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(), //get today's date
-                          firstDate: DateTime(
-                              2000), //DateTime.now() - not to allow to choose before today.
-                          lastDate: DateTime(2101));
-
-                      if (pickedDate != null) {
-                        String formattedDate = DateFormat('yyyy-MM-dd').format(
-                            pickedDate); // format date in required form here we use yyyy-MM-dd that means time is remov
-
-                        setState(() {
-                          overdueEndDateController.text =
-                              formattedDate; //set foratted date to TextField value.
-                          loadNotificationCases(overdueStartDateController.text,
-                              overdueEndDateController.text);
-                        });
-                      }
-                    },
-                  ),
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: notificationCasesDto.length,
+                  itemBuilder: (context, int index) {
+                    if (notificationCasesDto.isEmpty) {
+                      return const Center(child: Text('No Cases Found.'));
+                    }
+                    return notificationCasesDto[index]
+                                .childName!
+                                .toLowerCase()
+                                .contains(searchString) ||
+                            notificationCasesDto[index]
+                                .notificationDateSet!
+                                .toLowerCase()
+                                .contains(searchString)
+                        ? ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 194, 191, 199),
+                              child: Text(notificationCasesDto[index]
+                                  .childNameAbbr
+                                  .toString()),
+                            ),
+                            title: Text(notificationCasesDto[index]
+                                .childName
+                                .toString()),
+                            subtitle: Text(
+                                notificationCasesDto[index]
+                                    .notificationDateSet
+                                    .toString(),
+                                style: const TextStyle(color: Colors.grey)),
+                            trailing: Text(
+                                notificationCasesDto[index]
+                                    .hoursLeft
+                                    .toString(),
+                                style: const TextStyle(color: Colors.red)),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CaseDetailsAssignPage(),
+                                  settings: RouteSettings(
+                                    arguments: notificationCasesDto[index],
+                                  ),
+                                ),
+                              );
+                            })
+                        : Container();
+                  },
+                  separatorBuilder: (context, index) {
+                    return notificationCasesDto[index]
+                                .childName!
+                                .toLowerCase()
+                                .contains(searchString) ||
+                            notificationCasesDto[index]
+                                .notificationDateSet!
+                                .toLowerCase()
+                                .contains(searchString)
+                        ? const Divider(thickness: 1)
+                        : Container();
+                  },
                 ),
               ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            child: TextField(
-              onChanged: (value) {
-                setState(() {
-                  searchString = value.toLowerCase();
-                });
-              },
-              decoration: const InputDecoration(
-                labelText: 'Search',
-                suffixIcon: Icon(Icons.search),
-              ),
-            ),
-          ),
-          Expanded(
-            child: ListView.separated(
-              shrinkWrap: true,
-              itemCount: notificationCasesDto.length,
-              itemBuilder: (context, int index) {
-                if (notificationCasesDto.isEmpty) {
-                  return const Center(child: Text('No Cases Found.'));
-                }
-                return notificationCasesDto[index]
-                            .childName!
-                            .toLowerCase()
-                            .contains(searchString) ||
-                        notificationCasesDto[index]
-                            .notificationDateSet!
-                            .toLowerCase()
-                            .contains(searchString)
-                    ? ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor:
-                              const Color.fromARGB(255, 194, 191, 199),
-                          child: Text(notificationCasesDto[index]
-                              .childNameAbbr
-                              .toString()),
-                        ),
-                        title: Text(
-                            notificationCasesDto[index].childName.toString()),
-                        subtitle: Text(
-                            notificationCasesDto[index]
-                                .notificationDateSet
-                                .toString(),
-                            style: const TextStyle(color: Colors.grey)),
-                        trailing: Text(
-                            notificationCasesDto[index].hoursLeft.toString(),
-                            style: const TextStyle(color: Colors.red)),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const CaseDetailsAssignPage(),
-                              settings: RouteSettings(
-                                arguments: notificationCasesDto[index],
-                              ),
-                            ),
-                          );
-                        })
-                    : Container();
-              },
-              separatorBuilder: (context, index) {
-                return notificationCasesDto[index]
-                            .childName!
-                            .toLowerCase()
-                            .contains(searchString) ||
-                        notificationCasesDto[index]
-                            .notificationDateSet!
-                            .toLowerCase()
-                            .contains(searchString)
-                    ? const Divider(thickness: 1)
-                    : Container();
-              },
-            ),
-          ),
-        ],
-      ),
-    );
+        ));
   }
 }

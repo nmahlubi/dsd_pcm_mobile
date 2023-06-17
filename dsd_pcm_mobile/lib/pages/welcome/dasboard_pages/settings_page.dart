@@ -51,8 +51,11 @@ class _SettingPageState extends State<SettingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: Column(
         children: <Widget>[
           Row(
             children: [

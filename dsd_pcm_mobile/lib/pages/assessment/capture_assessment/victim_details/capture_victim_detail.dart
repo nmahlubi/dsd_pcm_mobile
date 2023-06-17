@@ -1,21 +1,20 @@
-import 'package:dropdown_plus/dropdown_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
 
 import '../../../../model/intake/gender_dto.dart';
 import '../../../../widgets/dropdown_widget.dart';
 
+// ignore: must_be_immutable
 class CaptureVictimDetailPage extends StatelessWidget {
+  // ignore: prefer_typing_uninitialized_variables
   final addNewVictim;
-  final List<Map<String, dynamic>> genderItemsDto;
+  final List<GenderDto> gendersDto;
   CaptureVictimDetailPage(
-      {super.key, required this.genderItemsDto, this.addNewVictim});
+      {super.key, required this.gendersDto, this.addNewVictim});
 //controls
   final TextEditingController nameController = TextEditingController();
   final TextEditingController surnameController = TextEditingController();
   final TextEditingController ageController = TextEditingController();
-  final DropdownEditingController<Map<String, dynamic>>? genderController =
-      DropdownEditingController();
   final TextEditingController isVictimIndividualController =
       TextEditingController();
   final TextEditingController victimOccupationController =
@@ -25,6 +24,7 @@ class CaptureVictimDetailPage extends StatelessWidget {
   final TextEditingController addressLine1Controller = TextEditingController();
   final TextEditingController addressLine2Controller = TextEditingController();
   final TextEditingController postalCodeController = TextEditingController();
+  int? genderDropdownButtonFormField;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +46,7 @@ class CaptureVictimDetailPage extends StatelessWidget {
                 header: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Text(
-                      "Capture Victim",
+                      "Capture Individual Victim",
                       style: Theme.of(context).textTheme.bodyLarge,
                     )),
                 collapsed: const Text(
@@ -119,15 +119,31 @@ class CaptureVictimDetailPage extends StatelessWidget {
                         Expanded(
                           child: Container(
                               padding: const EdgeInsets.all(10),
-                              child: dynamicDropdownWidget(
-                                  dropdownEditingName: genderController,
-                                  labelTextValue: 'Gender',
-                                  displayItemFnValue: 'description',
-                                  itemsCollection: genderItemsDto,
-                                  selectedFnValue: 'genderId',
-                                  filterFnValue: 'description',
-                                  titleValue: 'description',
-                                  subtitleValue: '')),
+                              child: DropdownButtonFormField(
+                                value: genderDropdownButtonFormField,
+                                decoration: const InputDecoration(
+                                  hintText: 'Gender',
+                                  labelText: 'Gender',
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 1, color: Colors.green),
+                                  ),
+                                ),
+                                items: gendersDto.map((gender) {
+                                  return DropdownMenuItem(
+                                      value: gender.genderId,
+                                      child:
+                                          Text(gender.description.toString()));
+                                }).toList(),
+                                onChanged: (selectedValue) {
+                                  genderDropdownButtonFormField = selectedValue;
+                                },
+                                validator: (value) {
+                                  if (value == null) {
+                                    return 'Gender is required';
+                                  }
+                                },
+                              )),
                         ),
                       ],
                     ),
@@ -276,7 +292,7 @@ class CaptureVictimDetailPage extends StatelessWidget {
                                         int.parse(
                                             ageController.text.toString()),
                                         GenderDto.fromJson(
-                                            genderController!.value),
+                                            genderDropdownButtonFormField),
                                         victimOccupationController.text
                                             .toString(),
                                         isVictimIndividualController.text

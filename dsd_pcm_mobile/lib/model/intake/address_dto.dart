@@ -1,3 +1,5 @@
+import 'address_type_dto.dart';
+
 class AddressDto {
   AddressDto({
     int? addressId,
@@ -7,6 +9,7 @@ class AddressDto {
     int? townId,
     String? postalCode,
     String? addressType,
+    AddressTypeDto? addressTypeDto,
   }) {
     _addressId = addressId;
     _addressTypeId = addressTypeId;
@@ -15,6 +18,7 @@ class AddressDto {
     _townId = townId;
     _postalCode = postalCode;
     _addressType = addressType;
+    _addressTypeDto = addressTypeDto;
   }
 
   AddressDto.fromJson(dynamic json) {
@@ -25,6 +29,9 @@ class AddressDto {
     _townId = json['townId'];
     _postalCode = json['postalCode'];
     _addressType = json['addressType'];
+    _addressTypeDto = json['addressTypeDto'] != null
+        ? AddressTypeDto.fromJson(json['addressTypeDto'])
+        : null;
   }
   int? _addressId;
   int? _addressTypeId;
@@ -33,6 +40,7 @@ class AddressDto {
   int? _townId;
   String? _postalCode;
   String? _addressType;
+  AddressTypeDto? _addressTypeDto;
 
   int? get addressId => _addressId;
   int? get addressTypeId => _addressTypeId;
@@ -41,6 +49,7 @@ class AddressDto {
   int? get townId => _townId;
   String? get postalCode => _postalCode;
   String? get addressType => _addressType;
+  AddressTypeDto? get addressTypeDto => _addressTypeDto;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -51,6 +60,9 @@ class AddressDto {
     map['townId'] = townId;
     map['postalCode'] = postalCode;
     map['addressType'] = addressType;
+    if (_addressTypeDto != null) {
+      map['addressTypeDto'] = _addressTypeDto?.toJson();
+    }
     return map;
   }
 }
