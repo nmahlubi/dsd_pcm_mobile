@@ -19,7 +19,7 @@ class MedicalHealthDetailSync {
       for (var medicalHealth in offlineMedicalDetailHealthDto) {
         try {
           apiResponse = await _medicalHealthDetailsService
-              .addMedicalHealthDetailOnline(medicalHealth);
+              .addUpdateMedicalHealthDetailOnline(medicalHealth);
           _medicalHealthDetailRepository
               .deleteMedicalHealthDetails(medicalHealth.healthDetailsId!);
         } on SocketException catch (_) {

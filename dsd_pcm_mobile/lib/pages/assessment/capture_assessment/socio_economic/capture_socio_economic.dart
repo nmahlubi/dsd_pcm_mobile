@@ -77,7 +77,7 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               child: TextFormField(
                                 controller: familyBackgroundCommentController,
                                 enableInteractiveSelection: false,
-                                maxLines: 1,
+                                maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
                                   labelText: 'Family Background Comments',
@@ -101,7 +101,7 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               child: TextFormField(
                                 controller: financeWorkRecordController,
                                 enableInteractiveSelection: false,
-                                maxLines: 1,
+                                maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
                                   labelText: 'Finance Work Record',
@@ -125,7 +125,7 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               child: TextFormField(
                                 controller: housingController,
                                 enableInteractiveSelection: false,
-                                maxLines: 1,
+                                maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
                                   labelText: 'Housing',
@@ -149,7 +149,7 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               child: TextFormField(
                                 controller: socialCircumsancesController,
                                 enableInteractiveSelection: false,
-                                maxLines: 1,
+                                maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
                                   labelText: 'Social Circumsances',
@@ -173,7 +173,7 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               child: TextFormField(
                                 controller: previousInterventionController,
                                 enableInteractiveSelection: false,
-                                maxLines: 1,
+                                maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
                                   labelText: 'Previous Intervention',
@@ -197,7 +197,7 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               child: TextFormField(
                                 controller: interPersonalRelationshipController,
                                 enableInteractiveSelection: false,
-                                maxLines: 1,
+                                maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
                                   labelText: 'InterPersonal Relationship',
@@ -221,7 +221,7 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               child: TextFormField(
                                 controller: peerPresureController,
                                 enableInteractiveSelection: false,
-                                maxLines: 1,
+                                maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
                                   labelText: 'Peer Presure',
@@ -245,7 +245,7 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               child: TextFormField(
                                 controller: substanceAbuseController,
                                 enableInteractiveSelection: false,
-                                maxLines: 1,
+                                maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
                                   labelText: 'Substance Abuse',
@@ -269,7 +269,7 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               child: TextFormField(
                                 controller: religiousInvolveController,
                                 enableInteractiveSelection: false,
-                                maxLines: 1,
+                                maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
                                   labelText: 'Religious Involve',
@@ -293,7 +293,7 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               child: TextFormField(
                                 controller: childBehaviorController,
                                 enableInteractiveSelection: false,
-                                maxLines: 1,
+                                maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
                                   labelText: 'Child Behavior',
@@ -317,7 +317,7 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               child: TextFormField(
                                 controller: otherController,
                                 enableInteractiveSelection: false,
-                                maxLines: 1,
+                                maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
                                   labelText: 'Other',

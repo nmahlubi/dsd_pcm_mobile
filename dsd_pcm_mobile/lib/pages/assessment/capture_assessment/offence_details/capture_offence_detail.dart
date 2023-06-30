@@ -6,9 +6,10 @@ import 'package:flutter/material.dart';
 import '../../../../model/intake/offence_category_dto.dart';
 import '../../../../model/intake/offence_schedule_dto.dart';
 import '../../../../model/intake/offence_type_dto.dart';
-import '../../../../widgets/dropdown_widget.dart';
 
+// ignore: must_be_immutable
 class CaptureOffenceDetailPage extends StatelessWidget {
+  // ignore: prefer_typing_uninitialized_variables
   final addNewOffenceDetail;
 
   final List<YesNoDto> yesNoDtoItemsDto;

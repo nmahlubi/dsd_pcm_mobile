@@ -1,39 +1,27 @@
-import 'package:dropdown_plus/dropdown_plus.dart';
-
 import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
 
 import '../../../../model/intake/placement_type_dto.dart';
 import '../../../../model/intake/recommendation_type_dto.dart';
-import '../../../../widgets/dropdown_widget.dart';
 
+// ignore: must_be_immutable
 class CaptureRecommendationPage extends StatelessWidget {
+  // ignore: prefer_typing_uninitialized_variables
   final addNewRecommandation;
-  final List<Map<String, dynamic>> recommendationTypeItemsDto;
-  final List<Map<String, dynamic>> placementTypeItemsDto;
+  final List<RecommendationTypeDto> recommendationTypesDto;
+  final List<PlacementTypeDto> placementTypesDto;
+
   CaptureRecommendationPage(
       {super.key,
-      required this.recommendationTypeItemsDto,
-      required this.placementTypeItemsDto,
+      required this.recommendationTypesDto,
+      required this.placementTypesDto,
       this.addNewRecommandation});
 //controls
   final TextEditingController commentsForRecommendationController =
       TextEditingController();
-  final DropdownEditingController<Map<String, dynamic>>?
-      recommendationTypeController = DropdownEditingController();
-  final DropdownEditingController<Map<String, dynamic>>?
-      placementTypeController = DropdownEditingController();
-/*
- int? recommendationId,
-    int? recommendationTypeId,
-    int? placementTypeId,
-    String? commentsForRecommendation,
-    int? createdBy,
-    String? dateCreated,
-    int? modifiedBy,
-    String? dateModified,
-    int? intakeAssessmentId,
-    */
+  int? recommendationTypeDropdownButtonFormField;
+  int? placementTypeDropdownButtonFormField;
+
   @override
   Widget build(BuildContext context) {
     return ExpandableNotifier(
@@ -76,37 +64,74 @@ class CaptureRecommendationPage extends StatelessWidget {
                             fontSize: 21),
                       ),
                     ),
-                    Row(children: [
-                      Expanded(
-                        child: Container(
-                            padding: const EdgeInsets.all(10),
-                            child: dynamicDropdownWidget(
-                                dropdownEditingName:
-                                    recommendationTypeController,
-                                labelTextValue: 'Recommandation Type',
-                                displayItemFnValue: 'description',
-                                itemsCollection: recommendationTypeItemsDto,
-                                selectedFnValue: 'recommendationTypeId',
-                                filterFnValue: 'description',
-                                titleValue: 'description',
-                                subtitleValue: '')),
-                      ),
-                    ]),
                     Row(
                       children: [
                         Expanded(
-                          child: Container(
-                              padding: const EdgeInsets.all(10),
-                              child: dynamicDropdownWidget(
-                                  dropdownEditingName: placementTypeController,
-                                  labelTextValue: 'Placement Type',
-                                  displayItemFnValue: 'description',
-                                  itemsCollection: placementTypeItemsDto,
-                                  selectedFnValue: 'placementTypeId',
-                                  filterFnValue: 'description',
-                                  titleValue: 'description',
-                                  subtitleValue: '')),
-                        ),
+                            child: Container(
+                                padding: const EdgeInsets.all(10),
+                                child: DropdownButtonFormField(
+                                  value:
+                                      recommendationTypeDropdownButtonFormField,
+                                  decoration: const InputDecoration(
+                                    hintText: 'Recommandation Type',
+                                    labelText: 'Recommandation Type',
+                                    border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 1, color: Colors.green),
+                                    ),
+                                  ),
+                                  items: recommendationTypesDto
+                                      .map((recommandationType) {
+                                    return DropdownMenuItem(
+                                        value: recommandationType
+                                            .recommendationTypeId,
+                                        child: Text(recommandationType
+                                            .description
+                                            .toString()));
+                                  }).toList(),
+                                  onChanged: (selectedValue) {
+                                    recommendationTypeDropdownButtonFormField =
+                                        selectedValue;
+                                  },
+                                  validator: (value) {
+                                    if (value == null) {
+                                      return 'Recommandation Type is required';
+                                    }
+                                  },
+                                ))),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Container(
+                                padding: const EdgeInsets.all(10),
+                                child: DropdownButtonFormField(
+                                  value: placementTypeDropdownButtonFormField,
+                                  decoration: const InputDecoration(
+                                    hintText: 'Placement Type',
+                                    labelText: 'Placement Type',
+                                    border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 1, color: Colors.green),
+                                    ),
+                                  ),
+                                  items: placementTypesDto.map((placementType) {
+                                    return DropdownMenuItem(
+                                        value: placementType.placementTypeId,
+                                        child: Text(placementType.description
+                                            .toString()));
+                                  }).toList(),
+                                  onChanged: (selectedValue) {
+                                    placementTypeDropdownButtonFormField =
+                                        selectedValue;
+                                  },
+                                  validator: (value) {
+                                    if (value == null) {
+                                      return 'Placement Type is required';
+                                    }
+                                  },
+                                ))),
                       ],
                     ),
                     Row(
@@ -120,7 +145,7 @@ class CaptureRecommendationPage extends StatelessWidget {
                               maxLines: 4,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
-                                labelText: 'Comments For Recommendation',
+                                labelText: 'Comments',
                               ),
                             ),
                           ),
@@ -135,27 +160,27 @@ class CaptureRecommendationPage extends StatelessWidget {
                           padding: const EdgeInsets.fromLTRB(10, 20, 10, 2),
                         )),
                         Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                          ),
-                        ),
-                        Expanded(
                             child: Container(
                                 height: 70,
                                 padding:
                                     const EdgeInsets.fromLTRB(10, 20, 10, 2),
-                                child: ElevatedButton(
-                                  child: const Text('Add'),
+                                child: OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    backgroundColor:
+                                        const Color.fromARGB(255, 23, 22, 22),
+                                    shape: const StadiumBorder(),
+                                    side: const BorderSide(
+                                        width: 2, color: Colors.blue),
+                                  ),
                                   onPressed: () {
                                     addNewRecommandation(
-                                      RecommendationTypeDto.fromJson(
-                                          recommendationTypeController!.value),
-                                      PlacementTypeDto.fromJson(
-                                          placementTypeController!.value),
+                                      recommendationTypeDropdownButtonFormField,
+                                      placementTypeDropdownButtonFormField,
                                       commentsForRecommendationController.text
                                           .toString(),
                                     );
                                   },
+                                  child: const Text('Add Recommandation'),
                                 ))),
                       ],
                     ),

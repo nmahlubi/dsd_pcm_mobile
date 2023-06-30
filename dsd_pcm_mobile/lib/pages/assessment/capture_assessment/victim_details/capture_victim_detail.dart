@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../model/intake/gender_dto.dart';
-import '../../../../widgets/dropdown_widget.dart';
 
 // ignore: must_be_immutable
 class CaptureVictimDetailPage extends StatelessWidget {
   // ignore: prefer_typing_uninitialized_variables
-  final addNewVictim;
+  final captureVictimIndividual;
   final List<GenderDto> gendersDto;
   CaptureVictimDetailPage(
-      {super.key, required this.gendersDto, this.addNewVictim});
+      {super.key, required this.gendersDto, this.captureVictimIndividual});
 //controls
   final TextEditingController nameController = TextEditingController();
   final TextEditingController surnameController = TextEditingController();
+  final TextEditingController dateOfBirthController = TextEditingController();
   final TextEditingController ageController = TextEditingController();
   final TextEditingController isVictimIndividualController =
       TextEditingController();
@@ -106,6 +107,43 @@ class CaptureVictimDetailPage extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
+                              controller: dateOfBirthController,
+                              enableInteractiveSelection: false,
+                              maxLines: 1,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Date Of Birth',
+                              ),
+                              readOnly: true, // when true user cannot edit text
+                              onTap: () async {
+                                DateTime? pickedDate = await showDatePicker(
+                                    context: context,
+                                    initialDate:
+                                        DateTime.now(), //get today's date
+                                    firstDate: DateTime(
+                                        2000), //DateTime.now() - not to allow to choose before today.
+                                    lastDate: DateTime(2101));
+
+                                if (pickedDate != null) {
+                                  String formattedDate =
+                                      DateFormat('yyyy-MM-dd').format(
+                                          pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
+                                  dateOfBirthController.text = formattedDate;
+                                  //You can format date as per your need
+
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            child: TextFormField(
                               controller: ageController,
                               enableInteractiveSelection: false,
                               maxLines: 1,
@@ -163,6 +201,10 @@ class CaptureVictimDetailPage extends StatelessWidget {
                             ),
                           ),
                         ),
+                      ],
+                    ),
+                    Row(
+                      children: [
                         Expanded(
                           child: Container(
                             padding: const EdgeInsets.all(10),
@@ -274,25 +316,26 @@ class CaptureVictimDetailPage extends StatelessWidget {
                           padding: const EdgeInsets.fromLTRB(10, 20, 10, 2),
                         )),
                         Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                          ),
-                        ),
-                        Expanded(
                             child: Container(
                                 height: 70,
                                 padding:
                                     const EdgeInsets.fromLTRB(10, 20, 10, 2),
-                                child: ElevatedButton(
-                                  child: const Text('Add'),
+                                child: OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    backgroundColor:
+                                        const Color.fromARGB(255, 23, 22, 22),
+                                    shape: const StadiumBorder(),
+                                    side: const BorderSide(
+                                        width: 2, color: Colors.blue),
+                                  ),
                                   onPressed: () {
-                                    addNewVictim(
+                                    captureVictimIndividual(
                                         nameController.text.toString(),
                                         surnameController.text.toString(),
+                                        dateOfBirthController.text.toString(),
                                         int.parse(
                                             ageController.text.toString()),
-                                        GenderDto.fromJson(
-                                            genderDropdownButtonFormField),
+                                        genderDropdownButtonFormField,
                                         victimOccupationController.text
                                             .toString(),
                                         isVictimIndividualController.text
@@ -303,6 +346,7 @@ class CaptureVictimDetailPage extends StatelessWidget {
                                         addressLine2Controller.text.toString(),
                                         postalCodeController.text.toString());
                                   },
+                                  child: const Text('Add Indivitual'),
                                 ))),
                       ],
                     ),

@@ -84,80 +84,10 @@ class MedicalHealthDetailsService {
     return apiResponse;
   }
 
-/*
- Future<ApiResponse> addMedicalHealthDetail(
+  Future<ApiResponse> addUpdateMedicalHealthDetailOnline(
       MedicalHealthDetailDto medicalHealthDetailDto) async {
-    ApiResponse apiResponse = ApiResponse();
-    try {
-      final response = await client.post(
-          Uri.parse("${AppUrl.pcmURL}/Medical/HealthDetails/Add"),
-          body: json.encode(medicalHealthDetailDto),
-          headers: {'Content-Type': 'application/json'});
-
-      switch (response.statusCode) {
-        case 200:
-          ApiResults apiResults =
-              ApiResults.fromJson(json.decode(response.body));
-          apiResponse.Data = apiResults;
-          break;
-        default:
-          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
-          break;
-      }
-    } on SocketException {
-      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
-    }
-    return apiResponse;
+    return await _httpClientService.httpClientPost(
+        "${AppUrl.pcmURL}/Medical/HealthDetails/AddUpdate",
+        medicalHealthDetailDto);
   }
-  */
-
-  /* Future<ApiResponse> addMedicalHealthDetailOnline(
-      MedicalHealthDetailDto medicalHealthDetailDto) async {
-    ApiResponse apiResponse = ApiResponse();
-    try {
-      final response = await client.post(
-          Uri.parse("${AppUrl.pcmURL}/Medical/HealthDetails/Add"),
-          body: json.encode(medicalHealthDetailDto),
-          headers: {'Content-Type': 'application/json'});
-
-      switch (response.statusCode) {
-        case 200:
-          ApiResults apiResults =
-              ApiResults.fromJson(json.decode(response.body));
-          apiResponse.Data = apiResults;
-          break;
-        default:
-          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
-          break;
-      }
-    } on SocketException {
-      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
-    }
-    return apiResponse;
-  }
-
-  Future<ApiResponse> addMedicalHealthDetail(
-      MedicalHealthDetailDto medicalHealthDetailDto) async {
-    ApiResponse apiResponse = ApiResponse();
-    try {
-      final response = await client.post(
-          Uri.parse("${AppUrl.pcmURL}/Medical/HealthDetails/Add"),
-          body: json.encode(medicalHealthDetailDto),
-          headers: {'Content-Type': 'application/json'});
-
-      switch (response.statusCode) {
-        case 200:
-          ApiResults apiResults =
-              ApiResults.fromJson(json.decode(response.body));
-          apiResponse.Data = apiResults;
-          break;
-        default:
-          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
-          break;
-      }
-    } on SocketException {
-      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
-    }
-    return apiResponse;
-  }*/
 }

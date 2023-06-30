@@ -30,7 +30,7 @@ class CaptureMedicalHealthPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ExpandableNotifier(
         child: Padding(
-      padding: const EdgeInsets.all(2),
+      padding: const EdgeInsets.all(0),
       child: Card(
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -142,7 +142,7 @@ class CaptureMedicalHealthPage extends StatelessWidget {
                                     initialDate:
                                         DateTime.now(), //get today's date
                                     firstDate: DateTime(
-                                        2000), //DateTime.now() - not to allow to choose before today.
+                                        1800), //DateTime.now() - not to allow to choose before today.
                                     lastDate: DateTime(2101));
 
                                 if (pickedDate != null) {
@@ -189,6 +189,7 @@ class CaptureMedicalHealthPage extends StatelessWidget {
                                   if (value == null) {
                                     return 'Health Status is required';
                                   }
+                                  return null;
                                 },
                               )),
                         ),

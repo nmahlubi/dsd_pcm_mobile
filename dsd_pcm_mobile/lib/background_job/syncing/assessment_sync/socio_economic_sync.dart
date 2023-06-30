@@ -18,8 +18,8 @@ class SocioEconomicSync {
     if (offlineSocioEconomicDto.isNotEmpty) {
       for (var socioEconomic in offlineSocioEconomicDto) {
         try {
-          apiResponse =
-              await _socioEconomicService.addSocioEconomicOnline(socioEconomic);
+          apiResponse = await _socioEconomicService
+              .addUpdateSocioEconomicOnline(socioEconomic);
           _socioEconomicRepository
               .deleteSocioEconomic(socioEconomic.socioEconomyid!);
         } on SocketException catch (_) {

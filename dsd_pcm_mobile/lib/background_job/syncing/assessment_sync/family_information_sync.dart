@@ -19,7 +19,7 @@ class FamilyInformationSync {
       for (var familyInfo in offlineFamilyInformationDto) {
         try {
           apiResponse = await _familyServiceService
-              .addFamilyInformationOnline(familyInfo);
+              .addUpdateFamilyInformationOnline(familyInfo);
           _familyInformationRepository
               .deleteFamilyInformation(familyInfo.familyInformationId!);
         } on SocketException catch (_) {

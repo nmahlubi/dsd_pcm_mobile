@@ -190,8 +190,8 @@ class CaptureCareGiverDetailPage extends StatelessWidget {
                                     initialDate:
                                         DateTime.now(), //get today's date
                                     firstDate: DateTime(
-                                        2000), //DateTime.now() - not to allow to choose before today.
-                                    lastDate: DateTime(2101));
+                                        1900), //DateTime.now() - not to allow to choose before today.
+                                    lastDate: DateTime(3000));
 
                                 if (pickedDate != null) {
                                   String formattedDate =

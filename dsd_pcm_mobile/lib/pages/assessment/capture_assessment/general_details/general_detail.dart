@@ -11,6 +11,7 @@ import '../../../../util/shared/apiresults.dart';
 import '../../../../util/shared/loading_overlay.dart';
 import '../../../../util/shared/randon_generator.dart';
 import '../../../probation_officer/accepted_worklist.dart';
+import '../development_assessment/development_assessment.dart';
 import 'capture_general_detail.dart';
 import 'view_general_detail.dart';
 
@@ -86,8 +87,7 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
         await _generalDetailServiceClient.addGeneralDetail(generalDetailDto);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
-      await showAlertDialogMessage(
-          "Successfull", "General details successfully created.");
+      showSuccessMessage('General Details Successfully Created.');
       navigator.push(
         MaterialPageRoute(
             builder: (context) => const GeneralDetailPage(),
@@ -108,25 +108,10 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
     );
   }
 
-  showAlertDialogMessage(String? headerMessage, String? message) async {
-    await showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(headerMessage!),
-        content: Text(message!),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-            },
-            child: Container(
-              //color: Colors.green,
-              padding: const EdgeInsets.all(14),
-              child: const Text("okay"),
-            ),
-          ),
-        ],
-      ),
+  showSuccessMessage(String? message) {
+    final messageDialog = ScaffoldMessenger.of(context);
+    messageDialog.showSnackBar(
+      SnackBar(content: Text(message!), backgroundColor: Colors.green),
     );
   }
 
@@ -188,7 +173,18 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
                     heroTag: null,
                     child: const Icon(Icons.arrow_back)),
                 FloatingActionButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const DevelopmentAssessmentPage(),
+                          settings: RouteSettings(
+                            arguments: acceptedWorklistDto,
+                          ),
+                        ),
+                      );
+                    },
                     heroTag: null,
                     child: const Icon(Icons.arrow_forward)),
               ],

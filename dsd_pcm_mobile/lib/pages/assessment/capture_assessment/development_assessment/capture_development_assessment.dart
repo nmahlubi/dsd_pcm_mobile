@@ -185,16 +185,30 @@ class CaptureDevelopmentAssessmentPage extends StatelessWidget {
                             padding: const EdgeInsets.fromLTRB(10, 20, 10, 2),
                           )),
                           Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                            ),
-                          ),
-                          Expanded(
                               child: Container(
                                   height: 70,
                                   padding:
                                       const EdgeInsets.fromLTRB(10, 20, 10, 2),
-                                  child: ElevatedButton(
+                                  child: OutlinedButton(
+                                    style: OutlinedButton.styleFrom(
+                                      backgroundColor:
+                                          const Color.fromARGB(255, 23, 22, 22),
+                                      shape: const StadiumBorder(),
+                                      side: const BorderSide(
+                                          width: 2, color: Colors.blue),
+                                    ),
+                                    onPressed: () {
+                                      addDevelopmentAssessment(
+                                          belongingController.text.toString(),
+                                          masteryController.text.toString(),
+                                          independenceController.text
+                                              .toString(),
+                                          generosityController.text.toString(),
+                                          evaluationController.text.toString());
+                                    },
+                                    child: const Text('Add Assessment'),
+                                  )
+                                  /*child: ElevatedButton(
                                     child: const Text('Add'),
                                     onPressed: () {
                                       if (_captureGeneralDetailFormKey
@@ -209,13 +223,10 @@ class CaptureDevelopmentAssessmentPage extends StatelessWidget {
                                                 .toString(),
                                             evaluationController.text
                                                 .toString());
-
-                                        /*
-                                                
-    */
                                       }
                                     },
-                                  ))),
+                                  )*/
+                                  )),
                         ],
                       ),
                     ],

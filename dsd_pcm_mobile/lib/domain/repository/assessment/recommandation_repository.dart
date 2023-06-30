@@ -71,11 +71,6 @@ class RecommendationRepository {
             recommendationType:
                 _recommendationTypeRepository.recommendationTypeToDb(
                     recommendationDto.recommendationTypeDto),
-            /*recommendationType:
-                _recommendationTypeRepository._recommendationTypeToDb(
-                    recommendationDto.recommendationTypeDto),
-            placementTypeModel:
-                _placementTypeToDb(recommendationDto.placementTypeDto)*/
             placementTypeModel: _placementTypeRepository
                 .placementTypeToDb(recommendationDto.placementTypeDto)));
   }

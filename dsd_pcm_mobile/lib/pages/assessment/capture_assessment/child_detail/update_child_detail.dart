@@ -25,6 +25,7 @@ import '../../../../util/shared/loading_overlay.dart';
 import '../../../../util/shared/randon_generator.dart';
 import '../../../../widgets/alert_dialog_messege_widget.dart';
 import '../../../probation_officer/accepted_worklist.dart';
+import '../assessment_details/assessment_detail.dart';
 import '../health_detail/health_detail.dart';
 
 class UpdateChildDetailPage extends StatefulWidget {
@@ -207,8 +208,7 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       if (!mounted) return;
-      alertDialogMessageWidget(
-          context, "Successfull", "Address successfully added.");
+      showSuccessMessage('Address Successfully Created.');
       addressLine1Controller.text = '';
       addressLine2Controller.text = '';
       postalCodeController.text = '';
@@ -301,8 +301,7 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       if (!mounted) return;
-      alertDialogMessageWidget(
-          context, "Successfull", "Child details successfully updated.");
+      showSuccessMessage('Child Details Successfully Updated.');
     } else {
       showDialogMessage((apiResponse.ApiError as ApiError));
       overlay.hide();
@@ -315,6 +314,13 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
     final messageDialog = ScaffoldMessenger.of(context);
     messageDialog.showSnackBar(
       SnackBar(content: Text(apiError.error!), backgroundColor: Colors.red),
+    );
+  }
+
+  showSuccessMessage(String? message) {
+    final messageDialog = ScaffoldMessenger.of(context);
+    messageDialog.showSnackBar(
+      SnackBar(content: Text(message!), backgroundColor: Colors.green),
     );
   }
 
@@ -389,7 +395,7 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const HealthDetailPage(),
+                            builder: (context) => const AssessmentDetailPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),

@@ -92,4 +92,11 @@ class CareGiverDetailService {
     }
     return apiResponse;
   }
+
+  Future<ApiResponse> addUpdateCareGiverDetailOnline(
+      CareGiverDetailsDto careGiverDetailsDto, int? personId) async {
+    return await _httpClientService.httpClientPost(
+        "${AppUrl.intakeURL}/CareGiverDetails/AddUpdate/$personId",
+        careGiverDetailsDto);
+  }
 }

@@ -1,32 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../../model/intake/health_status_dto.dart';
 import '../../../../model/pcm/accepted_worklist_dto.dart';
-import '../../../../model/pcm/medical_health_detail_dto.dart';
+import '../../../../model/pcm/general_detail_dto.dart';
 import '../../../../navigation_drawer/go_to_assessment_drawer.dart';
-import '../../../../service/pcm/medical_health_details_service.dart';
-import '../../../../transform_dynamic/transform_lookup.dart';
+import '../../../../service/pcm/general_detail_service.dart';
 import '../../../../util/shared/apierror.dart';
 import '../../../../util/shared/apiresponse.dart';
 import '../../../../util/shared/apiresults.dart';
 import '../../../../util/shared/loading_overlay.dart';
 import '../../../../util/shared/randon_generator.dart';
 import '../../../probation_officer/accepted_worklist.dart';
-import '../assessment_details/assessment_detail.dart';
-import '../care_giver_detail/care_giver_detail.dart';
 import '../child_detail/update_child_detail.dart';
-import 'capture_medical_health.dart';
-import 'view_medical_health.dart';
+import '../development_assessment/development_assessment.dart';
+import '../health_detail/health_detail.dart';
 
-class HealthDetailPage extends StatefulWidget {
-  const HealthDetailPage({Key? key}) : super(key: key);
+class AssessmentDetailPage extends StatefulWidget {
+  const AssessmentDetailPage({Key? key}) : super(key: key);
 
   @override
-  State<HealthDetailPage> createState() => _HealthDetailPageState();
+  State<AssessmentDetailPage> createState() => _AssessmentDetailPageState();
 }
 
-class _HealthDetailPageState extends State<HealthDetailPage> {
+class _AssessmentDetailPageState extends State<AssessmentDetailPage> {
   SharedPreferences? preferences;
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -35,13 +31,11 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
   }
 
   late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
-  final _lookupTransform = LookupTransform();
   final _randomGenerator = RandomGenerator();
-  final _medicalHealthDetailsServiceClient = MedicalHealthDetailsService();
+  final _generalDetailServiceClient = GeneralDetailService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
-  late List<HealthStatusDto> healthStatusesDto = [];
-  late List<MedicalHealthDetailDto> medicalHealthDetailsDto = [];
+  late List<GeneralDetailDto> generalDetailsDto = [];
 
   @override
   void initState() {
@@ -51,31 +45,22 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
         setState(() {
           acceptedWorklistDto =
               ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
-          loadLookUpTransformer();
-          loadMedicalHealthDetailsByIntakeAssessmentId(
+          loadGeneralDetailsByIntakeAssessmentId(
               acceptedWorklistDto.intakeAssessmentId);
         });
       });
     });
   }
 
-  loadLookUpTransformer() async {
+  loadGeneralDetailsByIntakeAssessmentId(int? intakeAssessmentId) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    healthStatusesDto = await _lookupTransform.transformHealthStatusesDto();
-    overlay.hide();
-  }
-
-  loadMedicalHealthDetailsByIntakeAssessmentId(int? intakeAssessmentId) async {
-    final overlay = LoadingOverlay.of(context);
-    overlay.show();
-    apiResponse = await _medicalHealthDetailsServiceClient
-        .getMedicalHealthDetailsByAssessmentId(intakeAssessmentId);
+    apiResponse = await _generalDetailServiceClient
+        .getGeneralDetailByIntakeAssessmentId(intakeAssessmentId);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        medicalHealthDetailsDto =
-            (apiResponse.Data as List<MedicalHealthDetailDto>);
+        generalDetailsDto = (apiResponse.Data as List<GeneralDetailDto>);
       });
     } else {
       showDialogMessage((apiResponse.ApiError as ApiError));
@@ -83,38 +68,29 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
     }
   }
 
-  captureMedicalHealth(String? injuries, String? medication, String? allergies,
-      String? medicalAppointment, int? healthStatusId) async {
+  captureGeneralDetail(String? consultedSources, String? traceEfforts,
+      String? commentsBySupervisor, String? additionalInfo) async {
+    GeneralDetailDto generalDetailDto = GeneralDetailDto(
+        generalDetailsId: _randomGenerator.getRandomGeneratedNumber(),
+        dateCreated: _randomGenerator.getCurrentDateGenerated(),
+        intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
+        createdBy: preferences!.getInt('userId')!,
+        consultedSources: consultedSources,
+        traceEfforts: traceEfforts,
+        commentsBySupervisor: commentsBySupervisor,
+        additionalInfo: additionalInfo);
+
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
     overlay.show();
-    MedicalHealthDetailDto requestAddmedicalHealthDetailDto =
-        MedicalHealthDetailDto(
-            healthDetailsId: _randomGenerator.getRandomGeneratedNumber(),
-            healthStatusId: healthStatusId,
-            healthStatusDto: healthStatusId != null
-                ? healthStatusesDto
-                    .where((h) => h.healthStatusId == healthStatusId)
-                    .single
-                : null,
-            injuries: injuries,
-            medication: medication,
-            allergies: allergies,
-            dateCreated: _randomGenerator.getCurrentDateGenerated(),
-            medicalAppointments: medicalAppointment,
-            intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
-            createdBy: preferences!.getInt('userId'));
-
-    apiResponse = await _medicalHealthDetailsServiceClient
-        .addMedicalHealthDetail(requestAddmedicalHealthDetailDto);
-
+    apiResponse =
+        await _generalDetailServiceClient.addGeneralDetail(generalDetailDto);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
-      if (!mounted) return;
-      showSuccessMessage('Medical Information Is Successfully Created.');
+      showSuccessMessage('Assessment Details Successfully Created.');
       navigator.push(
         MaterialPageRoute(
-            builder: (context) => const HealthDetailPage(),
+            builder: (context) => const AssessmentDetailPage(),
             settings: RouteSettings(
               arguments: acceptedWorklistDto,
             )),
@@ -122,7 +98,6 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
     } else {
       showDialogMessage((apiResponse.ApiError as ApiError));
       overlay.hide();
-      return;
     }
   }
 
@@ -149,7 +124,7 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
         child: Scaffold(
           key: scaffoldKey,
           appBar: AppBar(
-            title: const Text("Medical Information"),
+            title: const Text("Assessment Details"),
             leading: IconButton(
               icon: const Icon(Icons.offline_pin_rounded),
               onPressed: () {
@@ -188,7 +163,7 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const AssessmentDetailPage(),
+                          builder: (context) => const UpdateChildDetailPage(),
                           settings: RouteSettings(
                             arguments: acceptedWorklistDto,
                           ),
@@ -202,7 +177,7 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const CareGiverDetailPage(),
+                          builder: (context) => const HealthDetailPage(),
                           settings: RouteSettings(
                             arguments: acceptedWorklistDto,
                           ),
@@ -219,11 +194,9 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
           body: ListView(
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 70),
             children: [
-              CaptureMedicalHealthPage(
-                  healthStatusesDto: healthStatusesDto,
-                  addNewMedicalHealth: captureMedicalHealth),
-              ViewMedicalHealth(
-                  medicalHealthDetailsDto: medicalHealthDetailsDto)
+              /*CaptureGeneralDetailPage(
+                  addNewGeneralDetail: captureGeneralDetail),
+              ViewGeneralDetailPage(generalDetailsDto: generalDetailsDto)*/
             ],
           ),
         ));

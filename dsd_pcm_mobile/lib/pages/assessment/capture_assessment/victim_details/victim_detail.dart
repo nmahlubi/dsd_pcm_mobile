@@ -14,7 +14,9 @@ import '../../../../util/shared/apiresponse.dart';
 import '../../../../util/shared/apiresults.dart';
 import '../../../../util/shared/loading_overlay.dart';
 import '../../../../util/shared/randon_generator.dart';
+import '../../../../widgets/alert_dialog_messege_widget.dart';
 import '../../../probation_officer/accepted_worklist.dart';
+import '../development_assessment/development_assessment.dart';
 import '../offence_details/offence_detail.dart';
 import 'capture_victim_detail.dart';
 import 'capture_victim_organisation_detail.dart';
@@ -107,9 +109,10 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
     }
   }
 
-  captureVictim(
+  captureVictimIndividual(
       String? name,
       String? surname,
+      String? dateOfBirth,
       int? age,
       int? genderId,
       String? victimOccupation,
@@ -118,42 +121,56 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
       String? addressLine1,
       String? addressLine2,
       String? postalCode) async {
-    /*
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
+    int? localPersonId = _randomGenerator.getRandomGeneratedNumber();
+    VictimDetailDto requestVictimDetailDto = VictimDetailDto(
+        victimId: _randomGenerator.getRandomGeneratedNumber(),
+        intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
+        isVictimIndividual: isVictimIndividual,
+        personId: localPersonId,
+        victimOccupation: victimOccupation,
+        victimCareGiverNames: victimCareGiverNames,
+        addressLine1: addressLine1,
+        addressLine2: addressLine2,
+        postalCode: postalCode,
+        createdBy: preferences!.getInt('userId')!,
+        personDto: PersonDto(
+          firstName: name,
+          lastName: surname,
+          dateOfBirth: dateOfBirth,
+          age: age,
+          personId: localPersonId,
+          genderId: genderId,
+          isEstimatedAge: true,
+          dateCreated: _randomGenerator.getCurrentDateGenerated(),
+          isActive: true,
+          isDeleted: false,
+          isPivaValidated: true,
+          createdBy: preferences!.getString('username'),
+          genderDto: genderId != null
+              ? gendersDto.where((i) => i.genderId == genderId).single
+              : null,
+        ));
     overlay.show();
-
+    apiResponse =
+        await _victimServiceClient.addVictimDetail(requestVictimDetailDto);
     if ((apiResponse.ApiError) == null) {
-      apiResults = (apiResponse.Data as ApiResults);
-      VictimDetailDto victimDetailDto = VictimDetailDto(
-          victimId: 0,
-          intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
-          isVictimIndividual: isVictimIndividual,
-          personId: victimPerson.personId,
-          victimOccupation: victimOccupation,
-          victimCareGiverNames: victimCareGiverNames,
-          addressLine1: addressLine1,
-          addressLine2: addressLine2,
-          postalCode: postalCode,
-          createdBy: preferences!.getInt('userId')!);
+      overlay.hide();
+      if (!mounted) return;
+      showSuccessMessage('Victim Detail Successfully Created');
 
-      apiResponse = await _victimServiceClient.addVictimDetail(victimDetailDto);
-      if ((apiResponse.ApiError) == null) {
-        overlay.hide();
-        await showAlertDialogMessage(
-            "Successfull", (apiResponse.Data as ApiResults).message!);
-        navigator.push(
-          MaterialPageRoute(
-              builder: (context) => const VictimDetailPage(),
-              settings: RouteSettings(
-                arguments: acceptedWorklistDto,
-              )),
-        );
-      } else {
-        showDialogMessage((apiResponse.ApiError as ApiError));
-        overlay.hide();
-      }
-    }*/
+      navigator.push(
+        MaterialPageRoute(
+            builder: (context) => const VictimDetailPage(),
+            settings: RouteSettings(
+              arguments: acceptedWorklistDto,
+            )),
+      );
+    } else {
+      showDialogMessage((apiResponse.ApiError as ApiError));
+      overlay.hide();
+    }
   }
 
   captureVictimOrganisation(
@@ -193,8 +210,7 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
         .addVictimOrganisation(victimOrganisationDetailDto);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
-      await showAlertDialogMessage(
-          "Successfull", "Organization successfully created.");
+      showSuccessMessage('Organization Successfully Created.');
       navigator.push(
         MaterialPageRoute(
             builder: (context) => const VictimDetailPage(),
@@ -215,25 +231,10 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
     );
   }
 
-  showAlertDialogMessage(String? headerMessage, String? message) async {
-    await showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(headerMessage!),
-        content: Text(message!),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-            },
-            child: Container(
-              //color: Colors.green,
-              padding: const EdgeInsets.all(14),
-              child: const Text("okay"),
-            ),
-          ),
-        ],
-      ),
+  showSuccessMessage(String? message) {
+    final messageDialog = ScaffoldMessenger.of(context);
+    messageDialog.showSnackBar(
+      SnackBar(content: Text(message!), backgroundColor: Colors.green),
     );
   }
 
@@ -299,7 +300,8 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const VictimDetailPage(),
+                          builder: (context) =>
+                              const DevelopmentAssessmentPage(),
                           settings: RouteSettings(
                             arguments: acceptedWorklistDto,
                           ),
@@ -317,7 +319,8 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 70),
             children: [
               CaptureVictimDetailPage(
-                  gendersDto: gendersDto, addNewVictim: captureVictim),
+                  gendersDto: gendersDto,
+                  captureVictimIndividual: captureVictimIndividual),
               ViewVictimDetailPage(victimDetailsDto: victimDetailsDto),
               CaptureVictimOrganisationDetailPage(
                   addNewVictimOrganisation: captureVictimOrganisation),

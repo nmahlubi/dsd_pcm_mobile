@@ -81,4 +81,10 @@ class SocioEconomicService {
     }
     return apiResponse;
   }
+
+  Future<ApiResponse> addUpdateSocioEconomicOnline(
+      SocioEconomicDto socioEconomicDto) async {
+    return await _httpClientService.httpClientPost(
+        "${AppUrl.pcmURL}/SocioEconomic/AddUpdate", socioEconomicDto);
+  }
 }

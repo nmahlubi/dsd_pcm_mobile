@@ -3,12 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/pcm/accepted_worklist_dto.dart';
+import '../pages/assessment/capture_assessment/assessment_details/assessment_detail.dart';
 import '../pages/assessment/capture_assessment/care_giver_detail/care_giver_detail.dart';
 import '../pages/assessment/capture_assessment/child_detail/update_child_detail.dart';
+import '../pages/assessment/capture_assessment/development_assessment/development_assessment.dart';
 import '../pages/assessment/capture_assessment/family/family.dart';
 import '../pages/assessment/capture_assessment/general_details/general_detail.dart';
 import '../pages/assessment/capture_assessment/health_detail/health_detail.dart';
 import '../pages/assessment/capture_assessment/offence_details/offence_detail.dart';
+import '../pages/assessment/capture_assessment/recommendation/recommendation.dart';
 import '../pages/assessment/capture_assessment/socio_economic/socio_economic.dart';
 import '../pages/assessment/capture_assessment/victim_details/victim_detail.dart';
 import 'create_drawer_body_item_trail.dart';
@@ -76,21 +79,21 @@ class _GoToAssessmentDrawerPageWidgetState extends State<GoToAssessmentDrawer> {
                 );
               },
               status: widget.isCompleted),
-          /*createDrawerBodyItemTrail(
+          createDrawerBodyItemTrail(
               icon: Icons.arrow_right,
               text: 'Assessment Details',
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const HealthDetailPage(),
+                    builder: (context) => const AssessmentDetailPage(),
                     settings: RouteSettings(
                       arguments: widget.acceptedWorklistDto,
                     ),
                   ),
                 );
               },
-              status: widget.isCompleted),*/
+              status: widget.isCompleted),
           createDrawerBodyItemTrail(
               icon: Icons.arrow_right,
               text: 'Medical Information',
@@ -180,6 +183,36 @@ class _GoToAssessmentDrawerPageWidgetState extends State<GoToAssessmentDrawer> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const VictimDetailPage(),
+                    settings: RouteSettings(
+                      arguments: widget.acceptedWorklistDto,
+                    ),
+                  ),
+                );
+              },
+              status: widget.isCompleted),
+          createDrawerBodyItemTrail(
+              icon: Icons.arrow_right,
+              text: 'Development Assessment',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DevelopmentAssessmentPage(),
+                    settings: RouteSettings(
+                      arguments: widget.acceptedWorklistDto,
+                    ),
+                  ),
+                );
+              },
+              status: widget.isCompleted),
+          createDrawerBodyItemTrail(
+              icon: Icons.arrow_right,
+              text: 'Recommendation',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const RecommandationPage(),
                     settings: RouteSettings(
                       arguments: widget.acceptedWorklistDto,
                     ),

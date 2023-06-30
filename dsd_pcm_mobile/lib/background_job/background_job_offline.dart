@@ -1,3 +1,4 @@
+import 'package:dsd_pcm_mobile/background_job/syncing/assessment_sync/development_assessment_sync.dart';
 import 'package:dsd_pcm_mobile/background_job/syncing/assessment_sync/intake_sync/person_address_sync.dart';
 import 'package:dsd_pcm_mobile/model/pcm/accepted_worklist_dto.dart';
 
@@ -28,6 +29,7 @@ class BackgroundJobOffline {
   final _offenceDetailSync = OffenceDetailSync();
   final _generalDetailSync = GeneralDetailSync();
   final _victimDetailSync = VictimDetailSync();
+  final _developmentAssessmentSync = DevelopmentAssessmentSync();
 
   Future<void> startRunningBackgroundSyncJob() async {
     var userToken = await _authenticateRepository.getAllAuthTokens();
@@ -101,6 +103,8 @@ class BackgroundJobOffline {
     await _generalDetailSync.syncGeneralDetail(acceptedWork.intakeAssessmentId);
     await _victimDetailSync
         .syncVictimOrganisationDetail(acceptedWork.intakeAssessmentId);
+    await _developmentAssessmentSync
+        .syncDevelopmentAssessment(acceptedWork.intakeAssessmentId);
   }
 }
   

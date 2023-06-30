@@ -7,7 +7,6 @@ import '../../service/pcm/worklist_service.dart';
 import '../../util/shared/apierror.dart';
 import '../../util/shared/apiresponse.dart';
 import '../../util/shared/loading_overlay.dart';
-import '../assessment/capture_assessment/capture_assessment.dart';
 import '../assessment/capture_assessment/child_detail/update_child_detail.dart';
 
 class AcceptedWorklistPage extends StatefulWidget {

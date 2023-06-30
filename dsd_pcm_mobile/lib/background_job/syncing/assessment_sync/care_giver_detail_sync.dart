@@ -18,8 +18,8 @@ class CareGiverDetailSync {
   late List<CareGiverDetailsDto> careGiverDetailsDto = [];
 
   Future<void> syncCareGiverDetail(int? clientId) async {
-    var offlineCareGiverDetailsDto = await _careGiverDetailRepository
-        .getAllCareGiverDetailsByClientId(clientId!);
+    var offlineCareGiverDetailsDto =
+        _careGiverDetailRepository.getAllCareGiverDetailsByClientId(clientId!);
     if (offlineCareGiverDetailsDto.isNotEmpty) {
       for (var careGiver in offlineCareGiverDetailsDto) {
         try {
@@ -29,8 +29,9 @@ class CareGiverDetailSync {
             if ((apiResponse.ApiError) == null) {
               ApiResults apiResults = (apiResponse.Data as ApiResults);
               PersonDto personDto = PersonDto.fromJson(apiResults.data);
-              apiResponse = await _careGiverDetailService
-                  .addCareGiverDetailOnline(careGiver, personDto.personId);
+              apiResponse =
+                  await _careGiverDetailService.addUpdateCareGiverDetailOnline(
+                      careGiver, personDto.personId);
             }
           }
           _careGiverDetailRepository

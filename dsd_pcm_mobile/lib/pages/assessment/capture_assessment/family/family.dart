@@ -153,9 +153,7 @@ class _FamilyPageState extends State<FamilyPage> {
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       if (!mounted) return;
-      alertDialogMessageWidget(
-          context, 'Successfull', 'Family member successfully created');
-
+      showSuccessMessage("Family Member Successfull Added");
       navigator.push(
         MaterialPageRoute(
             builder: (context) => const FamilyPage(),
@@ -188,8 +186,7 @@ class _FamilyPageState extends State<FamilyPage> {
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       if (!mounted) return;
-      alertDialogMessageWidget(
-          context, "Successfull", "Family Information Successfull Added");
+      showSuccessMessage("Family Information Successfull Added");
       navigator.push(
         MaterialPageRoute(
             builder: (context) => const FamilyPage(),
@@ -207,6 +204,13 @@ class _FamilyPageState extends State<FamilyPage> {
     final messageDialog = ScaffoldMessenger.of(context);
     messageDialog.showSnackBar(
       SnackBar(content: Text(apiError.error!), backgroundColor: Colors.red),
+    );
+  }
+
+  showSuccessMessage(String? message) {
+    final messageDialog = ScaffoldMessenger.of(context);
+    messageDialog.showSnackBar(
+      SnackBar(content: Text(message!), backgroundColor: Colors.green),
     );
   }
 

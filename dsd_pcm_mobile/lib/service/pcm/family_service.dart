@@ -68,6 +68,12 @@ class FamilyService {
         "${AppUrl.pcmURL}/Family/Information/Add", familyInformationDto);
   }
 
+  Future<ApiResponse> addUpdateFamilyInformationOnline(
+      FamilyInformationDto familyInformationDto) async {
+    return await _httpClientService.httpClientPost(
+        "${AppUrl.pcmURL}/Family/Information/AddUpdate", familyInformationDto);
+  }
+
   Future<ApiResponse> addFamilyInformation(
       FamilyInformationDto familyInformationDto) async {
     ApiResponse apiResponse = ApiResponse();
@@ -160,5 +166,11 @@ class FamilyService {
           .getFamilyMemberById(familyMemberDto.familyMemberId!);
     }
     return apiResponse;
+  }
+
+  Future<ApiResponse> addUpdateFamilyMemberOnline(
+      FamilyMemberDto familyMemberDto, int? personId) async {
+    return await _httpClientService.httpClientPost(
+        "${AppUrl.pcmURL}/Family/Member/AddUpdate/$personId", familyMemberDto);
   }
 }

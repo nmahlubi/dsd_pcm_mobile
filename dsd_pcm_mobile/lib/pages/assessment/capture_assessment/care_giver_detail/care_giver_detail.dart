@@ -8,14 +8,12 @@ import '../../../../model/intake/relationship_type_dto.dart';
 import '../../../../model/pcm/accepted_worklist_dto.dart';
 import '../../../../navigation_drawer/go_to_assessment_drawer.dart';
 import '../../../../service/intake/care_giver_detail_service.dart';
-import '../../../../service/intake/person_service.dart';
 import '../../../../transform_dynamic/transform_lookup.dart';
 import '../../../../util/shared/apierror.dart';
 import '../../../../util/shared/apiresponse.dart';
 import '../../../../util/shared/apiresults.dart';
 import '../../../../util/shared/loading_overlay.dart';
 import '../../../../util/shared/randon_generator.dart';
-import '../../../../widgets/alert_dialog_messege_widget.dart';
 import '../../../probation_officer/accepted_worklist.dart';
 import '../family/family.dart';
 import '../health_detail/health_detail.dart';
@@ -40,9 +38,7 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
   late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
   final _lookupTransform = LookupTransform();
   final _randomGenerator = RandomGenerator();
-  final PersonService personServiceClient = PersonService();
-  final CareGiverDetailService careGiverDetailServiceClient =
-      CareGiverDetailService();
+  final _careGiverDetailServiceClient = CareGiverDetailService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
   late List<GenderDto> gendersDto = [];
@@ -76,7 +72,7 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
   loadCareGiverDetailsByClientId(int? clientId) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await careGiverDetailServiceClient
+    apiResponse = await _careGiverDetailServiceClient
         .getCareGiverDetailsByClientId(clientId);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
@@ -124,14 +120,12 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
             : null,
         createdBy: preferences!.getString('username')!);
     overlay.show();
-    apiResponse = await careGiverDetailServiceClient
+    apiResponse = await _careGiverDetailServiceClient
         .addCareGiverDetail(requestCareGiverDetailsDto);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       if (!mounted) return;
-      alertDialogMessageWidget(
-          context, 'Successfull', 'Care giver successfully created');
-
+      showSuccessMessage('Care Giver Detail Is Successfully Created.');
       navigator.push(
         MaterialPageRoute(
             builder: (context) => const CareGiverDetailPage(),
@@ -149,6 +143,13 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
     final messageDialog = ScaffoldMessenger.of(context);
     messageDialog.showSnackBar(
       SnackBar(content: Text(apiError.error!), backgroundColor: Colors.red),
+    );
+  }
+
+  showSuccessMessage(String? message) {
+    final messageDialog = ScaffoldMessenger.of(context);
+    messageDialog.showSnackBar(
+      SnackBar(content: Text(message!), backgroundColor: Colors.green),
     );
   }
 

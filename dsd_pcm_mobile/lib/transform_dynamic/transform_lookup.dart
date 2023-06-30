@@ -7,8 +7,11 @@ import '../model/intake/language_dto.dart';
 import '../model/intake/marital_status_dto.dart';
 import '../model/intake/nationality_dto.dart';
 import '../model/intake/person_address_dto.dart';
+import '../model/intake/placement_type_dto.dart';
 import '../model/intake/preferred_contact_type_dto.dart';
+import '../model/intake/recommendation_type_dto.dart';
 import '../model/intake/relationship_type_dto.dart';
+import '../model/pcm/recommendations_dto.dart';
 import '../service/intake/look_up_service.dart';
 import '../util/shared/apiresponse.dart';
 
@@ -26,6 +29,8 @@ class LookupTransform {
   late List<AddressTypeDto> addressTypesDto = [];
   late List<HealthStatusDto> healthStatusesDto = [];
   late List<RelationshipTypeDto> relationshipTypesDto = [];
+  late List<PlacementTypeDto> placementTypesDto = [];
+  late List<RecommendationTypeDto> recommendationTypesDto = [];
 
   Future<List<IdentificationTypeDto>> transformIdentificationTypeDto() async {
     apiResponse = await _lookUpServiceClient.getIdentificationTypes();
@@ -100,5 +105,22 @@ class LookupTransform {
       relationshipTypesDto = (apiResponse.Data as List<RelationshipTypeDto>);
     }
     return relationshipTypesDto;
+  }
+
+  Future<List<PlacementTypeDto>> transformPlacementTypeDto() async {
+    apiResponse = await _lookUpServiceClient.getPlacementTypes();
+    if ((apiResponse.ApiError) == null) {
+      placementTypesDto = (apiResponse.Data as List<PlacementTypeDto>);
+    }
+    return placementTypesDto;
+  }
+
+  Future<List<RecommendationTypeDto>> transformRecommendationTypeDto() async {
+    apiResponse = await _lookUpServiceClient.getRecommendationTypes();
+    if ((apiResponse.ApiError) == null) {
+      recommendationTypesDto =
+          (apiResponse.Data as List<RecommendationTypeDto>);
+    }
+    return recommendationTypesDto;
   }
 }

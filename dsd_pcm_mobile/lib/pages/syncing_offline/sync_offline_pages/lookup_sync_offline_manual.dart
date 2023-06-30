@@ -86,7 +86,7 @@ class _LookupSyncOfflineManualPageState
                 child: Form(
                     child: ListView(
                   children: [
-                    Container(
+                    /* Container(
                       padding: const EdgeInsets.all(8),
                       child: const Text(
                         'Start Syncing Offline Data',
@@ -122,7 +122,7 @@ class _LookupSyncOfflineManualPageState
                               )),
                         ),
                       ],
-                    ),
+                    ),*/
                     Container(
                       padding: const EdgeInsets.all(8),
                       child: const Text(

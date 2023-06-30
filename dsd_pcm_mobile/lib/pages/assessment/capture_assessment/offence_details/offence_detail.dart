@@ -142,8 +142,7 @@ class _OffenceDetailPageState extends State<OffenceDetailPage> {
         await offenceDetailServiceClient.addOffenceDetail(addOffenceDetailDto);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
-      await showAlertDialogMessage(
-          "Successfull", 'Offence successfully created.');
+      showSuccessMessage('Offence Successfully Created.');
       navigator.push(
         MaterialPageRoute(
             builder: (context) => const OffenceDetailPage(),
@@ -164,25 +163,10 @@ class _OffenceDetailPageState extends State<OffenceDetailPage> {
     );
   }
 
-  showAlertDialogMessage(String? headerMessage, String? message) async {
-    await showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(headerMessage!),
-        content: Text(message!),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-            },
-            child: Container(
-              //color: Colors.green,
-              padding: const EdgeInsets.all(14),
-              child: const Text("okay"),
-            ),
-          ),
-        ],
-      ),
+  showSuccessMessage(String? message) {
+    final messageDialog = ScaffoldMessenger.of(context);
+    messageDialog.showSnackBar(
+      SnackBar(content: Text(message!), backgroundColor: Colors.green),
     );
   }
 

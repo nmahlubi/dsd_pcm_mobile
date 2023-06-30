@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http_interceptor/http/intercepted_client.dart';
 
+import '../../domain/repository/assessment/victim_detail_repository.dart';
 import '../../domain/repository/assessment/victim_organisation_repository.dart';
+import '../../model/intake/person_dto.dart';
 import '../../model/pcm/victim_detail_dto.dart';
 import '../../model/pcm/victim_organisation_detail_dto.dart';
 import '../../util/app_url.dart';
@@ -19,7 +21,7 @@ class VictimService {
   final _personServiceClient = PersonService();
   final _victimOrganisationDetailRepository =
       VictimOrganisationDetailRepository();
-  //final _familyMemberRepository = FamilyMemberRepository();
+  final _victimDetailRepository = VictimDetailRepository();
   final _httpClientService = HttpClientService();
 
   Future<ApiResponse> getVictimDetailById(int? victimId) async {
@@ -42,49 +44,82 @@ class VictimService {
     return apiResponse;
   }
 
+  Future<ApiResponse> getVictimDetailByIntakeAssessmentIdOnline(
+      int? intakeAssessmentId) async {
+    ApiResponse apiResponse = ApiResponse();
+
+    final response = await client
+        .get(Uri.parse("${AppUrl.pcmURL}/Victim/GetAll/$intakeAssessmentId"));
+    switch (response.statusCode) {
+      case 200:
+        apiResponse.Data = (json.decode(response.body) as List)
+            .map((data) => VictimDetailDto.fromJson(data))
+            .toList();
+        break;
+      default:
+        apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+        break;
+    }
+    return apiResponse;
+  }
+
   Future<ApiResponse> getVictimDetailByIntakeAssessmentId(
       int? intakeAssessmentId) async {
     ApiResponse apiResponse = ApiResponse();
     try {
-      final response = await client
-          .get(Uri.parse("${AppUrl.pcmURL}/Victim/GetAll/$intakeAssessmentId"));
-      switch (response.statusCode) {
-        case 200:
-          apiResponse.Data = (json.decode(response.body) as List)
-              .map((data) => VictimDetailDto.fromJson(data))
-              .toList();
-          break;
-        default:
-          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
-          break;
+      apiResponse =
+          await getVictimDetailByIntakeAssessmentIdOnline(intakeAssessmentId);
+      if (apiResponse.ApiError == null) {
+        List<VictimDetailDto> victimDetailDtoResponse =
+            apiResponse.Data as List<VictimDetailDto>;
+        apiResponse.Data = victimDetailDtoResponse;
+        _victimDetailRepository.saveVictimDetailItems(victimDetailDtoResponse);
       }
     } on SocketException {
-      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+      apiResponse.Data = _victimDetailRepository
+          .getAllVictimDetailsByAssessmentId(intakeAssessmentId!);
     }
     return apiResponse;
+  }
+
+  Future<ApiResponse> addVictimDetailOnline(
+      VictimDetailDto victimDetailDto, int? personId) async {
+    return await _httpClientService.httpClientPost(
+        "${AppUrl.pcmURL}/Victim/Add/$personId", victimDetailDto);
   }
 
   Future<ApiResponse> addVictimDetail(VictimDetailDto victimDetailDto) async {
     ApiResponse apiResponse = ApiResponse();
     try {
-      final response = await client.post(
-          Uri.parse("${AppUrl.pcmURL}/Victim/Add"),
-          body: json.encode(victimDetailDto),
-          headers: {'Content-Type': 'application/json'});
-      switch (response.statusCode) {
-        case 200:
-          ApiResults apiResults =
-              ApiResults.fromJson(json.decode(response.body));
-          apiResponse.Data = apiResults;
-          break;
-        default:
-          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
-          break;
+      apiResponse = await _personServiceClient
+          .searchAddUdatePersonOnline(victimDetailDto.personDto!);
+      if (apiResponse.ApiError == null) {
+        ApiResults apiResults = (apiResponse.Data as ApiResults);
+        PersonDto personResponse = PersonDto.fromJson(apiResults.data);
+        //Victim Individual
+        apiResponse = await addVictimDetailOnline(
+            victimDetailDto, personResponse.personId);
+        if (apiResponse.ApiError == null) {
+          ApiResults apiResults = (apiResponse.Data as ApiResults);
+          VictimDetailDto victimDetailDtoResponse =
+              VictimDetailDto.fromJson(apiResults.data);
+          apiResponse.Data = victimDetailDtoResponse;
+          _victimDetailRepository.saveVictimDetailAfterOnline(victimDetailDto,
+              personResponse.personId!, victimDetailDto.victimId!);
+        }
       }
     } on SocketException {
-      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+      _victimDetailRepository.saveVictimDetail(victimDetailDto);
+      apiResponse.Data = _victimDetailRepository
+          .getVictimDetailById(victimDetailDto.victimId!);
     }
     return apiResponse;
+  }
+
+  Future<ApiResponse> addUpdateVictimDetailOnline(
+      VictimDetailDto victimDetailDto, int? personId) async {
+    return await _httpClientService.httpClientPost(
+        "${AppUrl.pcmURL}/Victim/AddUpdate/$personId", victimDetailDto);
   }
 
   Future<ApiResponse> getVictimOrganisationDetailById(

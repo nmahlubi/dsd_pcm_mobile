@@ -6,6 +6,7 @@ import 'package:workmanager/workmanager.dart';
 
 import 'background_job/background_job_offline.dart';
 import 'domain/repository/assessment/care_giver_detail_repository.dart';
+import 'domain/repository/assessment/development_assessment_repository.dart';
 import 'domain/repository/assessment/family_information_repository.dart';
 import 'domain/repository/assessment/family_member_repository.dart';
 import 'domain/repository/assessment/general_detail_repository.dart';
@@ -13,6 +14,7 @@ import 'domain/repository/assessment/medical_health_detail_repository.dart';
 import 'domain/repository/assessment/offence_detail_repository.dart';
 import 'domain/repository/assessment/recommandation_repository.dart';
 import 'domain/repository/assessment/socio_economic_repository.dart';
+import 'domain/repository/assessment/victim_detail_repository.dart';
 import 'domain/repository/assessment/victim_organisation_repository.dart';
 import 'domain/repository/authenticate/authenticate_repository.dart';
 import 'domain/repository/dashboard/dashboard_repository.dart';
@@ -78,6 +80,8 @@ final _offenceDetailRepository = OffenceDetailRepository();
 final _generalDetailRepository = GeneralDetailRepository();
 final _victimOrganisationDetailRepository =
     VictimOrganisationDetailRepository();
+final _victimDetailRepository = VictimDetailRepository();
+final _developmentAssessmentRepository = DevelopmentAssessmentRepository();
 
 ///
 ///
@@ -139,6 +143,8 @@ Future<void> main() async {
   await _offenceDetailRepository.initialize(); //33
   await _generalDetailRepository.initialize(); //34
   await _victimOrganisationDetailRepository.initialize(); //35
+  await _victimDetailRepository.initialize(); //36
+  await _developmentAssessmentRepository.initialize(); //38
 /*
   Workmanager().initialize(
       callbackDispatcher, // The top level function, aka callbackDispatcher
