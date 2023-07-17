@@ -13,7 +13,7 @@ class MedicalHealthDetailSync {
   late List<MedicalHealthDetailDto> medicalHealthDetailsDto = [];
 
   Future<void> syncMedicalDetailHealth(int? assessmentId) async {
-    var offlineMedicalDetailHealthDto = await _medicalHealthDetailRepository
+    var offlineMedicalDetailHealthDto = _medicalHealthDetailRepository
         .getAllMedicalHealthDetailsByAssessmentId(assessmentId!);
     if (offlineMedicalDetailHealthDto.isNotEmpty) {
       for (var medicalHealth in offlineMedicalDetailHealthDto) {

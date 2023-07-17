@@ -41,13 +41,9 @@ class RecommendationRepository {
             modifiedBy: recommendationDto.modifiedBy,
             dateModified: recommendationDto.dateModified,
             intakeAssessmentId: recommendationDto.intakeAssessmentId,
-            /*recommendationType: _recommendationTypeToDb(
-                  recommendationDto.recommendationTypeDto),*/
             recommendationType:
                 _recommendationTypeRepository.recommendationTypeToDb(
                     recommendationDto.recommendationTypeDto),
-            /* placementTypeModel:
-                  _placementTypeToDb(recommendationDto.placementTypeDto)*/
             placementTypeModel: _placementTypeRepository
                 .placementTypeToDb(recommendationDto.placementTypeDto),
           )));
@@ -75,8 +71,47 @@ class RecommendationRepository {
                 .placementTypeToDb(recommendationDto.placementTypeDto)));
   }
 
+  Future<void> saveRecommendationFromEndpoint(
+      RecommendationDto recommendationDto, int recommendationId) async {
+    await _recommendationsBox.put(
+        recommendationId,
+        RecommendationModel(
+            recommendationId: recommendationId,
+            recommendationTypeId: recommendationDto.recommendationTypeId,
+            placementTypeId: recommendationDto.placementTypeId,
+            commentsForRecommendation:
+                recommendationDto.commentsForRecommendation,
+            createdBy: recommendationDto.createdBy,
+            dateCreated: recommendationDto.dateCreated,
+            modifiedBy: recommendationDto.modifiedBy,
+            dateModified: recommendationDto.dateModified,
+            intakeAssessmentId: recommendationDto.intakeAssessmentId,
+            recommendationType:
+                _recommendationTypeRepository.recommendationTypeToDb(
+                    recommendationDto.recommendationTypeDto),
+            placementTypeModel: _placementTypeRepository
+                .placementTypeToDb(recommendationDto.placementTypeDto)));
+  }
+
   List<RecommendationDto> getAllRecommendations() {
-    return _recommendationsBox.values.map(_recommendationFromDb).toList();
+    return _recommendationsBox.values.map(recommendationFromDb).toList();
+  }
+
+  RecommendationDto? getRecommendationById(int id) {
+    final medicalHealthDetailDb = _recommendationsBox.get(id);
+    if (medicalHealthDetailDb != null) {
+      return recommendationFromDb(medicalHealthDetailDb);
+    }
+    return null;
+  }
+
+  List<RecommendationDto> getRecommendationByIntakeAssessment(
+      int? intakeAssessmentId) {
+    var recommandationDtoItems = _recommendationsBox.values
+        .where((medical) => medical.intakeAssessmentId == intakeAssessmentId)
+        .toList();
+
+    return recommandationDtoItems.map(recommendationFromDb).toList();
   }
 
 /*
@@ -110,7 +145,7 @@ class RecommendationRepository {
  
       */
 
-  RecommendationDto _recommendationFromDb(
+  RecommendationDto recommendationFromDb(
           RecommendationModel recommendationModel) =>
       RecommendationDto(
           recommendationId: recommendationModel.recommendationId,
@@ -127,10 +162,5 @@ class RecommendationRepository {
               _recommendationTypeRepository.recommendationTypeFromDb(
                   recommendationModel.recommendationType!),
           placementTypeDto: _placementTypeRepository
-              .placementTypeFromDb(recommendationModel.placementTypeModel!)
-          /*
-          placementTypeDto:
-              _placementTypeFromDb(recommendationModel.placementTypeModel)
-              */
-          );
+              .placementTypeFromDb(recommendationModel.placementTypeModel!));
 }

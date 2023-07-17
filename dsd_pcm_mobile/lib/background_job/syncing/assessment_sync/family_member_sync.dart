@@ -18,7 +18,7 @@ class FamilyMemberSync {
   late List<FamilyMemberDto> familyMembersDto = [];
 
   Future<void> syncFamilyMember(int? assessmentId) async {
-    var offlineFamilyMemberDto = await _familyMemberRepository
+    var offlineFamilyMemberDto = _familyMemberRepository
         .getAllFamilyMembersByAssessmentId(assessmentId!);
     if (offlineFamilyMemberDto.isNotEmpty) {
       for (var familyMember in offlineFamilyMemberDto) {

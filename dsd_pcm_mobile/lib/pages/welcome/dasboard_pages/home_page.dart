@@ -283,11 +283,10 @@ class _HomePageState extends State<HomePage> {
                         ]),
                   ),
                 ),
-
                 Container(
                   padding: const EdgeInsets.all(10),
                 ),
-                // if (preferences?.getBool('supervisor') == false)
+                //if (preferences?.getBool('supervisor') == false)
                 _buildTile(
                   onTap: () => Navigator.pushReplacementNamed(
                       context, '/sync-manual-offline'),

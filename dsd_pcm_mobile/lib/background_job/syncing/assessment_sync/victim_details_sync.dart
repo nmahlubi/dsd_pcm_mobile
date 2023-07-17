@@ -14,9 +14,8 @@ class VictimDetailSync {
   late List<VictimOrganisationDetailDto> victimOrganisationDetailsDto = [];
 
   Future<void> syncVictimOrganisationDetail(int? assessmentId) async {
-    var offlineVictimOrganisationDetailDto =
-        await _victimOrganisationDetailRepository
-            .getAllVictimOrganisationDetailsByAssessmentId(assessmentId!);
+    var offlineVictimOrganisationDetailDto = _victimOrganisationDetailRepository
+        .getAllVictimOrganisationDetailsByAssessmentId(assessmentId!);
     if (offlineVictimOrganisationDetailDto.isNotEmpty) {
       for (var victimOrganisationDetail in offlineVictimOrganisationDetailDto) {
         try {

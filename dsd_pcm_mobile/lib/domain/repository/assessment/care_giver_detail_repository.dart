@@ -57,7 +57,7 @@ class CareGiverDetailRepository {
     await _careGiverDetailsBox.put(
         clientCaregiverId,
         CareGiverDetailModel(
-            clientCaregiverId: careGiverDetailDto.clientCaregiverId,
+            clientCaregiverId: clientCaregiverId,
             clientId: careGiverDetailDto.clientId,
             personId: personId,
             relationshipTypeId: careGiverDetailDto.relationshipTypeId,

@@ -9,11 +9,9 @@ import '../model/intake/nationality_dto.dart';
 import '../model/intake/person_address_dto.dart';
 import '../model/intake/preferred_contact_type_dto.dart';
 import '../model/intake/relationship_type_dto.dart';
-import '../service/intake/person_service.dart';
 import '../util/shared/apiresponse.dart';
 
 class PersonTransform {
-  final _personServiceClient = PersonService();
   late ApiResponse apiResponse = ApiResponse();
   late List<IdentificationTypeDto> identificationTypesDto = [];
   late List<DisabilityTypeDto> disabilityTypesDto = [];

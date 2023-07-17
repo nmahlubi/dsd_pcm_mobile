@@ -13,7 +13,7 @@ class SocioEconomicSync {
   late List<SocioEconomicDto> socioEconomicsDto = [];
 
   Future<void> syncSocioEconomic(int? assessmentId) async {
-    var offlineSocioEconomicDto = await _socioEconomicRepository
+    var offlineSocioEconomicDto = _socioEconomicRepository
         .getAllSocioEconomicsByAssessmentId(assessmentId!);
     if (offlineSocioEconomicDto.isNotEmpty) {
       for (var socioEconomic in offlineSocioEconomicDto) {

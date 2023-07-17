@@ -1,24 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
+import 'package:intl/intl.dart';
 
-class CaptureGeneralDetailPage extends StatelessWidget {
+import '../../../../model/intake/grade_dto.dart';
+import '../../../../model/intake/health_status_dto.dart';
+import '../../../../model/intake/school_dto.dart';
+import '../../../../model/intake/school_type_dto.dart';
+
+// ignore: must_be_immutable
+class CaptureEducationPage extends StatelessWidget {
   // ignore: prefer_typing_uninitialized_variables
-  final addNewGeneralDetail;
-  CaptureGeneralDetailPage({super.key, this.addNewGeneralDetail});
+  final loadSchoolByTypeId;
+  // ignore: prefer_typing_uninitialized_variables
+  final addNewMedicalHealth;
+  final List<GradeDto> gradesDto;
+  final List<SchoolTypeDto> schoolTypesDto;
+  final List<SchoolDto> schoolsDto;
+
+  CaptureEducationPage(
+      {super.key,
+      required this.gradesDto,
+      required this.schoolTypesDto,
+      required this.schoolsDto,
+      this.loadSchoolByTypeId,
+      this.addNewMedicalHealth});
 //controls
-  final TextEditingController consultedSourcesController =
+  final TextEditingController injuriesController = TextEditingController();
+  final TextEditingController medicationController = TextEditingController();
+  final TextEditingController allergiesController = TextEditingController();
+  final TextEditingController medicalAppointmentsController =
       TextEditingController();
-  final TextEditingController traceEffortsController = TextEditingController();
-  final TextEditingController commentsBySupervisorController =
-      TextEditingController();
-  final TextEditingController additionalInfoController =
-      TextEditingController();
+  int? gradeDropdownButtonFormField;
+  int? schoolTypeDropdownButtonFormField;
+  int? schoolDropdownButtonFormField;
+
+  void dispose() {
+    injuriesController.dispose();
+    medicationController.dispose();
+    allergiesController.dispose();
+    medicalAppointmentsController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return ExpandableNotifier(
         child: Padding(
-      padding: const EdgeInsets.all(2),
+      padding: const EdgeInsets.all(0),
       child: Card(
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -34,7 +61,7 @@ class CaptureGeneralDetailPage extends StatelessWidget {
                 header: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Text(
-                      "Capture General Detail",
+                      "Capture Educational",
                       style: Theme.of(context).textTheme.bodyLarge,
                     )),
                 collapsed: const Text(
@@ -49,7 +76,7 @@ class CaptureGeneralDetailPage extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       child: const Text(
-                        'Comments',
+                        'Medical Details',
                         style: TextStyle(
                             color: Colors.blue,
                             fontWeight: FontWeight.w200,
@@ -62,26 +89,12 @@ class CaptureGeneralDetailPage extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              controller: consultedSourcesController,
+                              controller: allergiesController,
                               enableInteractiveSelection: false,
                               maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
-                                labelText: 'Consulted Sources',
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            child: TextFormField(
-                              controller: traceEffortsController,
-                              enableInteractiveSelection: false,
-                              maxLines: 1,
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: 'Trace Efforts',
+                                labelText: 'Allergies',
                               ),
                             ),
                           ),
@@ -94,13 +107,12 @@ class CaptureGeneralDetailPage extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              controller: commentsBySupervisorController,
+                              controller: medicationController,
                               enableInteractiveSelection: false,
-                              maxLines: 3,
-                              readOnly: true,
+                              maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
-                                labelText: 'Supervisor Comments',
+                                labelText: 'Medication',
                               ),
                             ),
                           ),
@@ -113,15 +125,151 @@ class CaptureGeneralDetailPage extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              controller: additionalInfoController,
+                              controller: injuriesController,
                               enableInteractiveSelection: false,
-                              maxLines: 3,
+                              maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
-                                labelText: 'Additional Information',
+                                labelText: 'Injuries',
                               ),
                             ),
                           ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            child: TextFormField(
+                              controller: medicalAppointmentsController,
+                              enableInteractiveSelection: false,
+                              maxLines: 1,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Medical Appointment',
+                              ),
+                              readOnly: true, // when true user cannot edit text
+                              onTap: () async {
+                                DateTime? pickedDate = await showDatePicker(
+                                    context: context,
+                                    initialDate:
+                                        DateTime.now(), //get today's date
+                                    firstDate: DateTime(
+                                        1800), //DateTime.now() - not to allow to choose before today.
+                                    lastDate: DateTime(2101));
+
+                                if (pickedDate != null) {
+                                  String formattedDate =
+                                      DateFormat('yyyy-MM-dd').format(
+                                          pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
+                                  medicalAppointmentsController.text =
+                                      formattedDate;
+                                  //You can format date as per your need
+
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                              padding: const EdgeInsets.all(10),
+                              child: DropdownButtonFormField(
+                                value: schoolTypeDropdownButtonFormField,
+                                decoration: const InputDecoration(
+                                  hintText: 'School Type',
+                                  labelText: 'School Type',
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 1, color: Colors.green),
+                                  ),
+                                ),
+                                items: schoolTypesDto.map((schoolType) {
+                                  return DropdownMenuItem(
+                                      value: schoolType.schoolTypeId,
+                                      child: Text(
+                                          schoolType.description.toString()));
+                                }).toList(),
+                                onChanged: (selectedValue) {
+                                  schoolTypeDropdownButtonFormField =
+                                      selectedValue;
+                                  loadSchoolByTypeId(selectedValue);
+                                },
+                              )),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                              padding: const EdgeInsets.all(10),
+                              child: DropdownButtonFormField(
+                                value: schoolDropdownButtonFormField,
+                                decoration: const InputDecoration(
+                                  hintText: 'School',
+                                  labelText: 'School',
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 1, color: Colors.green),
+                                  ),
+                                ),
+                                items: schoolsDto.map((school) {
+                                  return DropdownMenuItem(
+                                      value: school.schoolId,
+                                      child:
+                                          Text(school.schoolName.toString()));
+                                }).toList(),
+                                onChanged: (selectedValue) {
+                                  schoolDropdownButtonFormField = selectedValue;
+                                },
+                                validator: (value) {
+                                  if (value == null) {
+                                    return 'Shcool is required';
+                                  }
+                                  return null;
+                                },
+                              )),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                              padding: const EdgeInsets.all(10),
+                              child: DropdownButtonFormField(
+                                value: gradeDropdownButtonFormField,
+                                decoration: const InputDecoration(
+                                  hintText: 'Grade',
+                                  labelText: 'Grade',
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 1, color: Colors.green),
+                                  ),
+                                ),
+                                items: gradesDto.map((grade) {
+                                  return DropdownMenuItem(
+                                      value: grade.gradeId,
+                                      child:
+                                          Text(grade.description.toString()));
+                                }).toList(),
+                                onChanged: (selectedValue) {
+                                  gradeDropdownButtonFormField = selectedValue;
+                                },
+                                validator: (value) {
+                                  if (value == null) {
+                                    return 'Health Status is required';
+                                  }
+                                  return null;
+                                },
+                              )),
                         ),
                       ],
                     ),
@@ -133,27 +281,28 @@ class CaptureGeneralDetailPage extends StatelessWidget {
                           padding: const EdgeInsets.fromLTRB(10, 20, 10, 2),
                         )),
                         Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                          ),
-                        ),
-                        Expanded(
                             child: Container(
                                 height: 70,
                                 padding:
                                     const EdgeInsets.fromLTRB(10, 20, 10, 2),
-                                child: ElevatedButton(
-                                  child: const Text('Add'),
+                                child: OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    backgroundColor:
+                                        const Color.fromARGB(255, 23, 22, 22),
+                                    shape: const StadiumBorder(),
+                                    side: const BorderSide(
+                                        width: 2, color: Colors.blue),
+                                  ),
                                   onPressed: () {
-                                    addNewGeneralDetail(
-                                        consultedSourcesController.text
+                                    addNewMedicalHealth(
+                                        injuriesController.text.toString(),
+                                        medicationController.text.toString(),
+                                        allergiesController.text.toString(),
+                                        medicalAppointmentsController.text
                                             .toString(),
-                                        traceEffortsController.text.toString(),
-                                        commentsBySupervisorController.text
-                                            .toString(),
-                                        additionalInfoController.text
-                                            .toString());
+                                        gradeDropdownButtonFormField);
                                   },
+                                  child: const Text('Add Qualification'),
                                 ))),
                       ],
                     ),

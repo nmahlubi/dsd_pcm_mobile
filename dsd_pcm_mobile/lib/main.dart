@@ -1,10 +1,9 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:workmanager/workmanager.dart';
 //import 'package:hive_flutter/hive_flutter.dart';
 
 import 'background_job/background_job_offline.dart';
+import 'domain/repository/assessment/assesment_register_repository.dart';
 import 'domain/repository/assessment/care_giver_detail_repository.dart';
 import 'domain/repository/assessment/development_assessment_repository.dart';
 import 'domain/repository/assessment/family_information_repository.dart';
@@ -24,8 +23,10 @@ import 'domain/repository/intake/offence_category_repository.dart';
 import 'domain/repository/intake/offence_schedule_repository.dart';
 import 'domain/repository/intake/offence_type_repository.dart';
 import 'domain/repository/intake/person_address_repository.dart';
+import 'domain/repository/intake/person_education_repository.dart';
 import 'domain/repository/intake/person_repository.dart';
 import 'domain/repository/lookup/disability_type_repository.dart';
+import 'domain/repository/lookup/form_of_notification_repository.dart';
 import 'domain/repository/lookup/gender_repository.dart';
 import 'domain/repository/lookup/identification_type_repository.dart';
 import 'domain/repository/lookup/language_repository.dart';
@@ -35,6 +36,9 @@ import 'domain/repository/lookup/placement_type_repository.dart';
 import 'domain/repository/lookup/preferred_contact_type_repository.dart';
 import 'domain/repository/lookup/recommendation_type_repository.dart';
 import 'domain/repository/lookup/relationship_type_repository.dart';
+import 'domain/repository/school/grade_repository.dart';
+import 'domain/repository/school/school_repository.dart';
+import 'domain/repository/school/school_type_repository.dart';
 import 'domain/repository/worklist/accepted_worklist_repository.dart';
 import 'domain/repository/lookup/health_status_repository.dart';
 import 'pages/authenticate/login_authenticate.dart';
@@ -82,6 +86,12 @@ final _victimOrganisationDetailRepository =
     VictimOrganisationDetailRepository();
 final _victimDetailRepository = VictimDetailRepository();
 final _developmentAssessmentRepository = DevelopmentAssessmentRepository();
+final _gradeRepository = GradeRepository();
+final _schoolTypeRepository = SchoolTypeRepository();
+final _schoolRepository = SchoolRepository();
+final _personEducationRepository = PersonEducationRepository();
+final _formOfNotificationRepository = FormOfNotificationRepository();
+final _assesmentRegisterRepository = AssesmentRegisterRepository();
 
 ///
 ///
@@ -145,6 +155,13 @@ Future<void> main() async {
   await _victimOrganisationDetailRepository.initialize(); //35
   await _victimDetailRepository.initialize(); //36
   await _developmentAssessmentRepository.initialize(); //38
+  await _gradeRepository.initialize(); //39
+  await _schoolTypeRepository.initialize(); //40
+  await _schoolRepository.initialize(); //41
+  await _personEducationRepository.initialize(); //42
+  await _formOfNotificationRepository.initialize(); //43
+  await _assesmentRegisterRepository.initialize(); //44
+
 /*
   Workmanager().initialize(
       callbackDispatcher, // The top level function, aka callbackDispatcher

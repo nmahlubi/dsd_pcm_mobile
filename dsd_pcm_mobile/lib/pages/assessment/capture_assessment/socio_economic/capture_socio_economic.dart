@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
 
 class CaptureSocioEconomicPage extends StatelessWidget {
+  // ignore: prefer_typing_uninitialized_variables
   final addNewSocioEconomic;
   CaptureSocioEconomicPage({super.key, this.addNewSocioEconomic});
 //controls

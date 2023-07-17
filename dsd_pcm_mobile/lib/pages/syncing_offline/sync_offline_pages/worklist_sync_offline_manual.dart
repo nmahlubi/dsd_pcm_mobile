@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../background_job/background_job_offline.dart';
-import '../../../background_job/background_job_offline_lookup.dart';
 import '../../../model/pcm/accepted_worklist_dto.dart';
 import '../../../service/pcm/worklist_service.dart';
 import '../../../util/shared/apierror.dart';
@@ -29,7 +28,6 @@ class _WorklistSyncOfflineManualPagePageState
   }
 
   final _backgroundJobOffline = BackgroundJobOffline();
-  final _backgroundJobOfflineLookUp = BackgroundJobOfflineLookUp();
   final _worklistServiceClient = WorklistService();
   late ApiResponse apiResponse = ApiResponse();
   late List<AcceptedWorklistDto> acceptedWorklistDto = [];

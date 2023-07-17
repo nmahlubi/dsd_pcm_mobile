@@ -13,7 +13,7 @@ class FamilyInformationSync {
   late List<FamilyInformationDto> familyInformationsDto = [];
 
   Future<void> syncFamilyInformation(int? assessmentId) async {
-    var offlineFamilyInformationDto = await _familyInformationRepository
+    var offlineFamilyInformationDto = _familyInformationRepository
         .getAllFamilyInformationsByAssessmentId(assessmentId!);
     if (offlineFamilyInformationDto.isNotEmpty) {
       for (var familyInfo in offlineFamilyInformationDto) {

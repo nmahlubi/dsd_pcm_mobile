@@ -13,7 +13,7 @@ class DevelopmentAssessmentSync {
   late List<DevelopmentAssessmentDto> developmentAssessmentsDto = [];
 
   Future<void> syncDevelopmentAssessment(int? assessmentId) async {
-    var offlineDevelopmentAssessmentDto = await _developmentAssessmentRepository
+    var offlineDevelopmentAssessmentDto = _developmentAssessmentRepository
         .getAllDevelopmentAssessmentsByAssessmentId(assessmentId!);
     if (offlineDevelopmentAssessmentDto.isNotEmpty) {
       for (var developmentAssessment in offlineDevelopmentAssessmentDto) {

@@ -8,7 +8,7 @@ import '../../../util/shared/loading_overlay.dart';
 import '../../model/intake/language_dto.dart';
 import '../../model/intake/nationality_dto.dart';
 import '../../model/intake/person_dto.dart';
-import '../../model/intake/person_education_query_dto.dart';
+import '../../model/intake/person_education_dto.dart';
 import '../../model/pcm/accepted_worklist_dto.dart';
 import '../../model/pcm/family_information_dto.dart';
 import '../../model/pcm/family_member_dto.dart';
@@ -52,7 +52,6 @@ class _ViewChildDetailsPageState extends State<ViewChildDetailsPage> {
   late PersonDto personDto = PersonDto();
   late NationalityDto nationalityDto = NationalityDto();
   late LanguageDto languageDto = LanguageDto();
-  late List<PersonEducationQueryDto> personEducationsQueryDto = [];
   late List<CoAccusedDetailsQueryDto> coAccusedDetailsQueryDto = [];
   late List<MedicalHealthDetailDto> medicalHealthDetailsDto = [];
   late List<FamilyMemberDto> familyMembersDto = [];
@@ -105,21 +104,7 @@ class _ViewChildDetailsPageState extends State<ViewChildDetailsPage> {
     }
   }
 
-  loadEducationByPersonId(int? personId) async {
-    final overlay = LoadingOverlay.of(context);
-    overlay.show();
-    apiResponse = await personServiceClient.getEducationByPersonId(personId);
-    if ((apiResponse.ApiError) == null) {
-      overlay.hide();
-      setState(() {
-        personEducationsQueryDto =
-            (apiResponse.Data as List<PersonEducationQueryDto>);
-      });
-    } else {
-      showDialogMessage((apiResponse.ApiError as ApiError));
-      overlay.hide();
-    }
-  }
+  loadEducationByPersonId(int? personId) async {}
 
   loadCoAccusedByIntakeAssesmentId(int? intakeAssessmentId) async {
     final overlay = LoadingOverlay.of(context);
@@ -229,8 +214,8 @@ class _ViewChildDetailsPageState extends State<ViewChildDetailsPage> {
               personDto: personDto,
               nationalityDto: nationalityDto,
               languageDto: languageDto),
-          EducationInfoPanel(
-              personEducationsQueryDto: personEducationsQueryDto),
+          //EducationInfoPanel(
+          //  personEducationsQueryDto: personEducationsQueryDto),
           MedicalInfoPanel(medicalHealthDetailsDto: medicalHealthDetailsDto),
           FamilyMemberPanel(familyMembersDto: familyMembersDto),
           FamilyInfoPanel(familyInformationDto: familyInformationsDto),

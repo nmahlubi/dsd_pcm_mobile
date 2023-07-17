@@ -53,13 +53,16 @@ class ViewMedicalHealth extends StatelessWidget {
                                 }
                                 return ListTile(
                                   title: Text(
-                                      'Health Status : ${medicalHealthDetailsDto![index].healthStatusDto?.description}'),
+                                      'Health Status : ${medicalHealthDetailsDto![index].healthStatusDto?.description}',
+                                      style: const TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold)),
                                   subtitle: Text(
                                       'Allergy : ${medicalHealthDetailsDto![index].allergies}. '
                                       'Injuries : ${medicalHealthDetailsDto![index].injuries}. '
                                       'Medication : ${medicalHealthDetailsDto![index].medication}.',
                                       style:
-                                          const TextStyle(color: Colors.grey)),
+                                          const TextStyle(color: Colors.black)),
                                 );
                               },
                               separatorBuilder: (context, index) {

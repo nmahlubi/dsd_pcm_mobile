@@ -41,7 +41,7 @@ class AuthenticateRepository {
   }
 
   Future<List<AuthToken>> getAllAuthTokens() async {
-    return await _authTokensBox.values.map(_genderFromDb).toList();
+    return _authTokensBox.values.map(_genderFromDb).toList();
   }
 
   AuthToken? getAuthTokenByUsername(String? username, String? password) {

@@ -99,4 +99,28 @@ class CareGiverDetailService {
         "${AppUrl.intakeURL}/CareGiverDetails/AddUpdate/$personId",
         careGiverDetailsDto);
   }
+
+  Future<ApiResponse> addUpdateCareGiverDetail(
+      CareGiverDetailsDto careGiverDetailsDto) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse = await addUpdateCareGiverDetailOnline(
+          careGiverDetailsDto, careGiverDetailsDto.personId);
+      if (apiResponse.ApiError == null) {
+        ApiResults apiResults = (apiResponse.Data as ApiResults);
+        CareGiverDetailsDto careGiverDetailsDtoResponse =
+            CareGiverDetailsDto.fromJson(apiResults.data);
+        apiResponse.Data = careGiverDetailsDtoResponse;
+        _careGiverDetailRepository.saveCareGiverDetailAfterOnline(
+            careGiverDetailsDtoResponse,
+            careGiverDetailsDtoResponse.personId!,
+            careGiverDetailsDtoResponse.clientCaregiverId!);
+      }
+    } on SocketException {
+      _careGiverDetailRepository.saveCareGiverDetail(careGiverDetailsDto);
+      apiResponse.Data = _careGiverDetailRepository
+          .getCareGiverDetailById(careGiverDetailsDto.clientCaregiverId!);
+    }
+    return apiResponse;
+  }
 }

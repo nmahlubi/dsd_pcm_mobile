@@ -13,15 +13,15 @@ class OffenceDetailSync {
   late List<OffenceDetailDto> offenceDetailsDto = [];
 
   Future<void> syncOffenceDetail(int? assessmentId) async {
-    var offlineOffenceDetailDto = await _offenceDetailRepository
+    var offlineOffenceDetailDto = _offenceDetailRepository
         .getAllOffenceDetailsByAssessmentId(assessmentId!);
     if (offlineOffenceDetailDto.isNotEmpty) {
-      for (var OffenceDetail in offlineOffenceDetailDto) {
+      for (var offenceDetail in offlineOffenceDetailDto) {
         try {
           apiResponse = await _offenceDetailServiceClient
-              .addUpdateOffenceDetailOnline(OffenceDetail);
+              .addUpdateOffenceDetailOnline(offenceDetail);
           _offenceDetailRepository
-              .deleteOffenceDetail(OffenceDetail.pcmOffenceId!);
+              .deleteOffenceDetail(offenceDetail.pcmOffenceId!);
         } on SocketException catch (_) {
           if (kDebugMode) {
             print(
