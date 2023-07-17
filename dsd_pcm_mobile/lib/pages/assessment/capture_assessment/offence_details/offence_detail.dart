@@ -17,7 +17,7 @@ import '../../../../util/shared/apiresults.dart';
 import '../../../../util/shared/loading_overlay.dart';
 import '../../../../util/shared/randon_generator.dart';
 import '../../../probation_officer/accepted_worklist.dart';
-import '../socio_economic/socio_economic.dart';
+import '../socio_economic.dart';
 import '../victim_details/victim_detail.dart';
 import 'capture_offence_detail.dart';
 import 'view_offence_detail.dart';

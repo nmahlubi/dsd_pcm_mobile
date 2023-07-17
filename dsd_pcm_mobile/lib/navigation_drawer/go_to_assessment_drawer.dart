@@ -6,14 +6,16 @@ import '../model/pcm/accepted_worklist_dto.dart';
 import '../pages/assessment/capture_assessment/assessment_details/assessment_detail.dart';
 import '../pages/assessment/capture_assessment/care_giver_detail.dart';
 import '../pages/assessment/capture_assessment/child_detail/update_child_detail.dart';
-import '../pages/assessment/capture_assessment/development_assessment/development_assessment.dart';
+import '../pages/assessment/capture_assessment/development_assessment.dart';
 import '../pages/assessment/capture_assessment/educational/education.dart';
 import '../pages/assessment/capture_assessment/family/family.dart';
-import '../pages/assessment/capture_assessment/general_details/general_detail.dart';
+import '../pages/assessment/capture_assessment/family_information.dart';
+import '../pages/assessment/capture_assessment/family_member.dart';
+import '../pages/assessment/capture_assessment/general_detail.dart';
 import '../pages/assessment/capture_assessment/health_detail.dart';
 import '../pages/assessment/capture_assessment/offence_details/offence_detail.dart';
-import '../pages/assessment/capture_assessment/recommendation/recommendation.dart';
-import '../pages/assessment/capture_assessment/socio_economic/socio_economic.dart';
+import '../pages/assessment/capture_assessment/recommendation.dart';
+import '../pages/assessment/capture_assessment/socio_economic.dart';
 import '../pages/assessment/capture_assessment/victim_details/victim_detail.dart';
 import 'create_drawer_body_item_trail.dart';
 
@@ -142,12 +144,27 @@ class _GoToAssessmentDrawerPageWidgetState extends State<GoToAssessmentDrawer> {
               status: widget.isCompleted),
           createDrawerBodyItemTrail(
               icon: Icons.arrow_right,
+              text: 'Family Member',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const FamilyMemberPage(),
+                    settings: RouteSettings(
+                      arguments: widget.acceptedWorklistDto,
+                    ),
+                  ),
+                );
+              },
+              status: widget.isCompleted),
+          createDrawerBodyItemTrail(
+              icon: Icons.arrow_right,
               text: 'Family Information',
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const FamilyPage(),
+                    builder: (context) => const FamilyInformationPage(),
                     settings: RouteSettings(
                       arguments: widget.acceptedWorklistDto,
                     ),

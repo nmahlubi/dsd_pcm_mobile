@@ -1,34 +1,32 @@
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../model/intake/care_giver_details_dto.dart';
-import '../../../model/intake/gender_dto.dart';
-import '../../../model/intake/person_dto.dart';
-import '../../../model/intake/relationship_type_dto.dart';
+import '../../../model/intake/placement_type_dto.dart';
+import '../../../model/intake/recommendation_type_dto.dart';
 import '../../../model/pcm/accepted_worklist_dto.dart';
+import '../../../model/pcm/recommendations_dto.dart';
 import '../../../navigation_drawer/go_to_assessment_drawer.dart';
-import '../../../service/intake/care_giver_detail_service.dart';
+import '../../../service/pcm/recommendations_service.dart';
 import '../../../transform_dynamic/transform_lookup.dart';
 import '../../../util/shared/apierror.dart';
 import '../../../util/shared/apiresponse.dart';
 import '../../../util/shared/apiresults.dart';
 import '../../../util/shared/loading_overlay.dart';
+
 import '../../../util/shared/randon_generator.dart';
 import '../../probation_officer/accepted_worklist.dart';
-import 'family/family.dart';
-import 'family_member.dart';
-import 'health_detail.dart';
+import 'development_assessment.dart';
+import 'general_detail.dart';
 
-class CareGiverDetailPage extends StatefulWidget {
-  const CareGiverDetailPage({Key? key}) : super(key: key);
+class RecommandationPage extends StatefulWidget {
+  const RecommandationPage({Key? key}) : super(key: key);
 
   @override
-  State<CareGiverDetailPage> createState() => _CareGiverDetailPageState();
+  State<RecommandationPage> createState() => _RecommandationPageState();
 }
 
-class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
+class _RecommandationPageState extends State<RecommandationPage> {
   SharedPreferences? preferences;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final _loginFormKey = GlobalKey<FormState>();
@@ -37,44 +35,46 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
     preferences = await SharedPreferences.getInstance();
   }
 
-  late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
-  final _lookupTransform = LookupTransform();
   final _randomGenerator = RandomGenerator();
-  final _careGiverDetailServiceClient = CareGiverDetailService();
+  final _lookupTransform = LookupTransform();
+  late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
+  final _recommendationsServiceClient = RecommendationsService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
-  late List<GenderDto> gendersDto = [];
-  late List<CareGiverDetailsDto> careGiverDetailsDto = [];
-  late List<RelationshipTypeDto> relationshipTypesDto = [];
+  late RecommendationDto recommendationDto = RecommendationDto();
+  late List<RecommendationTypeDto> recommendationTypesDto = [];
+  late List<PlacementTypeDto> placementTypesDto = [];
+  late List<RecommendationDto> recommendationsDto = [];
 
-  ExpandableController captureCareGiverPanelController = ExpandableController();
-  ExpandableController viewCareGiverPanelController = ExpandableController();
-  final TextEditingController firstNameController = TextEditingController();
-  final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController dateOfBirthController = TextEditingController();
-  final TextEditingController ageController = TextEditingController();
-  int? genderDropdownButtonFormField;
-  int? relationshipTypeDropdownButtonFormField;
-  int? careGiverId;
-  int? personId;
+  ExpandableController captureRecommandationPanelController =
+      ExpandableController();
+  ExpandableController viewRecommandationPanelController =
+      ExpandableController();
+
+  final TextEditingController commentsForRecommendationController =
+      TextEditingController();
+  int? recommendationTypeDropdownButtonFormField;
+  int? placementTypeDropdownButtonFormField;
+  int? recommandationId;
   String? labelButtonAddUpdate = '';
 
   @override
   void initState() {
     super.initState();
-    captureCareGiverPanelController =
+    captureRecommandationPanelController =
         ExpandableController(initialExpanded: false);
-    viewCareGiverPanelController = ExpandableController(initialExpanded: true);
-    labelButtonAddUpdate = 'Add Care Giver';
-    careGiverId = null;
-    personId = null;
+    viewRecommandationPanelController =
+        ExpandableController(initialExpanded: true);
+    labelButtonAddUpdate = 'Add Medical';
+    recommandationId = null;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
         setState(() {
           acceptedWorklistDto =
               ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
           loadLookUpTransformer();
-          loadCareGiverDetailsByClientId(acceptedWorklistDto.clientId);
+          loadRecommandationByIntakeAssessmentId(
+              acceptedWorklistDto.intakeAssessmentId);
         });
       });
     });
@@ -83,21 +83,21 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
   loadLookUpTransformer() async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    gendersDto = await _lookupTransform.transformGendersDto();
-    relationshipTypesDto =
-        await _lookupTransform.transformRelationshipTypeDto();
+    placementTypesDto = await _lookupTransform.transformPlacementTypeDto();
+    recommendationTypesDto =
+        await _lookupTransform.transformRecommendationTypeDto();
     overlay.hide();
   }
 
-  loadCareGiverDetailsByClientId(int? clientId) async {
+  loadRecommandationByIntakeAssessmentId(int? intakeAssessmentId) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await _careGiverDetailServiceClient
-        .getCareGiverDetailsByClientId(clientId);
+    apiResponse = await _recommendationsServiceClient
+        .getRecommendationsByIntakeAssessmentId(intakeAssessmentId);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        careGiverDetailsDto = (apiResponse.Data as List<CareGiverDetailsDto>);
+        recommendationsDto = (apiResponse.Data as List<RecommendationDto>);
       });
     } else {
       overlay.hide();
@@ -105,116 +105,49 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
     }
   }
 
-  addUpdateCareGiverClient() async {
+  addUpdateRecommandation() async {
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
-    int? localPersonId =
-        personId ?? _randomGenerator.getRandomGeneratedNumber();
-    CareGiverDetailsDto requestCareGiverDetailsDto = CareGiverDetailsDto(
-        clientCaregiverId:
-            careGiverId ?? _randomGenerator.getRandomGeneratedNumber(),
-        clientId: acceptedWorklistDto.clientId,
-        personId: localPersonId,
+    overlay.show();
+    RecommendationDto requestRecommendationDto = RecommendationDto(
+        recommendationId:
+            recommandationId ?? _randomGenerator.getRandomGeneratedNumber(),
         dateCreated: _randomGenerator.getCurrentDateGenerated(),
-        personDto: PersonDto(
-          firstName: firstNameController.text,
-          lastName: lastNameController.text,
-          dateOfBirth: dateOfBirthController.text,
-          age: int.parse(ageController.text),
-          personId: localPersonId,
-          genderId: genderDropdownButtonFormField,
-          isEstimatedAge: true,
-          dateCreated: _randomGenerator.getCurrentDateGenerated(),
-          isActive: true,
-          isDeleted: false,
-          isPivaValidated: true,
-          createdBy: preferences!.getString('username'),
-          genderDto: genderDropdownButtonFormField != null
-              ? gendersDto
-                  .where((i) => i.genderId == genderDropdownButtonFormField)
-                  .single
-              : null,
-        ),
-        relationshipTypeId: relationshipTypeDropdownButtonFormField,
-        relationshipTypeDto: relationshipTypeDropdownButtonFormField != null
-            ? relationshipTypesDto
+        recommendationTypeId: recommendationTypeDropdownButtonFormField,
+        placementTypeId: placementTypeDropdownButtonFormField,
+        commentsForRecommendation: commentsForRecommendationController.text,
+        createdBy: preferences!.getInt('userId')!,
+        intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
+        recommendationTypeDto: recommendationTypeDropdownButtonFormField != null
+            ? recommendationTypesDto
                 .where((i) =>
-                    i.relationshipTypeId ==
-                    relationshipTypeDropdownButtonFormField)
+                    i.recommendationTypeId ==
+                    recommendationTypeDropdownButtonFormField)
                 .single
             : null,
-        createdBy: preferences!.getString('username')!);
-    overlay.show();
-    apiResponse = await _careGiverDetailServiceClient
-        .addUpdateCareGiverDetail(requestCareGiverDetailsDto);
-    if ((apiResponse.ApiError) == null) {
-      overlay.hide();
-      if (!mounted) return;
-      showSuccessMessage('Successfully $labelButtonAddUpdate.');
-      navigator.push(
-        MaterialPageRoute(
-            builder: (context) => const CareGiverDetailPage(),
-            settings: RouteSettings(
-              arguments: acceptedWorklistDto,
-            )),
-      );
-    } else {
-      overlay.hide();
-      showDialogMessage((apiResponse.ApiError as ApiError));
-    }
-  }
+        placementTypeDto: placementTypeDropdownButtonFormField != null
+            ? placementTypesDto
+                .where((i) =>
+                    i.placementTypeId == placementTypeDropdownButtonFormField)
+                .single
+            : null);
 
-  captureCareGiverDetail(String? name, String? surname, String? dateOfBirth,
-      int? age, int? genderId, int? relationshipTypeId) async {
-    final overlay = LoadingOverlay.of(context);
-    final navigator = Navigator.of(context);
-    int? localPersonId = _randomGenerator.getRandomGeneratedNumber();
-    CareGiverDetailsDto requestCareGiverDetailsDto = CareGiverDetailsDto(
-        clientCaregiverId: _randomGenerator.getRandomGeneratedNumber(),
-        clientId: acceptedWorklistDto.clientId,
-        personId: localPersonId,
-        dateCreated: _randomGenerator.getCurrentDateGenerated(),
-        personDto: PersonDto(
-          firstName: name,
-          lastName: surname,
-          dateOfBirth: dateOfBirth,
-          age: age,
-          personId: localPersonId,
-          genderId: genderId,
-          isEstimatedAge: true,
-          dateCreated: _randomGenerator.getCurrentDateGenerated(),
-          isActive: true,
-          isDeleted: false,
-          isPivaValidated: true,
-          createdBy: preferences!.getString('username'),
-          genderDto: genderId != null
-              ? gendersDto.where((i) => i.genderId == genderId).single
-              : null,
-        ),
-        relationshipTypeId: relationshipTypeId,
-        relationshipTypeDto: relationshipTypeId != null
-            ? relationshipTypesDto
-                .where((i) => i.relationshipTypeId == relationshipTypeId)
-                .single
-            : null,
-        createdBy: preferences!.getString('username')!);
-    overlay.show();
-    apiResponse = await _careGiverDetailServiceClient
-        .addCareGiverDetail(requestCareGiverDetailsDto);
+    apiResponse = await _recommendationsServiceClient
+        .addUpdateRecommendation(requestRecommendationDto);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       if (!mounted) return;
       showSuccessMessage('Successfully $labelButtonAddUpdate.');
       navigator.push(
         MaterialPageRoute(
-            builder: (context) => const CareGiverDetailPage(),
+            builder: (context) => const RecommandationPage(),
             settings: RouteSettings(
               arguments: acceptedWorklistDto,
             )),
       );
     } else {
-      overlay.hide();
       showDialogMessage((apiResponse.ApiError as ApiError));
+      overlay.hide();
     }
   }
 
@@ -232,48 +165,35 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
     );
   }
 
-  newCareGiver() {
+  newMRecommandation() {
     setState(() {
-      labelButtonAddUpdate = 'Add Care Giver';
-      firstNameController.clear();
-      lastNameController.clear();
-      dateOfBirthController.clear();
-      ageController.clear();
-      genderDropdownButtonFormField = null;
-      relationshipTypeDropdownButtonFormField = null;
-      personId = null;
-      careGiverId = null;
+      labelButtonAddUpdate = 'Add Recommandation';
+      commentsForRecommendationController.clear();
+      placementTypeDropdownButtonFormField = null;
+      recommendationTypeDropdownButtonFormField = null;
+      recommandationId = null;
     });
   }
 
-  populateCareGiverForm(CareGiverDetailsDto careGiverDetailsDto) {
+  populateRecommandationForm(RecommendationDto recommendationDto) {
     setState(() {
-      careGiverId = careGiverDetailsDto.clientCaregiverId;
-      personId = careGiverDetailsDto.personDto!.personId;
-      captureCareGiverPanelController =
+      recommandationId = recommendationDto.recommendationId;
+      captureRecommandationPanelController =
           ExpandableController(initialExpanded: true);
-      viewCareGiverPanelController =
+      viewRecommandationPanelController =
           ExpandableController(initialExpanded: false);
-      labelButtonAddUpdate = 'Update Care Giver';
-      firstNameController.text =
-          careGiverDetailsDto.personDto!.firstName.toString();
-      lastNameController.text =
-          careGiverDetailsDto.personDto!.lastName.toString();
-      dateOfBirthController.text =
-          careGiverDetailsDto.personDto!.dateOfBirth.toString();
-      ageController.text = careGiverDetailsDto.personDto!.age.toString();
-      genderDropdownButtonFormField = careGiverDetailsDto.personDto!.genderId;
-      relationshipTypeDropdownButtonFormField =
-          careGiverDetailsDto.relationshipTypeId;
+      labelButtonAddUpdate = 'Update Recommandation';
+      commentsForRecommendationController.text =
+          recommendationDto.commentsForRecommendation!;
+      recommendationTypeDropdownButtonFormField =
+          recommendationDto.recommendationTypeId;
+      placementTypeDropdownButtonFormField = recommendationDto.placementTypeId;
     });
   }
 
   @override
   void dispose() {
-    firstNameController.dispose();
-    lastNameController.dispose();
-    dateOfBirthController.dispose();
-    ageController.dispose();
+    commentsForRecommendationController.dispose();
     super.dispose();
   }
 
@@ -286,7 +206,7 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
         child: Scaffold(
             key: scaffoldKey,
             appBar: AppBar(
-              title: const Text("Care Giver Details"),
+              title: const Text("Recommendation"),
               leading: IconButton(
                 icon: const Icon(Icons.offline_pin_rounded),
                 onPressed: () {
@@ -326,7 +246,8 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const HealthDetailPage(),
+                            builder: (context) =>
+                                const DevelopmentAssessmentPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),
@@ -340,7 +261,7 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const FamilyMemberPage(),
+                            builder: (context) => const GeneralDetailPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),
@@ -373,7 +294,8 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                   scrollOnExpand: true,
                                   scrollOnCollapse: false,
                                   child: ExpandablePanel(
-                                    controller: captureCareGiverPanelController,
+                                    controller:
+                                        captureRecommandationPanelController,
                                     theme: const ExpandableThemeData(
                                       headerAlignment:
                                           ExpandablePanelHeaderAlignment.center,
@@ -382,7 +304,7 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                     header: Padding(
                                         padding: const EdgeInsets.all(10),
                                         child: Text(
-                                          "Capture Care Giver Details",
+                                          "Capture Recommandation",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
@@ -430,7 +352,7 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                                             color: Colors.blue),
                                                       ),
                                                       onPressed: () {
-                                                        newCareGiver();
+                                                        newMRecommandation();
                                                       },
                                                       child: const Text('New',
                                                           style: TextStyle(
@@ -449,13 +371,13 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                                     child:
                                                         DropdownButtonFormField(
                                                       value:
-                                                          relationshipTypeDropdownButtonFormField,
+                                                          recommendationTypeDropdownButtonFormField,
                                                       decoration:
                                                           const InputDecoration(
                                                         hintText:
-                                                            'Relationship Type',
+                                                            'Recommandation Type',
                                                         labelText:
-                                                            'Relationship Type',
+                                                            'Recommandation Type',
                                                         border:
                                                             OutlineInputBorder(
                                                           borderSide:
@@ -465,25 +387,27 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                                                       .green),
                                                         ),
                                                       ),
-                                                      items: relationshipTypesDto
-                                                          .map((relationship) {
+                                                      items: recommendationTypesDto
+                                                          .map(
+                                                              (recommandationType) {
                                                         return DropdownMenuItem(
-                                                            value: relationship
-                                                                .relationshipTypeId,
+                                                            value: recommandationType
+                                                                .recommendationTypeId,
                                                             child: Text(
-                                                                relationship
+                                                                recommandationType
                                                                     .description
                                                                     .toString()));
                                                       }).toList(),
                                                       onChanged:
                                                           (selectedValue) {
-                                                        relationshipTypeDropdownButtonFormField =
+                                                        recommendationTypeDropdownButtonFormField =
                                                             selectedValue;
                                                       },
                                                       validator: (value) {
                                                         if (value == null) {
-                                                          return 'Relationship Type is required';
+                                                          return 'Recommandation Type Required';
                                                         }
+                                                        return null;
                                                       },
                                                     ))),
                                           ],
@@ -498,11 +422,13 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                                     child:
                                                         DropdownButtonFormField(
                                                       value:
-                                                          genderDropdownButtonFormField,
+                                                          placementTypeDropdownButtonFormField,
                                                       decoration:
                                                           const InputDecoration(
-                                                        hintText: 'Gender',
-                                                        labelText: 'Gender',
+                                                        hintText:
+                                                            'Placement Type',
+                                                        labelText:
+                                                            'Placement Type',
                                                         border:
                                                             OutlineInputBorder(
                                                           borderSide:
@@ -512,23 +438,24 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                                                       .green),
                                                         ),
                                                       ),
-                                                      items: gendersDto
-                                                          .map((gender) {
+                                                      items: placementTypesDto
+                                                          .map((placementType) {
                                                         return DropdownMenuItem(
-                                                            value:
-                                                                gender.genderId,
-                                                            child: Text(gender
-                                                                .description
-                                                                .toString()));
+                                                            value: placementType
+                                                                .placementTypeId,
+                                                            child: Text(
+                                                                placementType
+                                                                    .description
+                                                                    .toString()));
                                                       }).toList(),
                                                       onChanged:
                                                           (selectedValue) {
-                                                        genderDropdownButtonFormField =
+                                                        placementTypeDropdownButtonFormField =
                                                             selectedValue;
                                                       },
                                                       validator: (value) {
                                                         if (value == null) {
-                                                          return 'Gender required';
+                                                          return 'Placement Type Required';
                                                         }
                                                         return null;
                                                       },
@@ -543,139 +470,20 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller:
-                                                      firstNameController,
+                                                      commentsForRecommendationController,
                                                   enableInteractiveSelection:
                                                       false,
-                                                  maxLines: 1,
+                                                  maxLines: 4,
                                                   decoration:
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
-                                                    labelText: 'Firstname',
+                                                    labelText: 'Comments',
                                                   ),
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Firstname Required';
-                                                    }
-                                                    return null;
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                child: TextFormField(
-                                                  controller:
-                                                      lastNameController,
-                                                  enableInteractiveSelection:
-                                                      false,
-                                                  maxLines: 1,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                    labelText: 'Lastname',
-                                                  ),
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Lastname Required';
-                                                    }
-                                                    return null;
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                child: TextFormField(
-                                                  controller:
-                                                      dateOfBirthController,
-                                                  enableInteractiveSelection:
-                                                      false,
-                                                  maxLines: 1,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                    labelText: 'Date Of Birth',
-                                                  ),
-                                                  readOnly:
-                                                      true, // when true user cannot edit text
-                                                  onTap: () async {
-                                                    DateTime? pickedDate =
-                                                        await showDatePicker(
-                                                            context: context,
-                                                            initialDate: DateTime
-                                                                .now(), //get today's date
-                                                            firstDate: DateTime(
-                                                                1900), //DateTime.now() - not to allow to choose before today.
-                                                            lastDate:
-                                                                DateTime(3000));
-
-                                                    if (pickedDate != null) {
-                                                      String formattedDate =
-                                                          DateFormat(
-                                                                  'yyyy-MM-dd')
-                                                              .format(
-                                                                  pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
-                                                      dateOfBirthController
-                                                          .text = formattedDate;
-                                                      String formattedYear =
-                                                          DateFormat('yyyy')
-                                                              .format(
-                                                                  pickedDate);
-                                                      ageController
-                                                          .text = (DateTime
-                                                                      .now()
-                                                                  .year -
-                                                              int.parse(
-                                                                  formattedYear))
-                                                          .toString();
-                                                      //You can format date as per your need
-
-                                                    }
-                                                  },
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Date Of Birth Required';
-                                                    }
-                                                    return null;
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                child: TextFormField(
-                                                  controller: ageController,
-                                                  enableInteractiveSelection:
-                                                      false,
-                                                  maxLines: 1,
-                                                  keyboardType:
-                                                      TextInputType.number,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                    labelText: 'Age',
-                                                  ),
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Age Required';
+                                                      return 'Comments Required';
                                                     }
                                                     return null;
                                                   },
@@ -719,7 +527,7 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                                         if (_loginFormKey
                                                             .currentState!
                                                             .validate()) {
-                                                          addUpdateCareGiverClient();
+                                                          addUpdateRecommandation();
                                                         }
                                                       },
                                                       child: Text(
@@ -761,7 +569,8 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                   scrollOnExpand: true,
                                   scrollOnCollapse: false,
                                   child: ExpandablePanel(
-                                    controller: viewCareGiverPanelController,
+                                    controller:
+                                        viewRecommandationPanelController,
                                     theme: const ExpandableThemeData(
                                       headerAlignment:
                                           ExpandablePanelHeaderAlignment.center,
@@ -770,7 +579,7 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                     header: Padding(
                                         padding: const EdgeInsets.all(10),
                                         child: Text(
-                                          "View Care Giver Details",
+                                          "View Recommandations",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
@@ -785,25 +594,25 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        if (careGiverDetailsDto.isNotEmpty)
+                                        if (recommendationsDto.isNotEmpty)
                                           Row(
                                             children: [
                                               Expanded(
                                                 child: ListView.separated(
                                                   shrinkWrap: true,
-                                                  itemCount: careGiverDetailsDto
-                                                      .length,
+                                                  itemCount:
+                                                      recommendationsDto.length,
                                                   itemBuilder:
                                                       (context, int index) {
-                                                    if (careGiverDetailsDto
+                                                    if (recommendationsDto
                                                         .isEmpty) {
                                                       return const Center(
                                                           child: Text(
-                                                              'No Accused Found.'));
+                                                              'No recommandation Found.'));
                                                     }
                                                     return ListTile(
                                                       title: Text(
-                                                          'Relationship : ${careGiverDetailsDto[index].relationshipTypeDto!.description ?? ''} ',
+                                                          'Type : ${recommendationsDto[index].recommendationTypeDto?.description ?? ''}',
                                                           style: const TextStyle(
                                                               color:
                                                                   Colors.black,
@@ -811,8 +620,8 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                                                   FontWeight
                                                                       .bold)),
                                                       subtitle: Text(
-                                                          'Name : ${careGiverDetailsDto[index].personDto!.firstName ?? ''} '
-                                                          ' ${careGiverDetailsDto[index].personDto!.lastName ?? ''}',
+                                                          'Placement Type ${recommendationsDto[index].placementTypeDto?.description ?? ''}'
+                                                          'Comments  :  ${recommendationsDto[index].commentsForRecommendation ?? ''}',
                                                           style:
                                                               const TextStyle(
                                                                   color: Colors
@@ -824,8 +633,8 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                                           //IconButton(onPressed: () {}, icon: const Icon(Icons.favorite)),
                                                           IconButton(
                                                               onPressed: () {
-                                                                populateCareGiverForm(
-                                                                    careGiverDetailsDto[
+                                                                populateRecommandationForm(
+                                                                    recommendationsDto[
                                                                         index]);
                                                               },
                                                               icon: const Icon(

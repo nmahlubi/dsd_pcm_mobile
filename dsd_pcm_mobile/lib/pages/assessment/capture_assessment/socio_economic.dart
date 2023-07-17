@@ -1,16 +1,11 @@
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../model/intake/care_giver_details_dto.dart';
-import '../../../model/intake/gender_dto.dart';
-import '../../../model/intake/person_dto.dart';
-import '../../../model/intake/relationship_type_dto.dart';
 import '../../../model/pcm/accepted_worklist_dto.dart';
+import '../../../model/pcm/socio_economic_dto.dart';
 import '../../../navigation_drawer/go_to_assessment_drawer.dart';
-import '../../../service/intake/care_giver_detail_service.dart';
-import '../../../transform_dynamic/transform_lookup.dart';
+import '../../../service/pcm/socio_economic_service.dart';
 import '../../../util/shared/apierror.dart';
 import '../../../util/shared/apiresponse.dart';
 import '../../../util/shared/apiresults.dart';
@@ -19,16 +14,16 @@ import '../../../util/shared/randon_generator.dart';
 import '../../probation_officer/accepted_worklist.dart';
 import 'family/family.dart';
 import 'family_member.dart';
-import 'health_detail.dart';
+import 'offence_details/offence_detail.dart';
 
-class CareGiverDetailPage extends StatefulWidget {
-  const CareGiverDetailPage({Key? key}) : super(key: key);
+class SocioEconomicPage extends StatefulWidget {
+  const SocioEconomicPage({Key? key}) : super(key: key);
 
   @override
-  State<CareGiverDetailPage> createState() => _CareGiverDetailPageState();
+  State<SocioEconomicPage> createState() => _SocioEconomicPageState();
 }
 
-class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
+class _SocioEconomicPageState extends State<SocioEconomicPage> {
   SharedPreferences? preferences;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final _loginFormKey = GlobalKey<FormState>();
@@ -38,66 +33,67 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
   }
 
   late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
-  final _lookupTransform = LookupTransform();
   final _randomGenerator = RandomGenerator();
-  final _careGiverDetailServiceClient = CareGiverDetailService();
+  final _socioEconomicServiceClient = SocioEconomicService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
-  late List<GenderDto> gendersDto = [];
-  late List<CareGiverDetailsDto> careGiverDetailsDto = [];
-  late List<RelationshipTypeDto> relationshipTypesDto = [];
+  late List<SocioEconomicDto> socioEconomicsDto = [];
 
-  ExpandableController captureCareGiverPanelController = ExpandableController();
-  ExpandableController viewCareGiverPanelController = ExpandableController();
-  final TextEditingController firstNameController = TextEditingController();
-  final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController dateOfBirthController = TextEditingController();
-  final TextEditingController ageController = TextEditingController();
-  int? genderDropdownButtonFormField;
-  int? relationshipTypeDropdownButtonFormField;
-  int? careGiverId;
-  int? personId;
+  ExpandableController captureSocioEconomicPanelController =
+      ExpandableController();
+  ExpandableController viewSocioEconomicPanelController =
+      ExpandableController();
+  final TextEditingController familyBackgroundCommentController =
+      TextEditingController();
+  final TextEditingController financeWorkRecordController =
+      TextEditingController();
+  final TextEditingController housingController = TextEditingController();
+  final TextEditingController socialCircumsancesController =
+      TextEditingController();
+  final TextEditingController previousInterventionController =
+      TextEditingController();
+  final TextEditingController interPersonalRelationshipController =
+      TextEditingController();
+  final TextEditingController peerPresureController = TextEditingController();
+  final TextEditingController substanceAbuseController =
+      TextEditingController();
+  final TextEditingController religiousInvolveController =
+      TextEditingController();
+  final TextEditingController childBehaviorController = TextEditingController();
+  final TextEditingController otherController = TextEditingController();
+  int? socioEconomicId;
   String? labelButtonAddUpdate = '';
 
   @override
   void initState() {
     super.initState();
-    captureCareGiverPanelController =
+    captureSocioEconomicPanelController =
         ExpandableController(initialExpanded: false);
-    viewCareGiverPanelController = ExpandableController(initialExpanded: true);
-    labelButtonAddUpdate = 'Add Care Giver';
-    careGiverId = null;
-    personId = null;
+    viewSocioEconomicPanelController =
+        ExpandableController(initialExpanded: true);
+    labelButtonAddUpdate = 'Add Socio Economic';
+    socioEconomicId = null;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
         setState(() {
           acceptedWorklistDto =
               ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
-          loadLookUpTransformer();
-          loadCareGiverDetailsByClientId(acceptedWorklistDto.clientId);
+          loadSocioEconomicsByIntakeAssessmentId(
+              acceptedWorklistDto.intakeAssessmentId);
         });
       });
     });
   }
 
-  loadLookUpTransformer() async {
+  loadSocioEconomicsByIntakeAssessmentId(int? intakeAssessmentId) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    gendersDto = await _lookupTransform.transformGendersDto();
-    relationshipTypesDto =
-        await _lookupTransform.transformRelationshipTypeDto();
-    overlay.hide();
-  }
-
-  loadCareGiverDetailsByClientId(int? clientId) async {
-    final overlay = LoadingOverlay.of(context);
-    overlay.show();
-    apiResponse = await _careGiverDetailServiceClient
-        .getCareGiverDetailsByClientId(clientId);
+    apiResponse = await _socioEconomicServiceClient
+        .getsocioEconomicsByAssessmentId(intakeAssessmentId);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        careGiverDetailsDto = (apiResponse.Data as List<CareGiverDetailsDto>);
+        socioEconomicsDto = (apiResponse.Data as List<SocioEconomicDto>);
       });
     } else {
       overlay.hide();
@@ -105,109 +101,36 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
     }
   }
 
-  addUpdateCareGiverClient() async {
-    final overlay = LoadingOverlay.of(context);
-    final navigator = Navigator.of(context);
-    int? localPersonId =
-        personId ?? _randomGenerator.getRandomGeneratedNumber();
-    CareGiverDetailsDto requestCareGiverDetailsDto = CareGiverDetailsDto(
-        clientCaregiverId:
-            careGiverId ?? _randomGenerator.getRandomGeneratedNumber(),
-        clientId: acceptedWorklistDto.clientId,
-        personId: localPersonId,
+  addUpdateSocioEconomic() async {
+    SocioEconomicDto requestSocioEconomicDto = SocioEconomicDto(
+        socioEconomyid:
+            socioEconomicId ?? _randomGenerator.getRandomGeneratedNumber(),
+        intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
         dateCreated: _randomGenerator.getCurrentDateGenerated(),
-        personDto: PersonDto(
-          firstName: firstNameController.text,
-          lastName: lastNameController.text,
-          dateOfBirth: dateOfBirthController.text,
-          age: int.parse(ageController.text),
-          personId: localPersonId,
-          genderId: genderDropdownButtonFormField,
-          isEstimatedAge: true,
-          dateCreated: _randomGenerator.getCurrentDateGenerated(),
-          isActive: true,
-          isDeleted: false,
-          isPivaValidated: true,
-          createdBy: preferences!.getString('username'),
-          genderDto: genderDropdownButtonFormField != null
-              ? gendersDto
-                  .where((i) => i.genderId == genderDropdownButtonFormField)
-                  .single
-              : null,
-        ),
-        relationshipTypeId: relationshipTypeDropdownButtonFormField,
-        relationshipTypeDto: relationshipTypeDropdownButtonFormField != null
-            ? relationshipTypesDto
-                .where((i) =>
-                    i.relationshipTypeId ==
-                    relationshipTypeDropdownButtonFormField)
-                .single
-            : null,
-        createdBy: preferences!.getString('username')!);
-    overlay.show();
-    apiResponse = await _careGiverDetailServiceClient
-        .addUpdateCareGiverDetail(requestCareGiverDetailsDto);
-    if ((apiResponse.ApiError) == null) {
-      overlay.hide();
-      if (!mounted) return;
-      showSuccessMessage('Successfully $labelButtonAddUpdate.');
-      navigator.push(
-        MaterialPageRoute(
-            builder: (context) => const CareGiverDetailPage(),
-            settings: RouteSettings(
-              arguments: acceptedWorklistDto,
-            )),
-      );
-    } else {
-      overlay.hide();
-      showDialogMessage((apiResponse.ApiError as ApiError));
-    }
-  }
+        createdBy: preferences!.getInt('userId')!,
+        familyBackgroundComment: familyBackgroundCommentController.text,
+        financeWorkRecord: financeWorkRecordController.text,
+        housing: housingController.text,
+        socialCircumsances: socialCircumsancesController.text,
+        previousIntervention: previousInterventionController.text,
+        interPersonalRelationship: interPersonalRelationshipController.text,
+        peerPresure: peerPresureController.text,
+        substanceAbuse: substanceAbuseController.text,
+        religiousInvolve: religiousInvolveController.text,
+        childBehavior: childBehaviorController.text,
+        other: otherController.text);
 
-  captureCareGiverDetail(String? name, String? surname, String? dateOfBirth,
-      int? age, int? genderId, int? relationshipTypeId) async {
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
-    int? localPersonId = _randomGenerator.getRandomGeneratedNumber();
-    CareGiverDetailsDto requestCareGiverDetailsDto = CareGiverDetailsDto(
-        clientCaregiverId: _randomGenerator.getRandomGeneratedNumber(),
-        clientId: acceptedWorklistDto.clientId,
-        personId: localPersonId,
-        dateCreated: _randomGenerator.getCurrentDateGenerated(),
-        personDto: PersonDto(
-          firstName: name,
-          lastName: surname,
-          dateOfBirth: dateOfBirth,
-          age: age,
-          personId: localPersonId,
-          genderId: genderId,
-          isEstimatedAge: true,
-          dateCreated: _randomGenerator.getCurrentDateGenerated(),
-          isActive: true,
-          isDeleted: false,
-          isPivaValidated: true,
-          createdBy: preferences!.getString('username'),
-          genderDto: genderId != null
-              ? gendersDto.where((i) => i.genderId == genderId).single
-              : null,
-        ),
-        relationshipTypeId: relationshipTypeId,
-        relationshipTypeDto: relationshipTypeId != null
-            ? relationshipTypesDto
-                .where((i) => i.relationshipTypeId == relationshipTypeId)
-                .single
-            : null,
-        createdBy: preferences!.getString('username')!);
     overlay.show();
-    apiResponse = await _careGiverDetailServiceClient
-        .addCareGiverDetail(requestCareGiverDetailsDto);
+    apiResponse = await _socioEconomicServiceClient
+        .addUpdateSocioEconomic(requestSocioEconomicDto);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
-      if (!mounted) return;
       showSuccessMessage('Successfully $labelButtonAddUpdate.');
       navigator.push(
         MaterialPageRoute(
-            builder: (context) => const CareGiverDetailPage(),
+            builder: (context) => const SocioEconomicPage(),
             settings: RouteSettings(
               arguments: acceptedWorklistDto,
             )),
@@ -232,48 +155,62 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
     );
   }
 
-  newCareGiver() {
+  newSocioEconomic() {
     setState(() {
-      labelButtonAddUpdate = 'Add Care Giver';
-      firstNameController.clear();
-      lastNameController.clear();
-      dateOfBirthController.clear();
-      ageController.clear();
-      genderDropdownButtonFormField = null;
-      relationshipTypeDropdownButtonFormField = null;
-      personId = null;
-      careGiverId = null;
+      labelButtonAddUpdate = 'Add Socio Economic';
+      familyBackgroundCommentController.clear();
+      financeWorkRecordController.clear();
+      housingController.clear();
+      socialCircumsancesController.clear();
+      previousInterventionController.clear();
+      interPersonalRelationshipController.clear();
+      peerPresureController.clear();
+      substanceAbuseController.clear();
+      religiousInvolveController.clear();
+      childBehaviorController.clear();
+      otherController.clear();
+      socioEconomicId = null;
     });
   }
 
-  populateCareGiverForm(CareGiverDetailsDto careGiverDetailsDto) {
+  populateSocioEconomicForm(SocioEconomicDto socioEconomicDto) {
     setState(() {
-      careGiverId = careGiverDetailsDto.clientCaregiverId;
-      personId = careGiverDetailsDto.personDto!.personId;
-      captureCareGiverPanelController =
+      socioEconomicId = socioEconomicDto.socioEconomyid;
+      captureSocioEconomicPanelController =
           ExpandableController(initialExpanded: true);
-      viewCareGiverPanelController =
+      viewSocioEconomicPanelController =
           ExpandableController(initialExpanded: false);
-      labelButtonAddUpdate = 'Update Care Giver';
-      firstNameController.text =
-          careGiverDetailsDto.personDto!.firstName.toString();
-      lastNameController.text =
-          careGiverDetailsDto.personDto!.lastName.toString();
-      dateOfBirthController.text =
-          careGiverDetailsDto.personDto!.dateOfBirth.toString();
-      ageController.text = careGiverDetailsDto.personDto!.age.toString();
-      genderDropdownButtonFormField = careGiverDetailsDto.personDto!.genderId;
-      relationshipTypeDropdownButtonFormField =
-          careGiverDetailsDto.relationshipTypeId;
+      labelButtonAddUpdate = 'Update Socio Economic';
+      familyBackgroundCommentController.text =
+          socioEconomicDto.familyBackgroundComment!;
+      financeWorkRecordController.text = socioEconomicDto.financeWorkRecord!;
+      housingController.text = socioEconomicDto.housing!;
+      socialCircumsancesController.text = socioEconomicDto.socialCircumsances!;
+      previousInterventionController.text =
+          socioEconomicDto.previousIntervention!;
+      interPersonalRelationshipController.text =
+          socioEconomicDto.interPersonalRelationship!;
+      peerPresureController.text = socioEconomicDto.peerPresure!;
+      substanceAbuseController.text = socioEconomicDto.substanceAbuse!;
+      religiousInvolveController.text = socioEconomicDto.religiousInvolve!;
+      childBehaviorController.text = socioEconomicDto.childBehavior!;
+      otherController.text = socioEconomicDto.other!;
     });
   }
 
   @override
   void dispose() {
-    firstNameController.dispose();
-    lastNameController.dispose();
-    dateOfBirthController.dispose();
-    ageController.dispose();
+    familyBackgroundCommentController.dispose();
+    financeWorkRecordController.dispose();
+    housingController.dispose();
+    socialCircumsancesController.dispose();
+    previousInterventionController.dispose();
+    interPersonalRelationshipController.dispose();
+    peerPresureController.dispose();
+    substanceAbuseController.dispose();
+    religiousInvolveController.dispose();
+    childBehaviorController.dispose();
+    otherController.dispose();
     super.dispose();
   }
 
@@ -286,7 +223,7 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
         child: Scaffold(
             key: scaffoldKey,
             appBar: AppBar(
-              title: const Text("Care Giver Details"),
+              title: const Text("Socio Ecomonic"),
               leading: IconButton(
                 icon: const Icon(Icons.offline_pin_rounded),
                 onPressed: () {
@@ -326,7 +263,7 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const HealthDetailPage(),
+                            builder: (context) => const FamilyMemberPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),
@@ -340,7 +277,7 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const FamilyMemberPage(),
+                            builder: (context) => const OffenceDetailPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),
@@ -373,7 +310,8 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                   scrollOnExpand: true,
                                   scrollOnCollapse: false,
                                   child: ExpandablePanel(
-                                    controller: captureCareGiverPanelController,
+                                    controller:
+                                        captureSocioEconomicPanelController,
                                     theme: const ExpandableThemeData(
                                       headerAlignment:
                                           ExpandablePanelHeaderAlignment.center,
@@ -382,7 +320,7 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                     header: Padding(
                                         padding: const EdgeInsets.all(10),
                                         child: Text(
-                                          "Capture Care Giver Details",
+                                          "Capture Socio Economic",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
@@ -430,7 +368,7 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                                             color: Colors.blue),
                                                       ),
                                                       onPressed: () {
-                                                        newCareGiver();
+                                                        newSocioEconomic();
                                                       },
                                                       child: const Text('New',
                                                           style: TextStyle(
@@ -442,147 +380,26 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                         Row(
                                           children: [
                                             Expanded(
-                                                child: Container(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10),
-                                                    child:
-                                                        DropdownButtonFormField(
-                                                      value:
-                                                          relationshipTypeDropdownButtonFormField,
-                                                      decoration:
-                                                          const InputDecoration(
-                                                        hintText:
-                                                            'Relationship Type',
-                                                        labelText:
-                                                            'Relationship Type',
-                                                        border:
-                                                            OutlineInputBorder(
-                                                          borderSide:
-                                                              BorderSide(
-                                                                  width: 1,
-                                                                  color: Colors
-                                                                      .green),
-                                                        ),
-                                                      ),
-                                                      items: relationshipTypesDto
-                                                          .map((relationship) {
-                                                        return DropdownMenuItem(
-                                                            value: relationship
-                                                                .relationshipTypeId,
-                                                            child: Text(
-                                                                relationship
-                                                                    .description
-                                                                    .toString()));
-                                                      }).toList(),
-                                                      onChanged:
-                                                          (selectedValue) {
-                                                        relationshipTypeDropdownButtonFormField =
-                                                            selectedValue;
-                                                      },
-                                                      validator: (value) {
-                                                        if (value == null) {
-                                                          return 'Relationship Type is required';
-                                                        }
-                                                      },
-                                                    ))),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                                child: Container(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10),
-                                                    child:
-                                                        DropdownButtonFormField(
-                                                      value:
-                                                          genderDropdownButtonFormField,
-                                                      decoration:
-                                                          const InputDecoration(
-                                                        hintText: 'Gender',
-                                                        labelText: 'Gender',
-                                                        border:
-                                                            OutlineInputBorder(
-                                                          borderSide:
-                                                              BorderSide(
-                                                                  width: 1,
-                                                                  color: Colors
-                                                                      .green),
-                                                        ),
-                                                      ),
-                                                      items: gendersDto
-                                                          .map((gender) {
-                                                        return DropdownMenuItem(
-                                                            value:
-                                                                gender.genderId,
-                                                            child: Text(gender
-                                                                .description
-                                                                .toString()));
-                                                      }).toList(),
-                                                      onChanged:
-                                                          (selectedValue) {
-                                                        genderDropdownButtonFormField =
-                                                            selectedValue;
-                                                      },
-                                                      validator: (value) {
-                                                        if (value == null) {
-                                                          return 'Gender required';
-                                                        }
-                                                        return null;
-                                                      },
-                                                    ))),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Expanded(
                                               child: Container(
                                                 padding:
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller:
-                                                      firstNameController,
+                                                      familyBackgroundCommentController,
                                                   enableInteractiveSelection:
                                                       false,
-                                                  maxLines: 1,
+                                                  maxLines: 2,
                                                   decoration:
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
-                                                    labelText: 'Firstname',
+                                                    labelText:
+                                                        'Family Background Comments',
                                                   ),
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Firstname Required';
-                                                    }
-                                                    return null;
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                child: TextFormField(
-                                                  controller:
-                                                      lastNameController,
-                                                  enableInteractiveSelection:
-                                                      false,
-                                                  maxLines: 1,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                    labelText: 'Lastname',
-                                                  ),
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Lastname Required';
+                                                      return 'Enter Family Background Comments';
                                                     }
                                                     return null;
                                                   },
@@ -599,83 +416,294 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller:
-                                                      dateOfBirthController,
+                                                      financeWorkRecordController,
                                                   enableInteractiveSelection:
                                                       false,
-                                                  maxLines: 1,
+                                                  maxLines: 2,
                                                   decoration:
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
-                                                    labelText: 'Date Of Birth',
+                                                    labelText:
+                                                        'Finance Work Record',
                                                   ),
-                                                  readOnly:
-                                                      true, // when true user cannot edit text
-                                                  onTap: () async {
-                                                    DateTime? pickedDate =
-                                                        await showDatePicker(
-                                                            context: context,
-                                                            initialDate: DateTime
-                                                                .now(), //get today's date
-                                                            firstDate: DateTime(
-                                                                1900), //DateTime.now() - not to allow to choose before today.
-                                                            lastDate:
-                                                                DateTime(3000));
-
-                                                    if (pickedDate != null) {
-                                                      String formattedDate =
-                                                          DateFormat(
-                                                                  'yyyy-MM-dd')
-                                                              .format(
-                                                                  pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
-                                                      dateOfBirthController
-                                                          .text = formattedDate;
-                                                      String formattedYear =
-                                                          DateFormat('yyyy')
-                                                              .format(
-                                                                  pickedDate);
-                                                      ageController
-                                                          .text = (DateTime
-                                                                      .now()
-                                                                  .year -
-                                                              int.parse(
-                                                                  formattedYear))
-                                                          .toString();
-                                                      //You can format date as per your need
-
-                                                    }
-                                                  },
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Date Of Birth Required';
+                                                      return 'Finance Work Record';
                                                     }
                                                     return null;
                                                   },
                                                 ),
                                               ),
                                             ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
                                             Expanded(
                                               child: Container(
                                                 padding:
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
-                                                  controller: ageController,
+                                                  controller: housingController,
                                                   enableInteractiveSelection:
                                                       false,
-                                                  maxLines: 1,
-                                                  keyboardType:
-                                                      TextInputType.number,
+                                                  maxLines: 2,
                                                   decoration:
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
-                                                    labelText: 'Age',
+                                                    labelText: 'Housing',
                                                   ),
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Age Required';
+                                                      return 'Enter Housing';
+                                                    }
+                                                    return null;
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: TextFormField(
+                                                  controller:
+                                                      socialCircumsancesController,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  maxLines: 2,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText:
+                                                        'Social Circumsances',
+                                                  ),
+                                                  validator: (value) {
+                                                    if (value == null ||
+                                                        value.isEmpty) {
+                                                      return 'Enter Social Circumsances';
+                                                    }
+                                                    return null;
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: TextFormField(
+                                                  controller:
+                                                      previousInterventionController,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  maxLines: 2,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText:
+                                                        'Previous Intervention',
+                                                  ),
+                                                  validator: (value) {
+                                                    if (value == null ||
+                                                        value.isEmpty) {
+                                                      return 'Enter Previous Intervention';
+                                                    }
+                                                    return null;
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: TextFormField(
+                                                  controller:
+                                                      interPersonalRelationshipController,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  maxLines: 2,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText:
+                                                        'InterPersonal Relationship',
+                                                  ),
+                                                  validator: (value) {
+                                                    if (value == null ||
+                                                        value.isEmpty) {
+                                                      return 'Enter InterPersonal Relationship';
+                                                    }
+                                                    return null;
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: TextFormField(
+                                                  controller:
+                                                      peerPresureController,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  maxLines: 2,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText: 'Peer Presure',
+                                                  ),
+                                                  validator: (value) {
+                                                    if (value == null ||
+                                                        value.isEmpty) {
+                                                      return 'Enter Peer Presure';
+                                                    }
+                                                    return null;
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: TextFormField(
+                                                  controller:
+                                                      substanceAbuseController,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  maxLines: 2,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText:
+                                                        'Substance Abuse',
+                                                  ),
+                                                  validator: (value) {
+                                                    if (value == null ||
+                                                        value.isEmpty) {
+                                                      return 'Enter Substance Abuse';
+                                                    }
+                                                    return null;
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: TextFormField(
+                                                  controller:
+                                                      religiousInvolveController,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  maxLines: 2,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText:
+                                                        'Religious Involve',
+                                                  ),
+                                                  validator: (value) {
+                                                    if (value == null ||
+                                                        value.isEmpty) {
+                                                      return 'Enter Religious Involve';
+                                                    }
+                                                    return null;
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: TextFormField(
+                                                  controller:
+                                                      childBehaviorController,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  maxLines: 2,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText: 'Child Behavior',
+                                                  ),
+                                                  validator: (value) {
+                                                    if (value == null ||
+                                                        value.isEmpty) {
+                                                      return 'Enter Child Behavior';
+                                                    }
+                                                    return null;
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: TextFormField(
+                                                  controller: otherController,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  maxLines: 2,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText: 'Other',
+                                                  ),
+                                                  validator: (value) {
+                                                    if (value == null ||
+                                                        value.isEmpty) {
+                                                      return 'Enter Other';
                                                     }
                                                     return null;
                                                   },
@@ -719,7 +747,7 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                                         if (_loginFormKey
                                                             .currentState!
                                                             .validate()) {
-                                                          addUpdateCareGiverClient();
+                                                          addUpdateSocioEconomic();
                                                         }
                                                       },
                                                       child: Text(
@@ -761,7 +789,8 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                   scrollOnExpand: true,
                                   scrollOnCollapse: false,
                                   child: ExpandablePanel(
-                                    controller: viewCareGiverPanelController,
+                                    controller:
+                                        viewSocioEconomicPanelController,
                                     theme: const ExpandableThemeData(
                                       headerAlignment:
                                           ExpandablePanelHeaderAlignment.center,
@@ -770,7 +799,7 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                     header: Padding(
                                         padding: const EdgeInsets.all(10),
                                         child: Text(
-                                          "View Care Giver Details",
+                                          "View Socio Economic",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
@@ -785,25 +814,25 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        if (careGiverDetailsDto.isNotEmpty)
+                                        if (socioEconomicsDto.isNotEmpty)
                                           Row(
                                             children: [
                                               Expanded(
                                                 child: ListView.separated(
                                                   shrinkWrap: true,
-                                                  itemCount: careGiverDetailsDto
-                                                      .length,
+                                                  itemCount:
+                                                      socioEconomicsDto.length,
                                                   itemBuilder:
                                                       (context, int index) {
-                                                    if (careGiverDetailsDto
+                                                    if (socioEconomicsDto
                                                         .isEmpty) {
                                                       return const Center(
                                                           child: Text(
-                                                              'No Accused Found.'));
+                                                              'No socio economics Found.'));
                                                     }
                                                     return ListTile(
                                                       title: Text(
-                                                          'Relationship : ${careGiverDetailsDto[index].relationshipTypeDto!.description ?? ''} ',
+                                                          'Family Background Comments : ${socioEconomicsDto[index].familyBackgroundComment ?? ''}',
                                                           style: const TextStyle(
                                                               color:
                                                                   Colors.black,
@@ -811,8 +840,10 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                                                   FontWeight
                                                                       .bold)),
                                                       subtitle: Text(
-                                                          'Name : ${careGiverDetailsDto[index].personDto!.firstName ?? ''} '
-                                                          ' ${careGiverDetailsDto[index].personDto!.lastName ?? ''}',
+                                                          'Finance Work Record : ${socioEconomicsDto[index].financeWorkRecord ?? ''}. '
+                                                          'Peer Presure : ${socioEconomicsDto[index].peerPresure ?? ''}. '
+                                                          'Religious Involve : ${socioEconomicsDto[index].religiousInvolve ?? ''}. '
+                                                          'Substance Abuse : ${socioEconomicsDto[index].substanceAbuse ?? ''}. ',
                                                           style:
                                                               const TextStyle(
                                                                   color: Colors
@@ -824,8 +855,8 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                                           //IconButton(onPressed: () {}, icon: const Icon(Icons.favorite)),
                                                           IconButton(
                                                               onPressed: () {
-                                                                populateCareGiverForm(
-                                                                    careGiverDetailsDto[
+                                                                populateSocioEconomicForm(
+                                                                    socioEconomicsDto[
                                                                         index]);
                                                               },
                                                               icon: const Icon(
