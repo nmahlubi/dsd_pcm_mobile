@@ -10,11 +10,11 @@ class PersonAddressSync {
   final _personAddressRepository = PersonAddressRepository();
   final _addressServiceClient = AddressService();
   late ApiResponse apiResponse = ApiResponse();
-  late List<PersonAddressDto> PersonAddresssDto = [];
+  late List<PersonAddressDto> personAddresssDto = [];
 
   Future<void> syncPersonAddress(int? personId) async {
     var offlinePersonAddressDto =
-        await _personAddressRepository.getPersonAddressByPersonId(personId!);
+        _personAddressRepository.getPersonAddressByPersonId(personId!);
     if (offlinePersonAddressDto.isNotEmpty) {
       for (var personAddress in offlinePersonAddressDto) {
         try {
@@ -39,10 +39,10 @@ class PersonAddressSync {
       apiResponse =
           await _addressServiceClient.getAddressByPersonIdOnline(personId);
       if ((apiResponse.ApiError) == null) {
-        PersonAddresssDto = (apiResponse.Data as List<PersonAddressDto>);
-        if (PersonAddresssDto.isNotEmpty) {
+        personAddresssDto = (apiResponse.Data as List<PersonAddressDto>);
+        if (personAddresssDto.isNotEmpty) {
           await _personAddressRepository
-              .savePersonAddressItems(PersonAddresssDto);
+              .savePersonAddressItems(personAddresssDto);
         }
       }
     } on SocketException catch (_) {

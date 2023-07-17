@@ -26,7 +26,6 @@ import '../../../../util/shared/randon_generator.dart';
 import '../../../../widgets/alert_dialog_messege_widget.dart';
 import '../../../probation_officer/accepted_worklist.dart';
 import '../assessment_details/assessment_detail.dart';
-import '../health_detail/health_detail.dart';
 
 class UpdateChildDetailPage extends StatefulWidget {
   const UpdateChildDetailPage({Key? key}) : super(key: key);
@@ -37,6 +36,7 @@ class UpdateChildDetailPage extends StatefulWidget {
 
 class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
   SharedPreferences? preferences;
+  final _loginFormKey = GlobalKey<FormState>();
 
   Future<void> initializePreference() async {
     preferences = await SharedPreferences.getInstance();
@@ -281,7 +281,12 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
         isPivaValidated: true,
         isEstimatedAge: true,
         isActive: true,
-        isDeleted: false);
+        isDeleted: false,
+        pivaTransactionId: "",
+        sexualOrientationId: null,
+        religionId: null,
+        populationGroupId: null,
+        citizenshipId: null);
 
     var acceptedWorklistOffline = AcceptedWorklistDto(
         assessmentStatus: acceptedWorklistDto.assessmentStatus,
@@ -303,8 +308,8 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
       if (!mounted) return;
       showSuccessMessage('Child Details Successfully Updated.');
     } else {
-      showDialogMessage((apiResponse.ApiError as ApiError));
       overlay.hide();
+      showDialogMessage((apiResponse.ApiError as ApiError));
       return;
     }
   }
@@ -412,7 +417,7 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
             body: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 70),
                 child: Form(
-                    key: _updateChildFormKey,
+                    key: _loginFormKey,
                     child: ListView(
                       children: [
                         Container(
@@ -873,7 +878,7 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
                                           width: 2, color: Colors.blue),
                                     ),
                                     onPressed: () {
-                                      if (_updateChildFormKey.currentState!
+                                      if (_loginFormKey.currentState!
                                           .validate()) {
                                         updateChildDetails();
                                       }

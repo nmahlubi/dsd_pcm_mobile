@@ -13,7 +13,7 @@ class GeneralDetailSync {
   late List<GeneralDetailDto> generalDetailsDto = [];
 
   Future<void> syncGeneralDetail(int? assessmentId) async {
-    var offlineGeneralDetailDto = await _generalDetailRepository
+    var offlineGeneralDetailDto = _generalDetailRepository
         .getAllGeneralDetailsByAssessmentId(assessmentId!);
     if (offlineGeneralDetailDto.isNotEmpty) {
       for (var generalDetail in offlineGeneralDetailDto) {

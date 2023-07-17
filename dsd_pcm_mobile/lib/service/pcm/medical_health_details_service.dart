@@ -90,4 +90,27 @@ class MedicalHealthDetailsService {
         "${AppUrl.pcmURL}/Medical/HealthDetails/AddUpdate",
         medicalHealthDetailDto);
   }
+
+  Future<ApiResponse> addUpdateMedicalHealthDetail(
+      MedicalHealthDetailDto medicalHealthDetailDto) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse =
+          await addUpdateMedicalHealthDetailOnline(medicalHealthDetailDto);
+      if (apiResponse.ApiError == null) {
+        ApiResults apiResults = (apiResponse.Data as ApiResults);
+        MedicalHealthDetailDto medicalHealthDetailDtoResponse =
+            MedicalHealthDetailDto.fromJson(apiResults.data);
+        apiResponse.Data = medicalHealthDetailDtoResponse;
+        _medicalHealthDetailRepository
+            .saveMedicalHealthDetail(medicalHealthDetailDtoResponse);
+      }
+    } on SocketException {
+      _medicalHealthDetailRepository
+          .saveMedicalHealthDetail(medicalHealthDetailDto);
+      apiResponse.Data = _medicalHealthDetailRepository
+          .getMedicalHealthDetailsById(medicalHealthDetailDto.healthDetailsId!);
+    }
+    return apiResponse;
+  }
 }

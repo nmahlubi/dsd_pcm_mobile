@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
 
-import '../../../../model/pcm/general_detail_dto.dart';
+import '../../../../model/intake/person_education_dto.dart';
+import '../../../../model/pcm/medical_health_detail_dto.dart';
 
-class ViewGeneralDetailPage extends StatelessWidget {
-  final List<GeneralDetailDto>? generalDetailsDto;
-  const ViewGeneralDetailPage({super.key, this.generalDetailsDto});
+class ViewEducation extends StatelessWidget {
+  final List<PersonEducationDto>? personEducationsDto;
+  const ViewEducation({super.key, this.personEducationsDto});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +28,7 @@ class ViewGeneralDetailPage extends StatelessWidget {
                 header: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Text(
-                      "View General Details",
+                      "View Educational",
                       style: Theme.of(context).textTheme.bodyLarge,
                     )),
                 collapsed: const Text(
@@ -39,26 +40,25 @@ class ViewGeneralDetailPage extends StatelessWidget {
                 expanded: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    if (generalDetailsDto!.isNotEmpty)
+                    if (personEducationsDto!.isNotEmpty)
                       Row(
                         children: [
                           Expanded(
                             child: ListView.separated(
                               shrinkWrap: true,
-                              itemCount: generalDetailsDto!.length,
+                              itemCount: personEducationsDto!.length,
                               itemBuilder: (context, int index) {
-                                if (generalDetailsDto!.isEmpty) {
+                                if (personEducationsDto!.isEmpty) {
                                   return const Center(
-                                      child: Text('No Comments Found.'));
+                                      child: Text('No education Found.'));
                                 }
                                 return ListTile(
                                   title: Text(
-                                      'Date : ${generalDetailsDto![index].dateCreated}'),
+                                      'School Name : ${personEducationsDto![index].schoolDto?.schoolName ?? ''}'),
                                   subtitle: Text(
-                                      'Consulted Sources : ${generalDetailsDto![index].consultedSources}. '
-                                      'Trace Efforts : ${generalDetailsDto![index].traceEfforts}. '
-                                      'Supervisor Comments : ${generalDetailsDto![index].commentsBySupervisor}. '
-                                      'Addional Information : ${generalDetailsDto![index].additionalInfo}',
+                                      'Highest Grade Passes : ${personEducationsDto![index].gradeDto?.description ?? ''} '
+                                      'Year Completed : ${personEducationsDto![index].yearCompleted ?? ''} '
+                                      'Last Attended : ${personEducationsDto![index].dateLastAttended ?? ''}',
                                       style:
                                           const TextStyle(color: Colors.grey)),
                                 );

@@ -15,5 +15,6 @@ class BackgroundJobOfflineLookUp {
     await _lookupSync.syncPreferredContactTypes();
     await _lookupSync.syncRecommendationTypes();
     await _lookupSync.syncRelationshipType();
+    await _lookupSync.syncFormOfNotifications();
   }
 }

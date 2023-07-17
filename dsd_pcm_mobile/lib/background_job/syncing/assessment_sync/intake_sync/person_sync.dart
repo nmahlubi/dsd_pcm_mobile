@@ -13,7 +13,7 @@ class PersonSync {
   late PersonDto personDto;
 
   Future<void> syncPerson(int? personId, int? userId) async {
-    var offlinePersonDto = await _personRepository.getPersonById(personId!);
+    var offlinePersonDto = _personRepository.getPersonById(personId!);
     try {
       if (offlinePersonDto != null) {
         apiResponse = await _personService.updatePersonOnline(offlinePersonDto);

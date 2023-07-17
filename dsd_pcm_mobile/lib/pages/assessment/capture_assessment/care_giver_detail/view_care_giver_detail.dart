@@ -52,15 +52,31 @@ class ViewCareGiverDetailPage extends StatelessWidget {
                                       child: Text('No Accused Found.'));
                                 }
                                 return ListTile(
-                                    title: Text(
-                                        'Relationship : ${careGiverDetailsDto![index].relationshipTypeDto!.description ?? ''} '),
-                                    subtitle: Text(
-                                        'Name : ${careGiverDetailsDto![index].personDto!.firstName ?? ''} '
-                                        ' ${careGiverDetailsDto![index].personDto!.lastName ?? ''}',
-                                        style: const TextStyle(
-                                            color: Colors.grey)),
-                                    trailing: const Icon(Icons.edit,
-                                        color: Colors.green));
+                                  title: Text(
+                                      'Relationship : ${careGiverDetailsDto![index].relationshipTypeDto!.description ?? ''} ',
+                                      style: const TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold)),
+                                  subtitle: Text(
+                                      'Name : ${careGiverDetailsDto![index].personDto!.firstName ?? ''} '
+                                      ' ${careGiverDetailsDto![index].personDto!.lastName ?? ''}',
+                                      style:
+                                          const TextStyle(color: Colors.black)),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      //IconButton(onPressed: () {}, icon: const Icon(Icons.favorite)),
+                                      IconButton(
+                                          onPressed: () {},
+                                          icon: const Icon(Icons.edit,
+                                              color: Colors.blue)),
+                                      IconButton(
+                                          onPressed: () {},
+                                          icon: const Icon(Icons.delete,
+                                              color: Colors.red)),
+                                    ],
+                                  ),
+                                );
                               },
                               separatorBuilder: (context, index) {
                                 return const Divider(thickness: 1);

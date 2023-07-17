@@ -1,11 +1,12 @@
-class PersonEducationQueryDto {
-  PersonEducationQueryDto({
+import 'grade_dto.dart';
+import 'school_dto.dart';
+
+class PersonEducationDto {
+  PersonEducationDto({
     int? personEducationId,
     int? personId,
-    int? gradeCompletedId,
-    String? gradeName,
+    int? gradeId,
     int? schoolId,
-    String? schoolName,
     String? yearCompleted,
     String? dateLastAttended,
     String? additionalInformation,
@@ -13,13 +14,15 @@ class PersonEducationQueryDto {
     String? createdBy,
     String? dateLastModified,
     String? modifiedBy,
+    bool? isActive,
+    bool? isDeleted,
+    SchoolDto? schoolDto,
+    GradeDto? gradeDto,
   }) {
     _personEducationId = personEducationId;
     _personId = personId;
-    _gradeCompletedId = gradeCompletedId;
-    _gradeName = gradeName;
+    _gradeId = gradeId;
     _schoolId = schoolId;
-    _schoolName = schoolName;
     _yearCompleted = yearCompleted;
     _dateLastAttended = dateLastAttended;
     _additionalInformation = additionalInformation;
@@ -27,15 +30,17 @@ class PersonEducationQueryDto {
     _createdBy = createdBy;
     _dateLastModified = dateLastModified;
     _modifiedBy = modifiedBy;
+    _isActive = isActive;
+    _isDeleted = isDeleted;
+    _schoolDto = schoolDto;
+    _gradeDto = gradeDto;
   }
 
-  PersonEducationQueryDto.fromJson(dynamic json) {
+  PersonEducationDto.fromJson(dynamic json) {
     _personEducationId = json['personEducationId'];
     _personId = json['personId'];
-    _gradeCompletedId = json['gradeCompletedId'];
-    _gradeName = json['gradeName'];
     _schoolId = json['schoolId'];
-    _schoolName = json['schoolName'];
+    _gradeId = json['gradeId'];
     _yearCompleted = json['yearCompleted'];
     _dateLastAttended = json['dateLastAttended'];
     _additionalInformation = json['additionalInformation'];
@@ -43,13 +48,18 @@ class PersonEducationQueryDto {
     _createdBy = json['createdBy'];
     _dateLastModified = json['dateLastModified'];
     _modifiedBy = json['modifiedBy'];
+    _isActive = json['isActive'];
+    _isDeleted = json['isDeleted'];
+    _schoolDto = json['schoolDto'] != null
+        ? SchoolDto.fromJson(json['schoolDto'])
+        : null;
+    _gradeDto =
+        json['gradeDto'] != null ? GradeDto.fromJson(json['gradeDto']) : null;
   }
   int? _personEducationId;
   int? _personId;
-  int? _gradeCompletedId;
-  String? _gradeName;
+  int? _gradeId;
   int? _schoolId;
-  String? _schoolName;
   String? _yearCompleted;
   String? _dateLastAttended;
   String? _additionalInformation;
@@ -57,13 +67,15 @@ class PersonEducationQueryDto {
   String? _createdBy;
   String? _dateLastModified;
   String? _modifiedBy;
+  bool? _isActive;
+  bool? _isDeleted;
+  SchoolDto? _schoolDto;
+  GradeDto? _gradeDto;
 
   int? get personEducationId => _personEducationId;
   int? get personId => _personId;
-  int? get gradeCompletedId => _gradeCompletedId;
-  String? get gradeName => _gradeName;
+  int? get gradeId => _gradeId;
   int? get schoolId => _schoolId;
-  String? get schoolName => _schoolName;
   String? get yearCompleted => _yearCompleted;
   String? get dateLastAttended => _dateLastAttended;
   String? get additionalInformation => _additionalInformation;
@@ -71,23 +83,33 @@ class PersonEducationQueryDto {
   String? get createdBy => _createdBy;
   String? get dateLastModified => _dateLastModified;
   String? get modifiedBy => _modifiedBy;
+  bool? get isActive => _isActive;
+  bool? get isDeleted => _isDeleted;
+  SchoolDto? get schoolDto => _schoolDto;
+  GradeDto? get gradeDto => _gradeDto;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
 
     map['personEducationId'] = _personEducationId;
     map['personId'] = _personId;
-    map['gradeCompletedId'] = _gradeCompletedId;
-    map['gradeName'] = _gradeName;
+    map['gradeId'] = _gradeId;
     map['schoolId'] = _schoolId;
-    map['schoolName'] = _schoolName;
     map['yearCompleted'] = _yearCompleted;
     map['dateLastAttended'] = _dateLastAttended;
     map['additionalInformation'] = _additionalInformation;
     map['dateCreated'] = _dateCreated;
     map['createdBy'] = _createdBy;
     map['dateLastModified'] = _dateLastModified;
+    map['isActive'] = _isActive;
+    map['isDeleted'] = _isDeleted;
     map['modifiedBy'] = _modifiedBy;
+    if (_schoolDto != null) {
+      map['schoolDto'] = _schoolDto?.toJson();
+    }
+    if (_gradeDto != null) {
+      map['gradeDto'] = _gradeDto?.toJson();
+    }
     return map;
   }
 }

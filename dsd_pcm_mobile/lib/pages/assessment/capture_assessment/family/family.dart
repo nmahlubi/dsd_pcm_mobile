@@ -18,7 +18,7 @@ import '../../../../util/shared/loading_overlay.dart';
 import '../../../../util/shared/randon_generator.dart';
 import '../../../../widgets/alert_dialog_messege_widget.dart';
 import '../../../probation_officer/accepted_worklist.dart';
-import '../care_giver_detail/care_giver_detail.dart';
+import '../care_giver_detail.dart';
 import '../socio_economic/socio_economic.dart';
 import 'capture_family_member.dart';
 import 'capture_family_information.dart';

@@ -4,12 +4,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/pcm/accepted_worklist_dto.dart';
 import '../pages/assessment/capture_assessment/assessment_details/assessment_detail.dart';
-import '../pages/assessment/capture_assessment/care_giver_detail/care_giver_detail.dart';
+import '../pages/assessment/capture_assessment/care_giver_detail.dart';
 import '../pages/assessment/capture_assessment/child_detail/update_child_detail.dart';
 import '../pages/assessment/capture_assessment/development_assessment/development_assessment.dart';
+import '../pages/assessment/capture_assessment/educational/education.dart';
 import '../pages/assessment/capture_assessment/family/family.dart';
 import '../pages/assessment/capture_assessment/general_details/general_detail.dart';
-import '../pages/assessment/capture_assessment/health_detail/health_detail.dart';
+import '../pages/assessment/capture_assessment/health_detail.dart';
 import '../pages/assessment/capture_assessment/offence_details/offence_detail.dart';
 import '../pages/assessment/capture_assessment/recommendation/recommendation.dart';
 import '../pages/assessment/capture_assessment/socio_economic/socio_economic.dart';
@@ -109,12 +110,21 @@ class _GoToAssessmentDrawerPageWidgetState extends State<GoToAssessmentDrawer> {
                 );
               },
               status: widget.isCompleted),
-          /*createDrawerBodyItemTrail(
+          createDrawerBodyItemTrail(
               icon: Icons.arrow_right,
               text: 'Educational Information',
-              onTap: () =>
-                  Navigator.pushReplacementNamed(context, '/allocated-cases'),
-              status: widget.isCompleted),*/
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const EducationPage(),
+                    settings: RouteSettings(
+                      arguments: widget.acceptedWorklistDto,
+                    ),
+                  ),
+                );
+              },
+              status: widget.isCompleted),
           createDrawerBodyItemTrail(
               icon: Icons.arrow_right,
               text: 'Care-Giver Details',

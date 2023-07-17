@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../background_job/background_job_offline.dart';
 import '../../../background_job/background_job_offline_lookup.dart';
+import '../../../background_job/background_job_offline_school.dart';
 import '../../../util/shared/loading_overlay.dart';
 import '../../../widgets/alert_dialog_messege_widget.dart';
 
@@ -24,8 +25,8 @@ class _LookupSyncOfflineManualPageState
     preferences = await SharedPreferences.getInstance();
   }
 
-  final _backgroundJobOffline = BackgroundJobOffline();
   final _backgroundJobOfflineLookUp = BackgroundJobOfflineLookUp();
+  final _backgroundJobOfflineSchool = BackgroundJobOfflineSchool();
 
   @override
   void initState() {
@@ -52,15 +53,15 @@ class _LookupSyncOfflineManualPageState
     }
   }
 
-  syncOfflineManual() async {
+  syncOfflineManualSchool() async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
     try {
-      await _backgroundJobOffline.startRunningBackgroundSyncJobManually(
-          preferences!.getInt('userId')!);
+      await _backgroundJobOfflineSchool.startRunningBackgroundSyncSchool();
       overlay.hide();
       if (!mounted) return;
-      alertDialogMessageWidget(context, "Successfull", "Synced Completed.");
+      alertDialogMessageWidget(
+          context, "Successfull", "School Synced Completed.");
     } on SocketException {
       overlay.hide();
       showDialogMessage('Unable to sync offline data.');
@@ -86,47 +87,10 @@ class _LookupSyncOfflineManualPageState
                 child: Form(
                     child: ListView(
                   children: [
-                    /* Container(
-                      padding: const EdgeInsets.all(8),
-                      child: const Text(
-                        'Start Syncing Offline Data',
-                        style: TextStyle(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.w200,
-                            fontSize: 21),
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                              height: 70,
-                              padding: const EdgeInsets.all(10),
-                              child: OutlinedButton(
-                                style: OutlinedButton.styleFrom(
-                                  backgroundColor:
-                                      const Color.fromARGB(255, 23, 22, 22),
-                                  shape: const StadiumBorder(),
-                                  side: const BorderSide(
-                                      width: 2, color: Colors.blue),
-                                ),
-                                onPressed: () {
-                                  syncOfflineManual();
-                                },
-                                child: const Text('Start Syncing'),
-                              )),
-                        ),
-                      ],
-                    ),*/
                     Container(
                       padding: const EdgeInsets.all(8),
                       child: const Text(
-                        'Start Syncing LookUp Offline Data',
+                        'Syncing LookUp Offline Data',
                         style: TextStyle(
                             color: Colors.blue,
                             fontWeight: FontWeight.w200,
@@ -135,11 +99,6 @@ class _LookupSyncOfflineManualPageState
                     ),
                     Row(
                       children: [
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                          ),
-                        ),
                         Expanded(
                           child: Container(
                               height: 70,
@@ -156,6 +115,38 @@ class _LookupSyncOfflineManualPageState
                                   syncOfflineManualLookUp();
                                 },
                                 child: const Text('Syncing LookUp'),
+                              )),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      child: const Text(
+                        'Syncing School Offline Data',
+                        style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.w200,
+                            fontSize: 21),
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                              height: 70,
+                              padding: const EdgeInsets.all(10),
+                              child: OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  backgroundColor:
+                                      const Color.fromARGB(255, 23, 22, 22),
+                                  shape: const StadiumBorder(),
+                                  side: const BorderSide(
+                                      width: 2, color: Colors.blue),
+                                ),
+                                onPressed: () {
+                                  syncOfflineManualSchool();
+                                },
+                                child: const Text('Syncing Schools'),
                               )),
                         ),
                       ],

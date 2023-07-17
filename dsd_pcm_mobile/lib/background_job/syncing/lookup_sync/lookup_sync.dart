@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 
 import '../../../domain/repository/lookup/disability_type_repository.dart';
+import '../../../domain/repository/lookup/form_of_notification_repository.dart';
 import '../../../domain/repository/lookup/gender_repository.dart';
 import '../../../domain/repository/lookup/health_status_repository.dart';
 import '../../../domain/repository/lookup/identification_type_repository.dart';
@@ -15,6 +16,7 @@ import '../../../domain/repository/lookup/recommendation_type_repository.dart';
 import '../../../domain/repository/lookup/relationship_type_repository.dart';
 import '../../../model/intake/address_type_dto.dart';
 import '../../../model/intake/disability_type_dto.dart';
+import '../../../model/intake/form_of_notification_dto.dart';
 import '../../../model/intake/gender_dto.dart';
 import '../../../model/intake/health_status_dto.dart';
 import '../../../model/intake/identification_type_dto.dart';
@@ -42,6 +44,7 @@ class LookupSync {
   final _preferredContactTypeRepository = PreferredContactTypeRepository();
   final _placementTypeRepository = PlacementTypeRepository();
   final _recommendationTypeRepository = RecommendationTypeRepository();
+  final _formOfNotificationRepository = FormOfNotificationRepository();
   late ApiResponse apiResponse = ApiResponse();
   late List<IdentificationTypeDto> identificationTypesDto = [];
   late List<DisabilityTypeDto> disabilityTypesDto = [];
@@ -56,6 +59,7 @@ class LookupSync {
   late List<RelationshipTypeDto> relationshipTypesDto = [];
   late List<RecommendationTypeDto> recommendationTypeDto = [];
   late List<PlacementTypeDto> placementTypeDto = [];
+  late List<FormOfNotificationDto> formOfNotificationsDto = [];
 
   Future<void> syncGender() async {
     try {
@@ -230,6 +234,24 @@ class LookupSync {
     } on SocketException catch (_) {
       if (kDebugMode) {
         print('Unable to access _lookUpService.syncPlacementTypes endpoint');
+      }
+    }
+  }
+
+  Future<void> syncFormOfNotifications() async {
+    try {
+      apiResponse = await _lookUpService.getFormOfNotificationsOnline();
+      if ((apiResponse.ApiError) == null) {
+        formOfNotificationsDto =
+            (apiResponse.Data as List<FormOfNotificationDto>);
+        await _formOfNotificationRepository.deleteAllFormOfNotifications();
+        await _formOfNotificationRepository
+            .saveFormOfNotificationItems(formOfNotificationsDto);
+      }
+    } on SocketException catch (_) {
+      if (kDebugMode) {
+        print(
+            'Unable to access _lookUpService.syncFormOfNotifications endpoint');
       }
     }
   }

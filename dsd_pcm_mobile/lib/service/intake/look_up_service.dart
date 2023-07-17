@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:http_interceptor/http/intercepted_client.dart';
 
 import '../../domain/repository/lookup/disability_type_repository.dart';
+import '../../domain/repository/lookup/form_of_notification_repository.dart';
 import '../../domain/repository/lookup/gender_repository.dart';
 import '../../domain/repository/lookup/health_status_repository.dart';
 import '../../domain/repository/lookup/identification_type_repository.dart';
@@ -14,6 +15,7 @@ import '../../domain/repository/lookup/preferred_contact_type_repository.dart';
 import '../../domain/repository/lookup/recommendation_type_repository.dart';
 import '../../domain/repository/lookup/relationship_type_repository.dart';
 import '../../model/intake/disability_type_dto.dart';
+import '../../model/intake/form_of_notification_dto.dart';
 import '../../model/intake/gender_dto.dart';
 import '../../model/intake/health_status_dto.dart';
 import '../../model/intake/identification_type_dto.dart';
@@ -43,6 +45,7 @@ class LookUpService {
   final preferredContactTypeRepository = PreferredContactTypeRepository();
   final placementTypeRepository = PlacementTypeRepository();
   final recommendationTypeRepository = RecommendationTypeRepository();
+  final formOfNotificationRepository = FormOfNotificationRepository();
 
   Future<ApiResponse> getGendersOnline() async {
     ApiResponse apiResponse = ApiResponse();
@@ -156,37 +159,6 @@ class LookUpService {
     return apiResponse;
   }
 
-  /* Future<ApiResponse> getDisabilityTypes() async {
-    ApiResponse apiResponse = ApiResponse();
-    try {
-      if (disabilityTypeRepository.getAllDisabilityTypes().isNotEmpty) {
-        apiResponse.Data = disabilityTypeRepository.getAllDisabilityTypes();
-        return apiResponse;
-      }
-      final response = await client
-          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/DisabilityType"));
-
-      switch (response.statusCode) {
-        case 200:
-          List<DisabilityTypeDto> disabilityTypeDtoResponse =
-              (json.decode(response.body) as List)
-                  .map((data) => DisabilityTypeDto.fromJson(data))
-                  .toList();
-          apiResponse.Data = disabilityTypeDtoResponse;
-          disabilityTypeRepository
-              .saveDisabilityTypeItems(disabilityTypeDtoResponse);
-          break;
-        default:
-          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
-          break;
-      }
-    } on SocketException {
-      apiResponse.Data = disabilityTypeRepository.getAllDisabilityTypes();
-    }
-    return apiResponse;
-  }
-  */
-
   Future<ApiResponse> getDisabilityTypesOnline() async {
     ApiResponse apiResponse = ApiResponse();
     final response = await client
@@ -225,35 +197,6 @@ class LookUpService {
     return apiResponse;
   }
 
-  /*Future<ApiResponse> getLanguages() async {
-    ApiResponse apiResponse = ApiResponse();
-    try {
-      if (languageRepository.getAllLanguages().isNotEmpty) {
-        apiResponse.Data = languageRepository.getAllLanguages();
-        return apiResponse;
-      }
-      final response =
-          await client.get(Uri.parse("${AppUrl.intakeURL}/LookUp/Language"));
-
-      switch (response.statusCode) {
-        case 200:    List<LanguageDto> languageDtoResponse =
-              (json.decode(response.body) as List)
-                  .map((data) => LanguageDto.fromJson(data))
-                  .toList();
-          apiResponse.Data = languageDtoResponse;
-          languageRepository.saveLanguageItems(languageDtoResponse);
-          break;
-        default:
-          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
-          break;
-      }
-    } on SocketException {
-      apiResponse.Data = languageRepository.getAllLanguages();
-    }
-    return apiResponse;
-  }
-  */
-
   Future<ApiResponse> getLanguagesOnline() async {
     ApiResponse apiResponse = ApiResponse();
     final response =
@@ -290,37 +233,6 @@ class LookUpService {
     }
     return apiResponse;
   }
-
-  /*Future<ApiResponse> getNationalities() async {
-    ApiResponse apiResponse = ApiResponse();
-    try {
-      if (nationalityRepository.getAllNationalities().isNotEmpty) {
-        apiResponse.Data = nationalityRepository.getAllNationalities();
-        return apiResponse;
-      }
-      final response =
-          await client.get(Uri.parse("${AppUrl.intakeURL}/LookUp/Nationality"));
-
-      switch (response.statusCode) {
-        case 200:
-
-          List<NationalityDto> nationalityDtoResponse =
-              (json.decode(response.body) as List)
-                  .map((data) => NationalityDto.fromJson(data))
-                  .toList();
-          apiResponse.Data = nationalityDtoResponse;
-          nationalityRepository.saveNationalityItems(nationalityDtoResponse);
-          break;
-        default:
-          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
-          break;
-      }
-    } on SocketException {
-      apiResponse.Data = nationalityRepository.getAllNationalities();
-    }
-    return apiResponse;
-  }
-  */
 
   Future<ApiResponse> getNationalitiesOnline() async {
     ApiResponse apiResponse = ApiResponse();
@@ -359,40 +271,6 @@ class LookUpService {
     return apiResponse;
   }
 
-/*
-  Future<ApiResponse> getMaritalStatus() async {
-    ApiResponse apiResponse = ApiResponse();
-    try {
-      if (maritalStatusRepository.getAllMaritalStatuses().isNotEmpty) {
-        apiResponse.Data = maritalStatusRepository.getAllMaritalStatuses();
-        return apiResponse;
-      }
-
-      final response = await client
-          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/MaritalStatus"));
-
-      switch (response.statusCode) {
-        case 200:
-          List<MaritalStatusDto> maritalStatusDtoResponse =
-              (json.decode(response.body) as List)
-                  .map((data) => MaritalStatusDto.fromJson(data))
-                  .toList();
-          apiResponse.Data = maritalStatusDtoResponse;
-          maritalStatusRepository
-              .saveMaritalStatusItems(maritalStatusDtoResponse);
-
-          break;
-        default:
-          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
-          break;
-      }
-    } on SocketException {
-      apiResponse.Data = maritalStatusRepository.getAllMaritalStatuses();
-    }
-    return apiResponse;
-  }
-  */
-
   Future<ApiResponse> getMaritalStatusOnline() async {
     ApiResponse apiResponse = ApiResponse();
     final response =
@@ -430,42 +308,6 @@ class LookUpService {
     }
     return apiResponse;
   }
-
-/*
-  Future<ApiResponse> getIdentificationTypes() async {
-    ApiResponse apiResponse = ApiResponse();
-    try {
-      if (identificationTypeRepository.getAllIdentificationTypes().isNotEmpty) {
-        apiResponse.Data =
-            identificationTypeRepository.getAllIdentificationTypes();
-        return apiResponse;
-      }
-      final response = await client
-          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/IdentificationType"));
-
-      switch (response.statusCode) {
-        case 200:
-          
-          List<IdentificationTypeDto> identificationTypeDtoResponse =
-              (json.decode(response.body) as List)
-                  .map((data) => IdentificationTypeDto.fromJson(data))
-                  .toList();
-          apiResponse.Data = identificationTypeDtoResponse;
-          identificationTypeRepository
-              .saveIdentificationTypeItems(identificationTypeDtoResponse);
-
-          break;
-        default:
-          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
-          break;
-      }
-    } on SocketException {
-      apiResponse.Data =
-          identificationTypeRepository.getAllIdentificationTypes();
-    }
-    return apiResponse;
-  }
-*/
 
   Future<ApiResponse> getIdentificationTypesOnline() async {
     ApiResponse apiResponse = ApiResponse();
@@ -506,45 +348,6 @@ class LookUpService {
     }
     return apiResponse;
   }
-
-  /*Future<ApiResponse> getPreferredContactTypes() async {
-    ApiResponse apiResponse = ApiResponse();
-    try {
-      if (preferredContactTypeRepository
-          .getAllPreferredContactTypes()
-          .isNotEmpty) {
-        apiResponse.Data =
-            preferredContactTypeRepository.getAllPreferredContactTypes();
-        return apiResponse;
-      }
-      final response = await client
-          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/PreferredContactType"));
-
-      switch (response.statusCode) {
-        case 200:
-          /*
-          apiResponse.Data = (json.decode(response.body) as List)
-              .map((data) => PreferredContactTypeDto.fromJson(data))
-              .toList();*/
-
-          List<PreferredContactTypeDto> preferredContactTypeDtoResponse =
-              (json.decode(response.body) as List)
-                  .map((data) => PreferredContactTypeDto.fromJson(data))
-                  .toList();
-          apiResponse.Data = preferredContactTypeDtoResponse;
-          preferredContactTypeRepository
-              .savePreferredContactTypeItems(preferredContactTypeDtoResponse);
-          break;
-        default:
-          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
-          break;
-      }
-    } on SocketException {
-      apiResponse.Data =
-          preferredContactTypeRepository.getAllPreferredContactTypes();
-    }
-    return apiResponse;
-  }*/
 
   Future<ApiResponse> getPreferredContactTypesOnline() async {
     ApiResponse apiResponse = ApiResponse();
@@ -588,42 +391,6 @@ class LookUpService {
     return apiResponse;
   }
 
-  /*Future<ApiResponse> getRecommendationTypes() async {
-    ApiResponse apiResponse = ApiResponse();
-    try {
-      if (recommendationTypeRepository.getAllRecommendationTypes().isNotEmpty) {
-        apiResponse.Data =
-            recommendationTypeRepository.getAllRecommendationTypes();
-        return apiResponse;
-      }
-      final response = await client
-          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/RecommendationType"));
-
-      switch (response.statusCode) {
-        case 200:
-          /*apiResponse.Data = (json.decode(response.body) as List)
-              .map((data) => RecommendationTypeDto.fromJson(data))
-              .toList();*/
-          List<RecommendationTypeDto> recommendationTypeDtoResponse =
-              (json.decode(response.body) as List)
-                  .map((data) => RecommendationTypeDto.fromJson(data))
-                  .toList();
-          apiResponse.Data = recommendationTypeDtoResponse;
-          recommendationTypeRepository
-              .saveRecommendationTypeItems(recommendationTypeDtoResponse);
-          break;
-        default:
-          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
-          break;
-      }
-    } on SocketException {
-      apiResponse.Data =
-          recommendationTypeRepository.getAllRecommendationTypes();
-    }
-    return apiResponse;
-  }
-  */
-
   Future<ApiResponse> getRecommendationTypesOnline() async {
     ApiResponse apiResponse = ApiResponse();
     final response = await client
@@ -664,41 +431,6 @@ class LookUpService {
     return apiResponse;
   }
 
-/*
-  Future<ApiResponse> getPlacementTypes() async {
-    ApiResponse apiResponse = ApiResponse();
-    try {
-      if (placementTypeRepository.getAllPlacementTypes().isNotEmpty) {
-        apiResponse.Data = placementTypeRepository.getAllPlacementTypes();
-        return apiResponse;
-      }
-      final response = await client
-          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/PlacementType"));
-
-      switch (response.statusCode) {
-        case 200:
-          /*apiResponse.Data = (json.decode(response.body) as List)
-              .map((data) => PlacementTypeDto.fromJson(data))
-              .toList();*/
-          List<PlacementTypeDto> placementTypeDtoResponse =
-              (json.decode(response.body) as List)
-                  .map((data) => PlacementTypeDto.fromJson(data))
-                  .toList();
-          apiResponse.Data = placementTypeDtoResponse;
-          placementTypeRepository
-              .savePlacementTypeItems(placementTypeDtoResponse);
-          break;
-        default:
-          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
-          break;
-      }
-    } on SocketException {
-      apiResponse.Data = placementTypeRepository.getAllPlacementTypes();
-    }
-    return apiResponse;
-  }
-  */
-
   Future<ApiResponse> getPlacementTypesOnline() async {
     ApiResponse apiResponse = ApiResponse();
     final response =
@@ -733,6 +465,46 @@ class LookUpService {
       }
     } on SocketException {
       apiResponse.Data = placementTypeRepository.getAllPlacementTypes();
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> getFormOfNotificationsOnline() async {
+    ApiResponse apiResponse = ApiResponse();
+    final response = await client
+        .get(Uri.parse("${AppUrl.intakeURL}/LookUp/FormOfNotification"));
+    switch (response.statusCode) {
+      case 200:
+        apiResponse.Data = (json.decode(response.body) as List)
+            .map((data) => FormOfNotificationDto.fromJson(data))
+            .toList();
+        break;
+      default:
+        apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+        break;
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> getFormOfNotifications() async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      if (formOfNotificationRepository.getAllFormOfNotifications().isNotEmpty) {
+        apiResponse.Data =
+            formOfNotificationRepository.getAllFormOfNotifications();
+        return apiResponse;
+      }
+      apiResponse = await getFormOfNotificationsOnline();
+      if (apiResponse.ApiError == null) {
+        List<FormOfNotificationDto> formOfNotificationsDtoResponse =
+            apiResponse.Data as List<FormOfNotificationDto>;
+        apiResponse.Data = formOfNotificationsDtoResponse;
+        formOfNotificationRepository
+            .saveFormOfNotificationItems(formOfNotificationsDtoResponse);
+      }
+    } on SocketException {
+      apiResponse.Data =
+          formOfNotificationRepository.getAllFormOfNotifications();
     }
     return apiResponse;
   }

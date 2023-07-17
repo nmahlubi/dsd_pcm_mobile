@@ -4,7 +4,6 @@ import 'identification_type_dto.dart';
 import 'language_dto.dart';
 import 'marital_status_dto.dart';
 import 'nationality_dto.dart';
-import 'person_address_dto.dart';
 
 class PersonDto {
   PersonDto({

@@ -3,9 +3,11 @@ import 'package:dsd_pcm_mobile/background_job/syncing/assessment_sync/intake_syn
 import 'package:dsd_pcm_mobile/model/pcm/accepted_worklist_dto.dart';
 
 import '../domain/repository/authenticate/authenticate_repository.dart';
+import 'syncing/assessment_sync/assessment_register_sync.dart';
 import 'syncing/assessment_sync/care_giver_detail_sync.dart';
 import 'syncing/assessment_sync/family_member_sync.dart';
 import 'syncing/assessment_sync/general_detail_sync.dart';
+import 'syncing/assessment_sync/intake_sync/person_education_sync.dart';
 import 'syncing/assessment_sync/offence_details_sync.dart';
 import 'syncing/assessment_sync/socio_economic_sync.dart';
 import 'syncing/assessment_sync/victim_details_sync.dart';
@@ -30,6 +32,8 @@ class BackgroundJobOffline {
   final _generalDetailSync = GeneralDetailSync();
   final _victimDetailSync = VictimDetailSync();
   final _developmentAssessmentSync = DevelopmentAssessmentSync();
+  final _personEducationSync = PersonEducationSync();
+  final _assessmentRegisterSync = AssessmentRegisterSync();
 
   Future<void> startRunningBackgroundSyncJob() async {
     var userToken = await _authenticateRepository.getAllAuthTokens();
@@ -105,6 +109,10 @@ class BackgroundJobOffline {
         .syncVictimOrganisationDetail(acceptedWork.intakeAssessmentId);
     await _developmentAssessmentSync
         .syncDevelopmentAssessment(acceptedWork.intakeAssessmentId);
+
+    await _personEducationSync.syncPersonEducationHealth(acceptedWork.personId);
+    await _assessmentRegisterSync.syncAssesmentRegister(
+        acceptedWork.intakeAssessmentId, acceptedWork.caseId);
   }
 }
   

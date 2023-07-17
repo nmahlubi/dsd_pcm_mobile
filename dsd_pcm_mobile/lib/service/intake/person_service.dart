@@ -5,7 +5,7 @@ import 'package:http_interceptor/http/intercepted_client.dart';
 
 import '../../domain/repository/intake/person_repository.dart';
 import '../../domain/repository/worklist/accepted_worklist_repository.dart';
-import '../../model/intake/person_education_query_dto.dart';
+import '../../model/intake/person_education_dto.dart';
 import '../../model/pcm/accepted_worklist_dto.dart';
 import '../../util/app_url.dart';
 import '../../util/auth_intercept/authorization_interceptor.dart';
@@ -106,27 +106,6 @@ class PersonService {
       _acceptedWorklistRepository.saveAcceptedWorklistSingle(
           acceptedWorklistDto, userId);
       apiResponse.Data = _personRepository.getPersonById(personDto.personId!);
-    }
-    return apiResponse;
-  }
-
-  Future<ApiResponse> getEducationByPersonId(int? personId) async {
-    ApiResponse apiResponse = ApiResponse();
-    try {
-      final response = await client
-          .get(Uri.parse("${AppUrl.intakeURL}/Person/Educations/$personId"));
-      switch (response.statusCode) {
-        case 200:
-          apiResponse.Data = (json.decode(response.body) as List)
-              .map((data) => PersonEducationQueryDto.fromJson(data))
-              .toList();
-          break;
-        default:
-          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
-          break;
-      }
-    } on SocketException {
-      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
     }
     return apiResponse;
   }

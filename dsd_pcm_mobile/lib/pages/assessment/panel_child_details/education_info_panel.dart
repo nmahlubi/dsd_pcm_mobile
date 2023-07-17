@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
 
-import '../../../model/intake/person_education_query_dto.dart';
+import '../../../model/intake/person_education_dto.dart';
 
 class EducationInfoPanel extends StatelessWidget {
-  final List<PersonEducationQueryDto>? personEducationsQueryDto;
+  final List<PersonEducationDto>? personEducationsQueryDto;
   const EducationInfoPanel({super.key, required this.personEducationsQueryDto});
 
   @override
@@ -54,9 +54,9 @@ class EducationInfoPanel extends StatelessWidget {
                                 }
                                 return ListTile(
                                     title: Text(
-                                        'School Name : ${personEducationsQueryDto![index].schoolName}'),
+                                        'School Name : ${personEducationsQueryDto![index].schoolDto!.schoolName}'),
                                     subtitle: Text(
-                                        'Highest grade completed : ${personEducationsQueryDto![index].gradeName}.'
+                                        'Highest grade completed : ${personEducationsQueryDto![index].gradeDto?.description}.'
                                         ' Year completed :  ${personEducationsQueryDto![index].yearCompleted}',
                                         style: const TextStyle(
                                             color: Colors.grey)));

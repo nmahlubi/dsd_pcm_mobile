@@ -3,18 +3,13 @@ import 'package:flutter/foundation.dart';
 
 import '../../../domain/repository/assessment/care_giver_detail_repository.dart';
 import '../../../model/intake/care_giver_details_dto.dart';
-import '../../../model/intake/person_dto.dart';
 import '../../../service/intake/care_giver_detail_service.dart';
-import '../../../service/intake/person_service.dart';
 import '../../../util/shared/apiresponse.dart';
-import '../../../util/shared/apiresults.dart';
 
 class CareGiverDetailSync {
   final _careGiverDetailRepository = CareGiverDetailRepository();
   final _careGiverDetailService = CareGiverDetailService();
-  final _personService = PersonService();
   late ApiResponse apiResponse = ApiResponse();
-  late PersonDto personDto;
   late List<CareGiverDetailsDto> careGiverDetailsDto = [];
 
   Future<void> syncCareGiverDetail(int? clientId) async {
@@ -24,15 +19,9 @@ class CareGiverDetailSync {
       for (var careGiver in offlineCareGiverDetailsDto) {
         try {
           if (careGiver.personDto != null) {
-            apiResponse = await _personService
-                .searchAddUdatePersonOnline(careGiver.personDto!);
-            if ((apiResponse.ApiError) == null) {
-              ApiResults apiResults = (apiResponse.Data as ApiResults);
-              PersonDto personDto = PersonDto.fromJson(apiResults.data);
-              apiResponse =
-                  await _careGiverDetailService.addUpdateCareGiverDetailOnline(
-                      careGiver, personDto.personId);
-            }
+            apiResponse =
+                await _careGiverDetailService.addUpdateCareGiverDetailOnline(
+                    careGiver, careGiver.personDto!.personId);
           }
           _careGiverDetailRepository
               .getCareGiverDetailById(careGiver.clientCaregiverId!);
