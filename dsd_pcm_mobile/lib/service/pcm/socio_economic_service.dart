@@ -87,4 +87,24 @@ class SocioEconomicService {
     return await _httpClientService.httpClientPost(
         "${AppUrl.pcmURL}/SocioEconomic/AddUpdate", socioEconomicDto);
   }
+
+  Future<ApiResponse> addUpdateSocioEconomic(
+      SocioEconomicDto socioEconomicDto) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse = await addUpdateSocioEconomicOnline(socioEconomicDto);
+      if (apiResponse.ApiError == null) {
+        ApiResults apiResults = (apiResponse.Data as ApiResults);
+        SocioEconomicDto socioEconomicDtoResponse =
+            SocioEconomicDto.fromJson(apiResults.data);
+        apiResponse.Data = socioEconomicDtoResponse;
+        _socioEconomicRepository.saveSocioEconomic(socioEconomicDtoResponse);
+      }
+    } on SocketException {
+      _socioEconomicRepository.saveSocioEconomic(socioEconomicDto);
+      apiResponse.Data = _socioEconomicRepository
+          .getSocioEconomicsById(socioEconomicDto.socioEconomyid!);
+    }
+    return apiResponse;
+  }
 }

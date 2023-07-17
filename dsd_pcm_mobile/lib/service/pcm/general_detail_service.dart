@@ -107,4 +107,25 @@ class GeneralDetailService {
     return await _httpClientService.httpClientPost(
         "${AppUrl.pcmURL}/GeneralDetail/AddUpdate", generalDetailDto);
   }
+
+  Future<ApiResponse> addUpdateGeneralDetail(
+      GeneralDetailDto generalDetailDto) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse = await addUpdateGeneralDetailOnline(generalDetailDto);
+      if (apiResponse.ApiError == null) {
+        ApiResults apiResults = (apiResponse.Data as ApiResults);
+        GeneralDetailDto generalDetailDtoResponse =
+            GeneralDetailDto.fromJson(apiResults.data);
+        apiResponse.Data = generalDetailDtoResponse;
+        _generalDetailRepository.saveGeneralDetailNewRecord(
+            generalDetailDto, generalDetailDtoResponse.generalDetailsId);
+      }
+    } on SocketException {
+      _generalDetailRepository.saveGeneralDetail(generalDetailDto);
+      apiResponse.Data = _generalDetailRepository
+          .getGeneralDetailById(generalDetailDto.generalDetailsId!);
+    }
+    return apiResponse;
+  }
 }

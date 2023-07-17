@@ -82,4 +82,32 @@ class RecommendationsService {
     }
     return apiResponse;
   }
+
+  Future<ApiResponse> addUpdateRecommendationOnline(
+      RecommendationDto recommendationDto) async {
+    return await _httpClientService.httpClientPost(
+        "${AppUrl.pcmURL}/Recommendations/AddUpdate", recommendationDto);
+  }
+
+  Future<ApiResponse> addUpdateRecommendation(
+      RecommendationDto recommendationDto) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse = await addUpdateRecommendationOnline(recommendationDto);
+      if (apiResponse.ApiError == null) {
+        ApiResults apiResults = (apiResponse.Data as ApiResults);
+        RecommendationDto recommendationDtoResponse =
+            RecommendationDto.fromJson(apiResults.data);
+        apiResponse.Data = recommendationDtoResponse;
+        _recommendationRepository.saveRecommendationFromEndpoint(
+            recommendationDtoResponse,
+            recommendationDtoResponse.recommendationId!);
+      }
+    } on SocketException {
+      _recommendationRepository.saveRecommendation(recommendationDto);
+      apiResponse.Data = _recommendationRepository
+          .getRecommendationById(recommendationDto.recommendationId!);
+    }
+    return apiResponse;
+  }
 }

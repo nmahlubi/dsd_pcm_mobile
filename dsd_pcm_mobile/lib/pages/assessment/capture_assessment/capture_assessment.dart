@@ -11,13 +11,13 @@ import '../../../service/pcm/assessment_service.dart';
 import 'care_giver_detail.dart';
 import 'child_detail/update_child_detail.dart';
 import 'complete_assessment.dart';
-import 'development_assessment/development_assessment.dart';
+import 'development_assessment.dart';
 import 'family/family.dart';
-import 'general_details/general_detail.dart';
+import 'general_detail.dart';
 import 'health_detail.dart';
 import 'offence_details/offence_detail.dart';
-import 'recommendation/recommendation.dart';
-import 'socio_economic/socio_economic.dart';
+import 'recommendation.dart';
+import 'socio_economic.dart';
 import 'victim_details/victim_detail.dart';
 
 class CaptureAssessmentPage extends StatefulWidget {
@@ -71,8 +71,8 @@ class _CaptureAssessmentPageState extends State<CaptureAssessmentPage> {
         assessmentCountQueryDto = (apiResponse.Data as AssessmentCountQueryDto);
       });
     } else {
-      showDialogMessage((apiResponse.ApiError as ApiError));
       overlay.hide();
+      showDialogMessage((apiResponse.ApiError as ApiError));
     }
   }
 

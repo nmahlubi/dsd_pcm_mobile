@@ -111,4 +111,28 @@ class DevelopmentAssessmentService {
         "${AppUrl.pcmURL}/DevelopmentAssessment/AddUpdate",
         developmentAssessmentDto);
   }
+
+  Future<ApiResponse> addUpdateDevelopmentAssessment(
+      DevelopmentAssessmentDto developmentAssessmentDto) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse =
+          await addUpdateDevelopmentAssessmentOnline(developmentAssessmentDto);
+      if (apiResponse.ApiError == null) {
+        ApiResults apiResults = (apiResponse.Data as ApiResults);
+        DevelopmentAssessmentDto developmentAssessmentDtoResponse =
+            DevelopmentAssessmentDto.fromJson(apiResults.data);
+        apiResponse.Data = developmentAssessmentDtoResponse;
+        _developmentAssessmentRepository
+            .saveDevelopmentAssessment(developmentAssessmentDtoResponse);
+      }
+    } on SocketException {
+      _developmentAssessmentRepository
+          .saveDevelopmentAssessment(developmentAssessmentDto);
+      apiResponse.Data =
+          _developmentAssessmentRepository.getDevelopmentAssessmentById(
+              developmentAssessmentDto.developmentId!);
+    }
+    return apiResponse;
+  }
 }

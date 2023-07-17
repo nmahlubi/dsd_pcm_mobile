@@ -48,15 +48,21 @@ class CaptureGeneralDetailPage extends StatelessWidget {
                   expanded: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        child: const Text(
-                          'Comments',
-                          style: TextStyle(
-                              color: Colors.blue,
-                              fontWeight: FontWeight.w200,
-                              fontSize: 21),
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              child: const Text(
+                                'Comments',
+                                style: TextStyle(
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.w200,
+                                    fontSize: 21),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       Row(
                         children: [
