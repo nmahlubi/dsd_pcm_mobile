@@ -75,7 +75,7 @@ class _NotificationCasesPageState extends State<NotificationCasesPage> {
           appBar: AppBar(
             title: const Text('Notification Cases'),
           ),
-          drawer: const NavigationDrawer(),
+          drawer: const NavigationDrawerMenu(),
           body: Column(
             children: <Widget>[
               Padding(

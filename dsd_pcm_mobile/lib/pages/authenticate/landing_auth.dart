@@ -5,6 +5,7 @@ import '../../model/child_notification/user_access_rights_dto.dart';
 import '../../model/intake/auth_token.dart';
 import '../../service/child_notification/police_station_supervisor_service.dart';
 import '../../service/intake/authenticate_user.dart';
+import '../../sessions/session.dart';
 import '../../util/shared/apierror.dart';
 import '../../util/shared/apiresponse.dart';
 import '../../util/shared/loading_overlay.dart';
@@ -74,8 +75,11 @@ class _LandingAuthPageWidgetState extends State<LandingAuthPage> {
       preferences?.setString('token', authToken.token!);
       preferences?.setBool('supervisor', authToken.supervisor!);
       overlay.hide();
+      Session session = Session();
+
       navigator.push(
-        MaterialPageRoute(builder: (context) => const DashboardPage(title: '')),
+        MaterialPageRoute(
+            builder: (context) => DashboardPage(session: session, title: '')),
       );
     } else {
       showDialogMessage((apiResponse.ApiError as ApiError));

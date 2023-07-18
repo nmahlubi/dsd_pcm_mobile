@@ -20,6 +20,7 @@ import '../../../service/child_notification/offense_type_service.dart';
 import '../../../service/intake/user_service.dart';
 import '../../../service/pcm/endpoint_inbox_service.dart';
 import '../../../service/pcm/worklist_service.dart';
+import '../../../sessions/session.dart';
 import '../../../util/shared/apierror.dart';
 import '../../../util/shared/apiresponse.dart';
 import '../../../util/shared/apiresults.dart';
@@ -188,8 +189,11 @@ class _CompleteReAssignedCasesPageState
       overlay.hide();
       apiResults = (apiResponse.Data as ApiResults);
       await showAlertDialogMessage("Successfull", apiResults.message!);
+      Session session = Session();
+
       navigator.push(
-        MaterialPageRoute(builder: (context) => const DashboardPage(title: '')),
+        MaterialPageRoute(
+            builder: (context) => DashboardPage(session: session, title: '')),
       );
     } else {
       showDialogMessage((apiResponse.ApiError as ApiError));

@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:dsd_pcm_mobile/sessions/session.dart';
+import 'package:dsd_pcm_mobile/sessions/session_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:workmanager/workmanager.dart';
 //import 'package:hive_flutter/hive_flutter.dart';
@@ -50,6 +54,8 @@ import 'pages/supervisor/re_assign/re_assigned_cases.dart';
 import 'pages/syncing_offline/syncing_offline_manual.dart';
 import 'pages/welcome/dashboard.dart';
 import 'util/palette.dart';
+
+final globalNavigatorKey = GlobalKey<NavigatorState>();
 
 const fetchBackground = "fetchBackground";
 
@@ -204,29 +210,74 @@ Future<void> main() async {
 
           */
 
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+
+  Session session = Session();
+  StreamController streamController = StreamController();
+
+  void redirectToLoginPage() {
+    if (globalNavigatorKey.currentContext != null) {
+      Navigator.pop(globalNavigatorKey.currentContext!);
+      Navigator.push(
+          globalNavigatorKey.currentContext!,
+          MaterialPageRoute(
+              builder: (context) =>
+                  LoginAuthenticatePage(title: "Login Page")));
+    }
+  }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'PCM',
-      theme: ThemeData(primarySwatch: Palette.kToDark),
-      routes: {
-        '/': (context) =>
-            const LoginAuthenticatePage(title: 'Authentification'),
-        '/dashboard': (context) => const DashboardPage(title: 'Dashboard'),
-        '/notification-cases': (context) => const NotificationCasesPage(),
-        '/allocated-cases': (context) => const AllocatedCasesPage(),
-        '/accepted-worklist': (context) => const AcceptedWorklistPage(),
-        '/re-assigned-cases': (context) => const ReAssignedCasesPage(),
-        '/overdue-cases': (context) => const OverdueCasesPage(),
-        '/sync-manual-offline': (context) => const SyncingOfflineManualPage()
+    if (globalNavigatorKey.currentContext != null) {
+      session.startListener(
+          streamController: streamController,
+          context: globalNavigatorKey.currentContext!);
+    }
+
+    return SessionManager(
+      onSessionTimeExpired: () {
+        if (globalNavigatorKey.currentContext != null &&
+            session.enableLoginPage == true) {
+          print('Session Expired');
+          ScaffoldMessenger.of(globalNavigatorKey.currentContext!)
+              .showSnackBar(SnackBar(
+                  content: Container(
+            color: Colors.black,
+            child: const Text(
+              'Session Expired',
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+          )));
+          redirectToLoginPage();
+        }
       },
+      //active time
+      duration: const Duration(seconds: 500),
+      streamController: streamController,
+      child: MaterialApp(
+        title: 'PCM',
+        navigatorKey: globalNavigatorKey,
+        theme: ThemeData(primarySwatch: Palette.kToDark),
+        routes: {
+          '/': (context) =>
+              const LoginAuthenticatePage(title: 'Authentification'),
+          '/dashboard': (context) =>
+              DashboardPage(session: session, title: 'Dashboard'),
+          '/notification-cases': (context) => const NotificationCasesPage(),
+          '/allocated-cases': (context) => const AllocatedCasesPage(),
+          '/accepted-worklist': (context) => const AcceptedWorklistPage(),
+          '/re-assigned-cases': (context) => const ReAssignedCasesPage(),
+          '/overdue-cases': (context) => const OverdueCasesPage(),
+          '/sync-manual-offline': (context) => const SyncingOfflineManualPage()
+        },
+      ),
     );
   }
 }

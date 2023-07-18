@@ -77,7 +77,7 @@ class _ReAssignedCasesPageState extends State<ReAssignedCasesPage> {
           appBar: AppBar(
             title: const Text('ReAllocate Case'),
           ),
-          drawer: const NavigationDrawer(),
+          drawer: const NavigationDrawerMenu(),
           body: Column(
             children: <Widget>[
               Padding(
