@@ -73,7 +73,7 @@ class _AcceptedWorklistPageState extends State<AcceptedWorklistPage> {
           appBar: AppBar(
             title: const Text('Accepted Worklist'),
           ),
-          drawer: const NavigationDrawer(),
+          drawer: const NavigationDrawerMenu(),
           body: Column(
             children: <Widget>[
               Padding(

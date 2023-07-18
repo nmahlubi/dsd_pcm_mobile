@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
 import '../../navigation_drawer/navigation_drawer.dart';
+import '../../sessions/session.dart';
 import 'dasboard_pages/home_page.dart';
 import 'dasboard_pages/profile_page.dart';
 import 'dasboard_pages/settings_page.dart';
 
 class DashboardPage extends StatefulWidget {
-  const DashboardPage({Key? key, required String title}) : super(key: key);
-
+  Session session;
+  DashboardPage({Key? key, required this.session, required String title})
+      : super(key: key);
   @override
   State<DashboardPage> createState() => _DashboardPageWidgetState();
 }
@@ -31,7 +33,7 @@ class _DashboardPageWidgetState extends State<DashboardPage> {
       appBar: AppBar(
         title: const Text('Dashboard'),
       ),
-      drawer: const NavigationDrawer(),
+      drawer: const NavigationDrawerMenu(),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),

@@ -85,7 +85,7 @@ class _OverdueCasesPageState extends State<OverdueCasesPage> {
           appBar: AppBar(
             title: const Text('Overdue Cases'),
           ),
-          drawer: const NavigationDrawer(),
+          drawer: const NavigationDrawerMenu(),
           body: Column(
             children: <Widget>[
               Row(

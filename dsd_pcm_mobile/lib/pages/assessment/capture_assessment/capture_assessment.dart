@@ -93,7 +93,7 @@ class _CaptureAssessmentPageState extends State<CaptureAssessmentPage> {
           appBar: AppBar(
             title: const Text('Capture Assessment'),
           ),
-          drawer: const NavigationDrawer(),
+          drawer: const NavigationDrawerMenu(),
           body: ListView(
             children: <Widget>[
               ListTile(

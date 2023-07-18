@@ -31,7 +31,7 @@ class _SyncingOfflineManualPageWidgetState
       appBar: AppBar(
         title: const Text('Syncing Offline'),
       ),
-      drawer: const NavigationDrawer(),
+      drawer: const NavigationDrawerMenu(),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),

@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../model/child_notification/user_access_rights_dto.dart';
 import '../../model/intake/auth_token.dart';
 import '../../service/intake/authenticate_user.dart';
+import '../../sessions/session.dart';
 import '../../util/shared/apierror.dart';
 import '../../util/shared/apiresponse.dart';
 import '../../util/shared/loading_overlay.dart';
@@ -69,8 +70,11 @@ class _LoginAuthenticatePageWidgetState extends State<LoginAuthenticatePage> {
       authToken = (apiResponse.Data as AuthToken);
       await setTokenPreferenceSession(authToken);
       overlay.hide();
+      Session session = Session();
+
       navigator.push(
-        MaterialPageRoute(builder: (context) => const DashboardPage(title: '')),
+        MaterialPageRoute(
+            builder: (context) => DashboardPage(session: session, title: '')),
       );
     } else {
       showDialogMessage((apiResponse.ApiError as ApiError));

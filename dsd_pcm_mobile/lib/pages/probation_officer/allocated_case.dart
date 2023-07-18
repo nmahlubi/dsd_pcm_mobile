@@ -78,7 +78,7 @@ class _AllocatedCasesPageState extends State<AllocatedCasesPage> {
           appBar: AppBar(
             title: const Text('Incoming Cases'),
           ),
-          drawer: const NavigationDrawer(),
+          drawer: const NavigationDrawerMenu(),
           body: Column(
             children: <Widget>[
               Padding(

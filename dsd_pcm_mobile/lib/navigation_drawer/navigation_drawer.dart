@@ -3,14 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // ignore: use_key_in_widget_constructors
-class NavigationDrawer extends StatefulWidget {
-  const NavigationDrawer({Key? key}) : super(key: key);
+class NavigationDrawerMenu extends StatefulWidget {
+  const NavigationDrawerMenu({Key? key}) : super(key: key);
 
   @override
-  State<NavigationDrawer> createState() => _NavigationDrawerPageWidgetState();
+  State<NavigationDrawerMenu> createState() =>
+      _NavigationDrawerMenuWidgetState();
 }
 
-class _NavigationDrawerPageWidgetState extends State<NavigationDrawer> {
+class _NavigationDrawerMenuWidgetState extends State<NavigationDrawerMenu> {
   SharedPreferences? preferences;
 
   Future<void> initializePreference() async {

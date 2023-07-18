@@ -101,7 +101,7 @@ class _CompleteAssessmentPageState extends State<CompleteAssessmentPage> {
           appBar: AppBar(
             title: const Text('Complete Assessment'),
           ),
-          drawer: const NavigationDrawer(),
+          drawer: const NavigationDrawerMenu(),
           body: Column(
             children: <Widget>[
               const Padding(
