@@ -258,8 +258,8 @@ class MyApp extends StatelessWidget {
           redirectToLoginPage();
         }
       },
-      //active time
-      duration: const Duration(seconds: 500),
+      //active time 5000= 5 minutes
+      duration: const Duration(seconds: 5000),
       streamController: streamController,
       child: MaterialApp(
         title: 'PCM',
