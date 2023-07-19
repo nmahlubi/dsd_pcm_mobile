@@ -87,4 +87,25 @@ class OffenceDetailService {
     return await _httpClientService.httpClientPost(
         "${AppUrl.pcmURL}/OffenceDetail/AddUpdate", offenceDetailDto);
   }
+
+  Future<ApiResponse> addUpdateOffenceDetail(
+      OffenceDetailDto offenceDetailDto) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse = await addUpdateOffenceDetailOnline(offenceDetailDto);
+      if (apiResponse.ApiError == null) {
+        ApiResults apiResults = (apiResponse.Data as ApiResults);
+        OffenceDetailDto offenceDetailDtoResponse =
+            OffenceDetailDto.fromJson(apiResults.data);
+        apiResponse.Data = offenceDetailDtoResponse;
+        _offenceDetailRepository.saveOffenceDetailNewRecord(
+            offenceDetailDto, offenceDetailDtoResponse.pcmOffenceId);
+      }
+    } on SocketException {
+      _offenceDetailRepository.saveOffenceDetail(offenceDetailDto);
+      apiResponse.Data = _offenceDetailRepository
+          .getOffenceDetailById(offenceDetailDto.pcmOffenceId!);
+    }
+    return apiResponse;
+  }
 }

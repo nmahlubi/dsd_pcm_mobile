@@ -1,30 +1,32 @@
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../model/intake/gender_dto.dart';
+import '../../../model/intake/person_dto.dart';
 import '../../../model/pcm/accepted_worklist_dto.dart';
-import '../../../model/pcm/development_assessment_dto.dart';
+import '../../../model/pcm/victim_detail_dto.dart';
 import '../../../navigation_drawer/go_to_assessment_drawer.dart';
-import '../../../service/pcm/development_assessment_service.dart';
+import '../../../service/pcm/victim_service.dart';
+import '../../../transform_dynamic/transform_lookup.dart';
 import '../../../util/shared/apierror.dart';
 import '../../../util/shared/apiresponse.dart';
 import '../../../util/shared/apiresults.dart';
 import '../../../util/shared/loading_overlay.dart';
 import '../../../util/shared/randon_generator.dart';
 import '../../probation_officer/accepted_worklist.dart';
-import 'recommendation.dart';
-import 'victim_detail.dart';
+import 'offence_detail.dart';
 import 'victim_organisation.dart';
 
-class DevelopmentAssessmentPage extends StatefulWidget {
-  const DevelopmentAssessmentPage({Key? key}) : super(key: key);
+class VictimDetailPage extends StatefulWidget {
+  const VictimDetailPage({Key? key}) : super(key: key);
 
   @override
-  State<DevelopmentAssessmentPage> createState() =>
-      _DevelopmentAssessmentPagetate();
+  State<VictimDetailPage> createState() => _VictimDetailPageState();
 }
 
-class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
+class _VictimDetailPageState extends State<VictimDetailPage> {
   SharedPreferences? preferences;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final _loginFormKey = GlobalKey<FormState>();
@@ -34,55 +36,74 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
   }
 
   final _randomGenerator = RandomGenerator();
+  final _lookupTransform = LookupTransform();
+  final _victimServiceClient = VictimService();
   late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
-  final _developmentAssessmentServiceClient = DevelopmentAssessmentService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
-  late List<DevelopmentAssessmentDto> developmentAssessmentsDto = [];
+  late List<VictimDetailDto> victimDetailsDto = [];
+  late List<GenderDto> gendersDto = [];
 
-  ExpandableController captureDevelopmentAssessmentPanelController =
+  ExpandableController captureVictimDetailPanelController =
       ExpandableController();
-  ExpandableController viewDevelopmentAssessmentPanelController =
-      ExpandableController();
-  final TextEditingController belongingController = TextEditingController();
-  final TextEditingController masteryController = TextEditingController();
-  final TextEditingController independenceController = TextEditingController();
-  final TextEditingController generosityController = TextEditingController();
-  final TextEditingController evaluationController = TextEditingController();
-  int? developmentAssessmentId;
+  ExpandableController viewVictimDetailPanelController = ExpandableController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController surnameController = TextEditingController();
+  final TextEditingController dateOfBirthController = TextEditingController();
+  final TextEditingController ageController = TextEditingController();
+  final TextEditingController isVictimIndividualController =
+      TextEditingController();
+  final TextEditingController victimOccupationController =
+      TextEditingController();
+  final TextEditingController victimCareGiverNamesController =
+      TextEditingController();
+  final TextEditingController addressLine1Controller = TextEditingController();
+  final TextEditingController addressLine2Controller = TextEditingController();
+  final TextEditingController postalCodeController = TextEditingController();
+  int? genderDropdownButtonFormField;
+  int? victimDetailId;
+  int? personId;
   String? labelButtonAddUpdate = '';
 
   @override
   void initState() {
     super.initState();
-    captureDevelopmentAssessmentPanelController =
+    captureVictimDetailPanelController =
         ExpandableController(initialExpanded: false);
-    viewDevelopmentAssessmentPanelController =
+    viewVictimDetailPanelController =
         ExpandableController(initialExpanded: true);
-    labelButtonAddUpdate = 'Add Dev Assessment';
-    developmentAssessmentId = null;
+    labelButtonAddUpdate = 'Add Victim';
+    victimDetailId = null;
+    personId = null;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
         setState(() {
           acceptedWorklistDto =
               ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
-          loadDevelopmentAssessmentByIntakeAssessmentId(
+          loadLookUpTransformer();
+          loadVictimDetailsByIntakeAssessmentId(
               acceptedWorklistDto.intakeAssessmentId);
         });
       });
     });
   }
 
-  loadDevelopmentAssessmentByIntakeAssessmentId(int? intakeAssessmentId) async {
+  loadLookUpTransformer() async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await _developmentAssessmentServiceClient
-        .getDevelopmentAssessmentsByIntakeAssessmentId(intakeAssessmentId);
+    gendersDto = await _lookupTransform.transformGendersDto();
+    overlay.hide();
+  }
+
+  loadVictimDetailsByIntakeAssessmentId(int? intakeAssessmentId) async {
+    final overlay = LoadingOverlay.of(context);
+    overlay.show();
+    apiResponse = await _victimServiceClient
+        .getVictimDetailByIntakeAssessmentId(intakeAssessmentId);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        developmentAssessmentsDto =
-            (apiResponse.Data as List<DevelopmentAssessmentDto>);
+        victimDetailsDto = (apiResponse.Data as List<VictimDetailDto>);
       });
     } else {
       showDialogMessage((apiResponse.ApiError as ApiError));
@@ -90,31 +111,52 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
     }
   }
 
-  addUpdateDevelopmentAssessment() async {
-    DevelopmentAssessmentDto addDevelopmentAssessment =
-        DevelopmentAssessmentDto(
-            developmentId: developmentAssessmentId ??
-                _randomGenerator.getRandomGeneratedNumber(),
-            intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
-            createdBy: preferences!.getInt('userId')!,
-            belonging: belongingController.text,
-            dateCreated: _randomGenerator.getCurrentDateGenerated(),
-            mastery: masteryController.text,
-            independence: independenceController.text,
-            generosity: generosityController.text,
-            evaluation: evaluationController.text);
-
+  addUpdateVictimIndividual() async {
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
+    int? localPersonId =
+        personId ?? _randomGenerator.getRandomGeneratedNumber();
+    VictimDetailDto requestVictimDetailDto = VictimDetailDto(
+        victimId: victimDetailId ?? _randomGenerator.getRandomGeneratedNumber(),
+        intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
+        isVictimIndividual: isVictimIndividualController.text,
+        personId: localPersonId,
+        victimOccupation: victimOccupationController.text,
+        victimCareGiverNames: victimCareGiverNamesController.text,
+        addressLine1: addressLine1Controller.text,
+        addressLine2: addressLine2Controller.text,
+        postalCode: postalCodeController.text,
+        createdBy: preferences!.getInt('userId')!,
+        personDto: PersonDto(
+          firstName: nameController.text,
+          lastName: surnameController.text,
+          dateOfBirth: dateOfBirthController.text,
+          age: int.parse(ageController.text),
+          personId: localPersonId,
+          genderId: genderDropdownButtonFormField,
+          isEstimatedAge: true,
+          dateCreated: _randomGenerator.getCurrentDateGenerated(),
+          isActive: true,
+          isDeleted: false,
+          isPivaValidated: true,
+          createdBy: preferences!.getString('username'),
+          genderDto: genderDropdownButtonFormField != null
+              ? gendersDto
+                  .where((i) => i.genderId == genderDropdownButtonFormField)
+                  .single
+              : null,
+        ));
     overlay.show();
-    apiResponse = await _developmentAssessmentServiceClient
-        .addUpdateDevelopmentAssessment(addDevelopmentAssessment);
+    apiResponse = await _victimServiceClient
+        .addUpdateVictimDetail(requestVictimDetailDto);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
-      showSuccessMessage('Successfully $labelButtonAddUpdate.');
+      if (!mounted) return;
+      showSuccessMessage('Successfully $labelButtonAddUpdate');
+
       navigator.push(
         MaterialPageRoute(
-            builder: (context) => const DevelopmentAssessmentPage(),
+            builder: (context) => const VictimDetailPage(),
             settings: RouteSettings(
               arguments: acceptedWorklistDto,
             )),
@@ -139,42 +181,65 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
     );
   }
 
-  newDevelopmentAssessment() {
+  newVictimDetail() {
     setState(() {
-      labelButtonAddUpdate = 'Add Dev Assessment';
-      belongingController.clear();
-      masteryController.clear();
-      independenceController.clear();
-      generosityController.clear();
-      evaluationController.clear();
-      developmentAssessmentId = null;
+      labelButtonAddUpdate = 'Add Victim';
+      nameController.clear();
+      surnameController.clear();
+      dateOfBirthController.clear();
+      ageController.clear();
+      isVictimIndividualController.clear;
+      victimOccupationController.clear;
+      victimCareGiverNamesController.clear;
+      addressLine1Controller.clear();
+      addressLine2Controller.clear();
+      postalCodeController.clear();
+      victimDetailId = null;
+      personId = null;
     });
   }
 
-  populateDevelopmentAssessmentForm(
-      DevelopmentAssessmentDto developmentAssessmentDto) {
+  populateVictimDetailForm(VictimDetailDto victimDetailDto) {
     setState(() {
-      developmentAssessmentId = developmentAssessmentDto.developmentId;
-      captureDevelopmentAssessmentPanelController =
+      victimDetailId = victimDetailDto.victimId;
+      personId = victimDetailDto.personDto!.personId;
+      captureVictimDetailPanelController =
           ExpandableController(initialExpanded: true);
-      viewDevelopmentAssessmentPanelController =
+      viewVictimDetailPanelController =
           ExpandableController(initialExpanded: false);
-      labelButtonAddUpdate = 'Update Dev Assessment';
-      belongingController.text = developmentAssessmentDto.belonging!;
-      masteryController.text = developmentAssessmentDto.mastery!;
-      independenceController.text = developmentAssessmentDto.independence!;
-      generosityController.text = developmentAssessmentDto.generosity!;
-      evaluationController.text = developmentAssessmentDto.evaluation!;
+      labelButtonAddUpdate = 'Update Victim';
+      nameController.text = victimDetailDto.personDto!.firstName!;
+      surnameController.text = victimDetailDto.personDto!.lastName!;
+      if (victimDetailDto.personDto!.age != null) {
+        ageController.text = victimDetailDto.personDto!.age!.toString();
+      }
+      if (victimDetailDto.personDto!.dateOfBirth != null) {
+        dateOfBirthController.text =
+            victimDetailDto.personDto!.dateOfBirth.toString();
+      }
+      isVictimIndividualController.text = victimDetailDto.isVictimIndividual!;
+      victimOccupationController.text = victimDetailDto.victimOccupation!;
+      victimCareGiverNamesController.text =
+          victimDetailDto.victimCareGiverNames!;
+      addressLine1Controller.text = victimDetailDto.addressLine1!;
+      addressLine2Controller.text = victimDetailDto.addressLine2!;
+      postalCodeController.text = victimDetailDto.postalCode!;
+      genderDropdownButtonFormField = victimDetailDto.personDto?.genderId;
     });
   }
 
   @override
   void dispose() {
-    belongingController.dispose();
-    masteryController.dispose();
-    independenceController.dispose();
-    generosityController.dispose();
-    evaluationController.dispose();
+    nameController.dispose();
+    surnameController.dispose();
+    dateOfBirthController.dispose();
+    ageController.dispose();
+    isVictimIndividualController.dispose;
+    victimOccupationController.dispose;
+    victimCareGiverNamesController.dispose;
+    addressLine1Controller.dispose();
+    addressLine2Controller.dispose();
+    postalCodeController.dispose();
     super.dispose();
   }
 
@@ -187,7 +252,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
         child: Scaffold(
             key: scaffoldKey,
             appBar: AppBar(
-              title: const Text("Development Assessment"),
+              title: const Text("Victim"),
               leading: IconButton(
                 icon: const Icon(Icons.offline_pin_rounded),
                 onPressed: () {
@@ -227,8 +292,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                const VictimOrganisationPage(),
+                            builder: (context) => const OffenceDetailPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),
@@ -242,7 +306,8 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const RecommandationPage(),
+                            builder: (context) =>
+                                const VictimOrganisationPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),
@@ -276,7 +341,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                   scrollOnCollapse: false,
                                   child: ExpandablePanel(
                                     controller:
-                                        captureDevelopmentAssessmentPanelController,
+                                        captureVictimDetailPanelController,
                                     theme: const ExpandableThemeData(
                                       headerAlignment:
                                           ExpandablePanelHeaderAlignment.center,
@@ -285,7 +350,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                     header: Padding(
                                         padding: const EdgeInsets.all(10),
                                         child: Text(
-                                          "Capture Development Assessment",
+                                          "Capture Individual Victim",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
@@ -333,7 +398,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                             color: Colors.blue),
                                                       ),
                                                       onPressed: () {
-                                                        newDevelopmentAssessment();
+                                                        newVictimDetail();
                                                       },
                                                       child: const Text('New',
                                                           style: TextStyle(
@@ -349,8 +414,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                 padding:
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
-                                                  controller:
-                                                      belongingController,
+                                                  controller: nameController,
                                                   enableInteractiveSelection:
                                                       false,
                                                   maxLines: 1,
@@ -358,28 +422,24 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
-                                                    labelText: 'Belonging',
+                                                    labelText: 'Name',
                                                   ),
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Enter Belonging';
+                                                      return 'FirstName Required';
                                                     }
                                                     return null;
                                                   },
                                                 ),
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
                                             Expanded(
                                               child: Container(
                                                 padding:
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
-                                                  controller: masteryController,
+                                                  controller: surnameController,
                                                   enableInteractiveSelection:
                                                       false,
                                                   maxLines: 1,
@@ -387,42 +447,12 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
-                                                    labelText: 'Mastery',
+                                                    labelText: 'Surname',
                                                   ),
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Enter Mastery';
-                                                    }
-                                                    return null;
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                child: TextFormField(
-                                                  controller:
-                                                      independenceController,
-                                                  enableInteractiveSelection:
-                                                      false,
-                                                  maxLines: 1,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                    labelText: 'Independence',
-                                                  ),
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Enter Independence';
+                                                      return 'Surname Required';
                                                     }
                                                     return null;
                                                   },
@@ -439,7 +469,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller:
-                                                      generosityController,
+                                                      dateOfBirthController,
                                                   enableInteractiveSelection:
                                                       false,
                                                   maxLines: 1,
@@ -447,12 +477,48 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
-                                                    labelText: 'Generosity',
+                                                    labelText: 'Date Of Birth',
                                                   ),
+                                                  readOnly:
+                                                      true, // when true user cannot edit text
+                                                  onTap: () async {
+                                                    DateTime? pickedDate =
+                                                        await showDatePicker(
+                                                            context: context,
+                                                            initialDate: DateTime
+                                                                .now(), //get today's date
+                                                            firstDate: DateTime(
+                                                                2000), //DateTime.now() - not to allow to choose before today.
+                                                            lastDate:
+                                                                DateTime(2101));
+
+                                                    if (pickedDate != null) {
+                                                      String formattedDate =
+                                                          DateFormat(
+                                                                  'yyyy-MM-dd')
+                                                              .format(
+                                                                  pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
+                                                      dateOfBirthController
+                                                          .text = formattedDate;
+                                                      String formattedYear =
+                                                          DateFormat('yyyy')
+                                                              .format(
+                                                                  pickedDate);
+                                                      ageController
+                                                          .text = (DateTime
+                                                                      .now()
+                                                                  .year -
+                                                              int.parse(
+                                                                  formattedYear))
+                                                          .toString();
+                                                      //You can format date as per your need
+
+                                                    }
+                                                  },
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Enter Generosity';
+                                                      return 'Date Of Birth Required';
                                                     }
                                                     return null;
                                                   },
@@ -468,8 +534,84 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                 padding:
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
+                                                  controller: ageController,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  keyboardType:
+                                                      TextInputType.number,
+                                                  maxLines: 1,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText: 'Age',
+                                                  ),
+                                                  validator: (value) {
+                                                    if (value == null ||
+                                                        value.isEmpty) {
+                                                      return 'Age Required';
+                                                    }
+                                                    return null;
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  child:
+                                                      DropdownButtonFormField(
+                                                    value:
+                                                        genderDropdownButtonFormField,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      hintText: 'Gender',
+                                                      labelText: 'Gender',
+                                                      border:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            width: 1,
+                                                            color:
+                                                                Colors.green),
+                                                      ),
+                                                    ),
+                                                    items: gendersDto
+                                                        .map((gender) {
+                                                      return DropdownMenuItem(
+                                                          value:
+                                                              gender.genderId,
+                                                          child: Text(gender
+                                                              .description
+                                                              .toString()));
+                                                    }).toList(),
+                                                    onChanged: (selectedValue) {
+                                                      genderDropdownButtonFormField =
+                                                          selectedValue;
+                                                    },
+                                                    validator: (value) {
+                                                      if (value == null) {
+                                                        return 'Gender Required';
+                                                      }
+                                                      return null;
+                                                    },
+                                                  )),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: TextFormField(
                                                   controller:
-                                                      evaluationController,
+                                                      victimOccupationController,
                                                   enableInteractiveSelection:
                                                       false,
                                                   maxLines: 1,
@@ -477,15 +619,141 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
-                                                    labelText: 'Evaluation',
+                                                    labelText: 'Occupation',
                                                   ),
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Enter Evaluation';
-                                                    }
-                                                    return null;
-                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: TextFormField(
+                                                  controller:
+                                                      isVictimIndividualController,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  maxLines: 1,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText:
+                                                        'Victim Individual',
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: TextFormField(
+                                                  controller:
+                                                      victimCareGiverNamesController,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  maxLines: 1,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText:
+                                                        'Care Giver Name',
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.all(8),
+                                          child: const Text(
+                                            'Physical Address',
+                                            style: TextStyle(
+                                                color: Colors.blue,
+                                                fontWeight: FontWeight.w200,
+                                                fontSize: 21),
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: TextFormField(
+                                                  controller:
+                                                      addressLine1Controller,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  maxLines: 1,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText: 'Address Line 1',
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: TextFormField(
+                                                  controller:
+                                                      addressLine2Controller,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  maxLines: 1,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText: 'Address Line 2',
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: TextFormField(
+                                                  controller:
+                                                      postalCodeController,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  maxLines: 1,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText: 'Postal Code',
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -526,7 +794,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                         if (_loginFormKey
                                                             .currentState!
                                                             .validate()) {
-                                                          addUpdateDevelopmentAssessment();
+                                                          addUpdateVictimIndividual();
                                                         }
                                                       },
                                                       child: Text(
@@ -568,8 +836,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                   scrollOnExpand: true,
                                   scrollOnCollapse: false,
                                   child: ExpandablePanel(
-                                    controller:
-                                        viewDevelopmentAssessmentPanelController,
+                                    controller: viewVictimDetailPanelController,
                                     theme: const ExpandableThemeData(
                                       headerAlignment:
                                           ExpandablePanelHeaderAlignment.center,
@@ -578,7 +845,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                     header: Padding(
                                         padding: const EdgeInsets.all(10),
                                         child: Text(
-                                          "View Development Assessment",
+                                          "View Medical Health",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
@@ -593,27 +860,25 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        if (developmentAssessmentsDto
-                                            .isNotEmpty)
+                                        if (victimDetailsDto.isNotEmpty)
                                           Row(
                                             children: [
                                               Expanded(
                                                 child: ListView.separated(
                                                   shrinkWrap: true,
                                                   itemCount:
-                                                      developmentAssessmentsDto
-                                                          .length,
+                                                      victimDetailsDto.length,
                                                   itemBuilder:
                                                       (context, int index) {
-                                                    if (developmentAssessmentsDto
+                                                    if (victimDetailsDto
                                                         .isEmpty) {
                                                       return const Center(
                                                           child: Text(
-                                                              'No development assessment Found.'));
+                                                              'No victim Found.'));
                                                     }
                                                     return ListTile(
                                                       title: Text(
-                                                          'Belonging : ${developmentAssessmentsDto[index].belonging ?? ''} ',
+                                                          'Victim Name : ${victimDetailsDto[index].personDto?.firstName} ${victimDetailsDto[index].personDto?.lastName}',
                                                           style: const TextStyle(
                                                               color:
                                                                   Colors.black,
@@ -621,10 +886,8 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                                   FontWeight
                                                                       .bold)),
                                                       subtitle: Text(
-                                                          'Mastery : ${developmentAssessmentsDto[index].mastery ?? ''}. '
-                                                          'Independence : ${developmentAssessmentsDto[index].independence ?? ''}. '
-                                                          'Generosity : ${developmentAssessmentsDto[index].generosity ?? ''}'
-                                                          'Evaluation : ${developmentAssessmentsDto[index].evaluation ?? ''}',
+                                                          'Occupation : ${victimDetailsDto[index].victimOccupation ?? ''}.'
+                                                          ' Address : ${victimDetailsDto[index].addressLine1 ?? ''} ${victimDetailsDto[index].addressLine2 ?? ''} ${victimDetailsDto[index].postalCode ?? ''}',
                                                           style:
                                                               const TextStyle(
                                                                   color: Colors
@@ -636,8 +899,8 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                           //IconButton(onPressed: () {}, icon: const Icon(Icons.favorite)),
                                                           IconButton(
                                                               onPressed: () {
-                                                                populateDevelopmentAssessmentForm(
-                                                                    developmentAssessmentsDto[
+                                                                populateVictimDetailForm(
+                                                                    victimDetailsDto[
                                                                         index]);
                                                               },
                                                               icon: const Icon(

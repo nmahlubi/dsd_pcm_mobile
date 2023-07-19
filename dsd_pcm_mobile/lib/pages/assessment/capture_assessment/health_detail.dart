@@ -15,7 +15,7 @@ import '../../../util/shared/apiresults.dart';
 import '../../../util/shared/loading_overlay.dart';
 import '../../../util/shared/randon_generator.dart';
 import '../../probation_officer/accepted_worklist.dart';
-import 'assessment_details/assessment_detail.dart';
+import 'assessment_detail.dart';
 import 'educational/education.dart';
 
 class HealthDetailPage extends StatefulWidget {

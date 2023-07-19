@@ -19,9 +19,8 @@ class CareGiverDetailSync {
       for (var careGiver in offlineCareGiverDetailsDto) {
         try {
           if (careGiver.personDto != null) {
-            apiResponse =
-                await _careGiverDetailService.addUpdateCareGiverDetailOnline(
-                    careGiver, careGiver.personDto!.personId);
+            apiResponse = await _careGiverDetailService
+                .addUpdateCareGiverDetailOnline(careGiver);
           }
           _careGiverDetailRepository
               .getCareGiverDetailById(careGiver.clientCaregiverId!);

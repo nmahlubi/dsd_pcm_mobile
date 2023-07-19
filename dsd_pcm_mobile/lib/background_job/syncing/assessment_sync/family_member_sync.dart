@@ -29,9 +29,8 @@ class FamilyMemberSync {
             if ((apiResponse.ApiError) == null) {
               ApiResults apiResults = (apiResponse.Data as ApiResults);
               PersonDto personDto = PersonDto.fromJson(apiResults.data);
-              apiResponse =
-                  await _familyServiceService.addUpdateFamilyMemberOnline(
-                      familyMember, personDto.personId);
+              apiResponse = await _familyServiceService
+                  .addUpdateFamilyMemberOnline(familyMember);
               _familyMemberRepository
                   .deleteFamilyMember(familyMember.familyMemberId!);
             }

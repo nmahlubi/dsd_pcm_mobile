@@ -56,10 +56,9 @@ class CareGiverDetailService {
   }
 
   Future<ApiResponse> addCareGiverDetailOnline(
-      CareGiverDetailsDto careGiverDetailsDto, int? personId) async {
+      CareGiverDetailsDto careGiverDetailsDto) async {
     return await _httpClientService.httpClientPost(
-        "${AppUrl.intakeURL}/CareGiverDetails/Add/$personId",
-        careGiverDetailsDto);
+        "${AppUrl.intakeURL}/CareGiverDetails/Add", careGiverDetailsDto);
   }
 
   Future<ApiResponse> addCareGiverDetail(
@@ -72,8 +71,7 @@ class CareGiverDetailService {
         ApiResults apiResults = (apiResponse.Data as ApiResults);
         PersonDto personResponse = PersonDto.fromJson(apiResults.data);
         //Care Giver
-        apiResponse = await addCareGiverDetailOnline(
-            careGiverDetailsDto, personResponse.personId);
+        apiResponse = await addCareGiverDetailOnline(careGiverDetailsDto);
         if (apiResponse.ApiError == null) {
           ApiResults apiResults = (apiResponse.Data as ApiResults);
           CareGiverDetailsDto careGiverDetailsDtoResponse =
@@ -94,18 +92,16 @@ class CareGiverDetailService {
   }
 
   Future<ApiResponse> addUpdateCareGiverDetailOnline(
-      CareGiverDetailsDto careGiverDetailsDto, int? personId) async {
+      CareGiverDetailsDto careGiverDetailsDto) async {
     return await _httpClientService.httpClientPost(
-        "${AppUrl.intakeURL}/CareGiverDetails/AddUpdate/$personId",
-        careGiverDetailsDto);
+        "${AppUrl.intakeURL}/CareGiverDetails/AddUpdate", careGiverDetailsDto);
   }
 
   Future<ApiResponse> addUpdateCareGiverDetail(
       CareGiverDetailsDto careGiverDetailsDto) async {
     ApiResponse apiResponse = ApiResponse();
     try {
-      apiResponse = await addUpdateCareGiverDetailOnline(
-          careGiverDetailsDto, careGiverDetailsDto.personId);
+      apiResponse = await addUpdateCareGiverDetailOnline(careGiverDetailsDto);
       if (apiResponse.ApiError == null) {
         ApiResults apiResults = (apiResponse.Data as ApiResults);
         CareGiverDetailsDto careGiverDetailsDtoResponse =

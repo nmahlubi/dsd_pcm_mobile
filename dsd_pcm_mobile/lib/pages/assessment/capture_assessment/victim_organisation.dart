@@ -3,28 +3,26 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../model/pcm/accepted_worklist_dto.dart';
-import '../../../model/pcm/development_assessment_dto.dart';
+import '../../../model/pcm/victim_organisation_detail_dto.dart';
 import '../../../navigation_drawer/go_to_assessment_drawer.dart';
-import '../../../service/pcm/development_assessment_service.dart';
+import '../../../service/pcm/victim_service.dart';
 import '../../../util/shared/apierror.dart';
 import '../../../util/shared/apiresponse.dart';
 import '../../../util/shared/apiresults.dart';
 import '../../../util/shared/loading_overlay.dart';
 import '../../../util/shared/randon_generator.dart';
 import '../../probation_officer/accepted_worklist.dart';
-import 'recommendation.dart';
+import 'development_assessment.dart';
 import 'victim_detail.dart';
-import 'victim_organisation.dart';
 
-class DevelopmentAssessmentPage extends StatefulWidget {
-  const DevelopmentAssessmentPage({Key? key}) : super(key: key);
+class VictimOrganisationPage extends StatefulWidget {
+  const VictimOrganisationPage({Key? key}) : super(key: key);
 
   @override
-  State<DevelopmentAssessmentPage> createState() =>
-      _DevelopmentAssessmentPagetate();
+  State<VictimOrganisationPage> createState() => _VictimOrganisationPageState();
 }
 
-class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
+class _VictimOrganisationPageState extends State<VictimOrganisationPage> {
   SharedPreferences? preferences;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final _loginFormKey = GlobalKey<FormState>();
@@ -33,88 +31,109 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
     preferences = await SharedPreferences.getInstance();
   }
 
-  final _randomGenerator = RandomGenerator();
   late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
-  final _developmentAssessmentServiceClient = DevelopmentAssessmentService();
+  final _randomGenerator = RandomGenerator();
+  final _victimServiceClient = VictimService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
-  late List<DevelopmentAssessmentDto> developmentAssessmentsDto = [];
+  late List<VictimOrganisationDetailDto> victimOrganisationDetailsDto = [];
 
-  ExpandableController captureDevelopmentAssessmentPanelController =
+  ExpandableController captureVictimOrganisationPanelController =
       ExpandableController();
-  ExpandableController viewDevelopmentAssessmentPanelController =
+  ExpandableController viewVictimOrganisationPanelController =
       ExpandableController();
-  final TextEditingController belongingController = TextEditingController();
-  final TextEditingController masteryController = TextEditingController();
-  final TextEditingController independenceController = TextEditingController();
-  final TextEditingController generosityController = TextEditingController();
-  final TextEditingController evaluationController = TextEditingController();
-  int? developmentAssessmentId;
+  final TextEditingController organisationNameController =
+      TextEditingController();
+  final TextEditingController contactPersonFirstNameController =
+      TextEditingController();
+  final TextEditingController contactPersonLastNameController =
+      TextEditingController();
+  final TextEditingController telephoneController = TextEditingController();
+  final TextEditingController cellNoController = TextEditingController();
+  final TextEditingController interventionserviceReferralsController =
+      TextEditingController();
+  final TextEditingController otherContactsController = TextEditingController();
+  final TextEditingController contactPersonOccupationController =
+      TextEditingController();
+  final TextEditingController addressLine1Controller = TextEditingController();
+  final TextEditingController addressLine2Controller = TextEditingController();
+  final TextEditingController postalCodeController = TextEditingController();
+  int? victimOrganisationId;
   String? labelButtonAddUpdate = '';
 
   @override
   void initState() {
     super.initState();
-    captureDevelopmentAssessmentPanelController =
+    captureVictimOrganisationPanelController =
         ExpandableController(initialExpanded: false);
-    viewDevelopmentAssessmentPanelController =
+    viewVictimOrganisationPanelController =
         ExpandableController(initialExpanded: true);
-    labelButtonAddUpdate = 'Add Dev Assessment';
-    developmentAssessmentId = null;
+    labelButtonAddUpdate = 'Add Organisation';
+    victimOrganisationId = null;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
         setState(() {
           acceptedWorklistDto =
               ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
-          loadDevelopmentAssessmentByIntakeAssessmentId(
+          loadVictimOrganisationDetailsByIntakeAssessmentId(
               acceptedWorklistDto.intakeAssessmentId);
         });
       });
     });
   }
 
-  loadDevelopmentAssessmentByIntakeAssessmentId(int? intakeAssessmentId) async {
+  loadVictimOrganisationDetailsByIntakeAssessmentId(
+      int? intakeAssessmentId) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await _developmentAssessmentServiceClient
-        .getDevelopmentAssessmentsByIntakeAssessmentId(intakeAssessmentId);
+    apiResponse = await _victimServiceClient
+        .getVictimOrganisationDetailByIntakeAssessmentId(intakeAssessmentId);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        developmentAssessmentsDto =
-            (apiResponse.Data as List<DevelopmentAssessmentDto>);
+        victimOrganisationDetailsDto =
+            (apiResponse.Data as List<VictimOrganisationDetailDto>);
       });
     } else {
-      showDialogMessage((apiResponse.ApiError as ApiError));
       overlay.hide();
+      showDialogMessage((apiResponse.ApiError as ApiError));
     }
   }
 
-  addUpdateDevelopmentAssessment() async {
-    DevelopmentAssessmentDto addDevelopmentAssessment =
-        DevelopmentAssessmentDto(
-            developmentId: developmentAssessmentId ??
-                _randomGenerator.getRandomGeneratedNumber(),
-            intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
-            createdBy: preferences!.getInt('userId')!,
-            belonging: belongingController.text,
-            dateCreated: _randomGenerator.getCurrentDateGenerated(),
-            mastery: masteryController.text,
-            independence: independenceController.text,
-            generosity: generosityController.text,
-            evaluation: evaluationController.text);
-
+  addUpdateVictimOrganisation() async {
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
     overlay.show();
-    apiResponse = await _developmentAssessmentServiceClient
-        .addUpdateDevelopmentAssessment(addDevelopmentAssessment);
+    VictimOrganisationDetailDto requestVictimOrganisationDetailDto =
+        VictimOrganisationDetailDto(
+            victimOrganisationId: victimOrganisationId ??
+                _randomGenerator.getRandomGeneratedNumber(),
+            dateCreated: _randomGenerator.getCurrentDateGenerated(),
+            intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
+            organisationName: organisationNameController.text,
+            contactPersonFirstName: contactPersonFirstNameController.text,
+            contactPersonLastName: contactPersonLastNameController.text,
+            telephone: telephoneController.text,
+            cellNo: cellNoController.text,
+            interventionserviceReferrals:
+                interventionserviceReferralsController.text,
+            otherContacts: otherContactsController.text,
+            contactPersonOccupation: contactPersonOccupationController.text,
+            addressLine1: addressLine1Controller.text,
+            addressLine2: addressLine2Controller.text,
+            postalCode: postalCodeController.text,
+            createdBy: preferences!.getInt('userId')!);
+
+    apiResponse = await _victimServiceClient
+        .addUpdateVictimOrganisation(requestVictimOrganisationDetailDto);
+
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
-      showSuccessMessage('Successfully $labelButtonAddUpdate.');
+      if (!mounted) return;
+      showSuccessMessage('Successfully $labelButtonAddUpdate');
       navigator.push(
         MaterialPageRoute(
-            builder: (context) => const DevelopmentAssessmentPage(),
+            builder: (context) => const VictimOrganisationPage(),
             settings: RouteSettings(
               arguments: acceptedWorklistDto,
             )),
@@ -123,6 +142,52 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
       overlay.hide();
       showDialogMessage((apiResponse.ApiError as ApiError));
     }
+  }
+
+  newVictimOrganisation() {
+    setState(() {
+      labelButtonAddUpdate = 'Add Organisation';
+      organisationNameController.clear();
+      contactPersonFirstNameController.clear();
+      contactPersonLastNameController.clear();
+      telephoneController.clear();
+      cellNoController.clear();
+      interventionserviceReferralsController.clear();
+      otherContactsController.clear();
+      contactPersonOccupationController.clear();
+      addressLine1Controller.clear();
+      addressLine2Controller.clear();
+      postalCodeController.clear();
+      victimOrganisationId = null;
+    });
+  }
+
+  populateVictimOrganisationForm(
+      VictimOrganisationDetailDto victimOrganisationDetailDto) {
+    setState(() {
+      victimOrganisationId = victimOrganisationDetailDto.victimOrganisationId;
+      captureVictimOrganisationPanelController =
+          ExpandableController(initialExpanded: true);
+      viewVictimOrganisationPanelController =
+          ExpandableController(initialExpanded: false);
+      labelButtonAddUpdate = 'Update Organisation';
+      organisationNameController.text =
+          victimOrganisationDetailDto.organisationName!;
+      contactPersonFirstNameController.text =
+          victimOrganisationDetailDto.contactPersonFirstName!;
+      contactPersonLastNameController.text =
+          victimOrganisationDetailDto.contactPersonLastName!;
+      telephoneController.text = victimOrganisationDetailDto.telephone!;
+      cellNoController.text = victimOrganisationDetailDto.cellNo!;
+      interventionserviceReferralsController.text =
+          victimOrganisationDetailDto.interventionserviceReferrals!;
+      otherContactsController.text = victimOrganisationDetailDto.otherContacts!;
+      contactPersonOccupationController.text =
+          victimOrganisationDetailDto.contactPersonOccupation!;
+      addressLine1Controller.text = victimOrganisationDetailDto.addressLine1!;
+      addressLine2Controller.text = victimOrganisationDetailDto.addressLine2!;
+      postalCodeController.text = victimOrganisationDetailDto.postalCode!;
+    });
   }
 
   showDialogMessage(ApiError apiError) {
@@ -139,42 +204,19 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
     );
   }
 
-  newDevelopmentAssessment() {
-    setState(() {
-      labelButtonAddUpdate = 'Add Dev Assessment';
-      belongingController.clear();
-      masteryController.clear();
-      independenceController.clear();
-      generosityController.clear();
-      evaluationController.clear();
-      developmentAssessmentId = null;
-    });
-  }
-
-  populateDevelopmentAssessmentForm(
-      DevelopmentAssessmentDto developmentAssessmentDto) {
-    setState(() {
-      developmentAssessmentId = developmentAssessmentDto.developmentId;
-      captureDevelopmentAssessmentPanelController =
-          ExpandableController(initialExpanded: true);
-      viewDevelopmentAssessmentPanelController =
-          ExpandableController(initialExpanded: false);
-      labelButtonAddUpdate = 'Update Dev Assessment';
-      belongingController.text = developmentAssessmentDto.belonging!;
-      masteryController.text = developmentAssessmentDto.mastery!;
-      independenceController.text = developmentAssessmentDto.independence!;
-      generosityController.text = developmentAssessmentDto.generosity!;
-      evaluationController.text = developmentAssessmentDto.evaluation!;
-    });
-  }
-
   @override
   void dispose() {
-    belongingController.dispose();
-    masteryController.dispose();
-    independenceController.dispose();
-    generosityController.dispose();
-    evaluationController.dispose();
+    organisationNameController.dispose();
+    contactPersonFirstNameController.dispose();
+    contactPersonLastNameController.dispose();
+    telephoneController.dispose();
+    cellNoController.dispose();
+    interventionserviceReferralsController.dispose();
+    otherContactsController.dispose();
+    contactPersonOccupationController.dispose();
+    addressLine1Controller.dispose();
+    addressLine2Controller.dispose();
+    postalCodeController.dispose();
     super.dispose();
   }
 
@@ -187,7 +229,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
         child: Scaffold(
             key: scaffoldKey,
             appBar: AppBar(
-              title: const Text("Development Assessment"),
+              title: const Text("Victim Organisation"),
               leading: IconButton(
                 icon: const Icon(Icons.offline_pin_rounded),
                 onPressed: () {
@@ -227,8 +269,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                const VictimOrganisationPage(),
+                            builder: (context) => const VictimDetailPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),
@@ -242,7 +283,8 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const RecommandationPage(),
+                            builder: (context) =>
+                                const DevelopmentAssessmentPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),
@@ -276,7 +318,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                   scrollOnCollapse: false,
                                   child: ExpandablePanel(
                                     controller:
-                                        captureDevelopmentAssessmentPanelController,
+                                        captureVictimOrganisationPanelController,
                                     theme: const ExpandableThemeData(
                                       headerAlignment:
                                           ExpandablePanelHeaderAlignment.center,
@@ -285,7 +327,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                     header: Padding(
                                         padding: const EdgeInsets.all(10),
                                         child: Text(
-                                          "Capture Development Assessment",
+                                          "Capture Victim Organisation",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
@@ -333,7 +375,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                             color: Colors.blue),
                                                       ),
                                                       onPressed: () {
-                                                        newDevelopmentAssessment();
+                                                        newVictimOrganisation();
                                                       },
                                                       child: const Text('New',
                                                           style: TextStyle(
@@ -342,64 +384,35 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                     ))),
                                           ],
                                         ),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                child: TextFormField(
-                                                  controller:
-                                                      belongingController,
-                                                  enableInteractiveSelection:
-                                                      false,
-                                                  maxLines: 1,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                    labelText: 'Belonging',
-                                                  ),
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Enter Belonging';
-                                                    }
-                                                    return null;
-                                                  },
-                                                ),
-                                              ),
+                                        Container(
+                                          padding: const EdgeInsets.all(10),
+                                          child: TextFormField(
+                                            controller:
+                                                organisationNameController,
+                                            enableInteractiveSelection: false,
+                                            maxLines: 1,
+                                            decoration: const InputDecoration(
+                                              border: OutlineInputBorder(),
+                                              labelText: 'Organisation Name',
                                             ),
-                                          ],
+                                            validator: (value) {
+                                              if (value == null ||
+                                                  value.isEmpty) {
+                                                return 'Organisation Name Required';
+                                              }
+                                              return null;
+                                            },
+                                          ),
                                         ),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                child: TextFormField(
-                                                  controller: masteryController,
-                                                  enableInteractiveSelection:
-                                                      false,
-                                                  maxLines: 1,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                    labelText: 'Mastery',
-                                                  ),
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Enter Mastery';
-                                                    }
-                                                    return null;
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                          ],
+                                        Container(
+                                          padding: const EdgeInsets.all(8),
+                                          child: const Text(
+                                            'Contact Person',
+                                            style: TextStyle(
+                                                color: Colors.blue,
+                                                fontWeight: FontWeight.w200,
+                                                fontSize: 21),
+                                          ),
                                         ),
                                         Row(
                                           children: [
@@ -409,7 +422,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller:
-                                                      independenceController,
+                                                      contactPersonFirstNameController,
                                                   enableInteractiveSelection:
                                                       false,
                                                   maxLines: 1,
@@ -417,29 +430,25 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
-                                                    labelText: 'Independence',
+                                                    labelText: 'First Name',
                                                   ),
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Enter Independence';
+                                                      return 'FirstName Required';
                                                     }
                                                     return null;
                                                   },
                                                 ),
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
                                             Expanded(
                                               child: Container(
                                                 padding:
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller:
-                                                      generosityController,
+                                                      contactPersonLastNameController,
                                                   enableInteractiveSelection:
                                                       false,
                                                   maxLines: 1,
@@ -447,12 +456,12 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
-                                                    labelText: 'Generosity',
+                                                    labelText: 'Last Name',
                                                   ),
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Enter Generosity';
+                                                      return 'LastName Required';
                                                     }
                                                     return null;
                                                   },
@@ -469,7 +478,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller:
-                                                      evaluationController,
+                                                      contactPersonOccupationController,
                                                   enableInteractiveSelection:
                                                       false,
                                                   maxLines: 1,
@@ -477,15 +486,158 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
-                                                    labelText: 'Evaluation',
+                                                    labelText: 'Occupation',
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: TextFormField(
+                                                  controller:
+                                                      telephoneController,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  maxLines: 1,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText: 'Tel Number',
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: TextFormField(
+                                                  controller: cellNoController,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  maxLines: 1,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText: 'Cell Number',
                                                   ),
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Enter Evaluation';
+                                                      return 'Cell Number Required';
                                                     }
                                                     return null;
                                                   },
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: TextFormField(
+                                                  controller:
+                                                      otherContactsController,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  maxLines: 1,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText: 'Other Number',
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: TextFormField(
+                                                  controller:
+                                                      addressLine1Controller,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  maxLines: 1,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText: 'Address Line 1',
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: TextFormField(
+                                                  controller:
+                                                      addressLine2Controller,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  maxLines: 1,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText: 'Address Line 2',
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: TextFormField(
+                                                  controller:
+                                                      postalCodeController,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  maxLines: 1,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText: 'Postal Code',
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -526,7 +678,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                         if (_loginFormKey
                                                             .currentState!
                                                             .validate()) {
-                                                          addUpdateDevelopmentAssessment();
+                                                          addUpdateVictimOrganisation();
                                                         }
                                                       },
                                                       child: Text(
@@ -569,7 +721,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                   scrollOnCollapse: false,
                                   child: ExpandablePanel(
                                     controller:
-                                        viewDevelopmentAssessmentPanelController,
+                                        viewVictimOrganisationPanelController,
                                     theme: const ExpandableThemeData(
                                       headerAlignment:
                                           ExpandablePanelHeaderAlignment.center,
@@ -578,7 +730,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                     header: Padding(
                                         padding: const EdgeInsets.all(10),
                                         child: Text(
-                                          "View Development Assessment",
+                                          "View Victim Organisation",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
@@ -593,7 +745,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        if (developmentAssessmentsDto
+                                        if (victimOrganisationDetailsDto
                                             .isNotEmpty)
                                           Row(
                                             children: [
@@ -601,19 +753,19 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                 child: ListView.separated(
                                                   shrinkWrap: true,
                                                   itemCount:
-                                                      developmentAssessmentsDto
+                                                      victimOrganisationDetailsDto
                                                           .length,
                                                   itemBuilder:
                                                       (context, int index) {
-                                                    if (developmentAssessmentsDto
+                                                    if (victimOrganisationDetailsDto
                                                         .isEmpty) {
                                                       return const Center(
                                                           child: Text(
-                                                              'No development assessment Found.'));
+                                                              'No victim organisation Found.'));
                                                     }
                                                     return ListTile(
                                                       title: Text(
-                                                          'Belonging : ${developmentAssessmentsDto[index].belonging ?? ''} ',
+                                                          'Name : ${victimOrganisationDetailsDto[index].organisationName}',
                                                           style: const TextStyle(
                                                               color:
                                                                   Colors.black,
@@ -621,10 +773,8 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                                   FontWeight
                                                                       .bold)),
                                                       subtitle: Text(
-                                                          'Mastery : ${developmentAssessmentsDto[index].mastery ?? ''}. '
-                                                          'Independence : ${developmentAssessmentsDto[index].independence ?? ''}. '
-                                                          'Generosity : ${developmentAssessmentsDto[index].generosity ?? ''}'
-                                                          'Evaluation : ${developmentAssessmentsDto[index].evaluation ?? ''}',
+                                                          'Contact Person : ${victimOrganisationDetailsDto[index].contactPersonFirstName ?? ''} ${victimOrganisationDetailsDto[index].contactPersonLastName ?? ''}.'
+                                                          'Address : ${victimOrganisationDetailsDto[index].addressLine1 ?? ''} ${victimOrganisationDetailsDto[index].addressLine2 ?? ''} ${victimOrganisationDetailsDto[index].postalCode ?? ''}',
                                                           style:
                                                               const TextStyle(
                                                                   color: Colors
@@ -636,8 +786,8 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                           //IconButton(onPressed: () {}, icon: const Icon(Icons.favorite)),
                                                           IconButton(
                                                               onPressed: () {
-                                                                populateDevelopmentAssessmentForm(
-                                                                    developmentAssessmentsDto[
+                                                                populateVictimOrganisationForm(
+                                                                    victimOrganisationDetailsDto[
                                                                         index]);
                                                               },
                                                               icon: const Icon(

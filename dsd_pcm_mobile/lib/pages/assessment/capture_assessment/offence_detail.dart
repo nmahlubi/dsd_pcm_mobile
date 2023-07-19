@@ -2,29 +2,33 @@ import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../model/intake/offence_category_dto.dart';
+import '../../../model/intake/offence_schedule_dto.dart';
+import '../../../model/intake/offence_type_dto.dart';
 import '../../../model/pcm/accepted_worklist_dto.dart';
-import '../../../model/pcm/development_assessment_dto.dart';
+import '../../../model/pcm/offence_detail_dto.dart';
+import '../../../model/static_model/yes_no_dto.dart';
 import '../../../navigation_drawer/go_to_assessment_drawer.dart';
-import '../../../service/pcm/development_assessment_service.dart';
+import '../../../service/intake/offence_service.dart';
+import '../../../service/pcm/offence_detail_service.dart';
+import '../../../transform_dynamic/transform_offence.dart';
 import '../../../util/shared/apierror.dart';
 import '../../../util/shared/apiresponse.dart';
 import '../../../util/shared/apiresults.dart';
 import '../../../util/shared/loading_overlay.dart';
 import '../../../util/shared/randon_generator.dart';
 import '../../probation_officer/accepted_worklist.dart';
-import 'recommendation.dart';
+import 'socio_economic.dart';
 import 'victim_detail.dart';
-import 'victim_organisation.dart';
 
-class DevelopmentAssessmentPage extends StatefulWidget {
-  const DevelopmentAssessmentPage({Key? key}) : super(key: key);
+class OffenceDetailPage extends StatefulWidget {
+  const OffenceDetailPage({Key? key}) : super(key: key);
 
   @override
-  State<DevelopmentAssessmentPage> createState() =>
-      _DevelopmentAssessmentPagetate();
+  State<OffenceDetailPage> createState() => _OffenceDetailPageState();
 }
 
-class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
+class _OffenceDetailPageState extends State<OffenceDetailPage> {
   SharedPreferences? preferences;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final _loginFormKey = GlobalKey<FormState>();
@@ -34,87 +38,135 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
   }
 
   final _randomGenerator = RandomGenerator();
+  final _offenceTransform = OffenceTransform();
+  final OffenceService offenceServiceClient = OffenceService();
+  final OffenceDetailService offenceDetailServiceClient =
+      OffenceDetailService();
   late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
-  final _developmentAssessmentServiceClient = DevelopmentAssessmentService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
-  late List<DevelopmentAssessmentDto> developmentAssessmentsDto = [];
+  late List<OffenceTypeDto> offenceTypesDto = [];
+  late List<OffenceCategoryDto> offenceCategoriesDto = [];
+  late List<OffenceScheduleDto> offenceSchedulesDto = [];
+  late List<YesNoDto> yesNoDtoItemsDto = [];
+  late List<OffenceDetailDto> offenceDetailsDto = [];
 
-  ExpandableController captureDevelopmentAssessmentPanelController =
+  ExpandableController captureOffenceDetailPanelController =
       ExpandableController();
-  ExpandableController viewDevelopmentAssessmentPanelController =
+  ExpandableController viewOffenceDetailPanelController =
       ExpandableController();
-  final TextEditingController belongingController = TextEditingController();
-  final TextEditingController masteryController = TextEditingController();
-  final TextEditingController independenceController = TextEditingController();
-  final TextEditingController generosityController = TextEditingController();
-  final TextEditingController evaluationController = TextEditingController();
-  int? developmentAssessmentId;
+  final TextEditingController offenceCircumstanceController =
+      TextEditingController();
+  final TextEditingController valueOfGoodsController = TextEditingController();
+  final TextEditingController valueRecoveredController =
+      TextEditingController();
+  final TextEditingController responsibilityDetailsController =
+      TextEditingController();
+  String? childResponsibleDropdownButtonFormField;
+  int? offenceTypeDropdownButtonFormField;
+  int? offenceCategoryDropdownButtonFormField;
+  int? offenceScheduleDropdownButtonFormField;
+  int? offenceDetailId;
   String? labelButtonAddUpdate = '';
 
   @override
   void initState() {
     super.initState();
-    captureDevelopmentAssessmentPanelController =
+    captureOffenceDetailPanelController =
         ExpandableController(initialExpanded: false);
-    viewDevelopmentAssessmentPanelController =
+    viewOffenceDetailPanelController =
         ExpandableController(initialExpanded: true);
-    labelButtonAddUpdate = 'Add Dev Assessment';
-    developmentAssessmentId = null;
+    labelButtonAddUpdate = 'Add Offence';
+    offenceDetailId = null;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
         setState(() {
           acceptedWorklistDto =
               ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
-          loadDevelopmentAssessmentByIntakeAssessmentId(
+          loadOffenceTransformer();
+          loadOffenceDetailsByIntakeAssessmentId(
               acceptedWorklistDto.intakeAssessmentId);
         });
       });
     });
   }
 
-  loadDevelopmentAssessmentByIntakeAssessmentId(int? intakeAssessmentId) async {
+  loadOffenceTransformer() async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await _developmentAssessmentServiceClient
-        .getDevelopmentAssessmentsByIntakeAssessmentId(intakeAssessmentId);
+    offenceTypesDto = await _offenceTransform.transformOffenceTypeDto();
+    offenceCategoriesDto =
+        await _offenceTransform.transformOffenceCategoryDto();
+    offenceSchedulesDto = await _offenceTransform.transformOffenceScheduleDto();
+    yesNoDtoItemsDto.add(YesNoDto(value: 'Yes', description: 'Yes'));
+    yesNoDtoItemsDto.add(YesNoDto(value: 'No', description: 'No'));
+    overlay.hide();
+  }
+
+  loadOffenceDetailsByIntakeAssessmentId(int? intakeAssessmentId) async {
+    final overlay = LoadingOverlay.of(context);
+    overlay.show();
+    apiResponse = await offenceDetailServiceClient
+        .getOffenceDetailIntakeAssessmentId(intakeAssessmentId);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        developmentAssessmentsDto =
-            (apiResponse.Data as List<DevelopmentAssessmentDto>);
+        offenceDetailsDto = (apiResponse.Data as List<OffenceDetailDto>);
       });
     } else {
-      showDialogMessage((apiResponse.ApiError as ApiError));
       overlay.hide();
+      showDialogMessage((apiResponse.ApiError as ApiError));
     }
   }
 
-  addUpdateDevelopmentAssessment() async {
-    DevelopmentAssessmentDto addDevelopmentAssessment =
-        DevelopmentAssessmentDto(
-            developmentId: developmentAssessmentId ??
-                _randomGenerator.getRandomGeneratedNumber(),
-            intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
-            createdBy: preferences!.getInt('userId')!,
-            belonging: belongingController.text,
-            dateCreated: _randomGenerator.getCurrentDateGenerated(),
-            mastery: masteryController.text,
-            independence: independenceController.text,
-            generosity: generosityController.text,
-            evaluation: evaluationController.text);
+  addUpdateOffenceDetails() async {
+    OffenceDetailDto addOffenceDetailDto = OffenceDetailDto(
+        pcmOffenceId:
+            offenceDetailId ?? _randomGenerator.getRandomGeneratedNumber(),
+        pcmCaseId: acceptedWorklistDto.caseId,
+        intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
+        createdBy: preferences!.getInt('userId')!,
+        dateCreated: _randomGenerator.getCurrentDateGenerated(),
+        offenceTypeId: offenceTypeDropdownButtonFormField,
+        offenceTypeDto: offenceTypeDropdownButtonFormField != null
+            ? offenceTypesDto
+                .where((o) =>
+                    o.offenceTypeId == offenceTypeDropdownButtonFormField)
+                .single
+            : null,
+        offenceCategoryId: offenceCategoryDropdownButtonFormField,
+        offenceCategoryDto: offenceCategoryDropdownButtonFormField != null
+            ? offenceCategoriesDto
+                .where((o) =>
+                    o.offenceCategoryId ==
+                    offenceCategoryDropdownButtonFormField)
+                .single
+            : null,
+        offenceScheduleId: offenceScheduleDropdownButtonFormField,
+        offenceScheduleDto: offenceScheduleDropdownButtonFormField != null
+            ? offenceSchedulesDto
+                .where((o) =>
+                    o.offenceScheduleId ==
+                    offenceScheduleDropdownButtonFormField)
+                .single
+            : null,
+        offenceCircumstance: offenceCircumstanceController.text,
+        valueOfGoods: valueOfGoodsController.text,
+        valueRecovered: valueRecoveredController.text,
+        isChildResponsible: childResponsibleDropdownButtonFormField,
+        responsibilityDetails: responsibilityDetailsController.text);
 
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
     overlay.show();
-    apiResponse = await _developmentAssessmentServiceClient
-        .addUpdateDevelopmentAssessment(addDevelopmentAssessment);
+    apiResponse = await offenceDetailServiceClient
+        .addUpdateOffenceDetail(addOffenceDetailDto);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       showSuccessMessage('Successfully $labelButtonAddUpdate.');
       navigator.push(
         MaterialPageRoute(
-            builder: (context) => const DevelopmentAssessmentPage(),
+            builder: (context) => const OffenceDetailPage(),
             settings: RouteSettings(
               arguments: acceptedWorklistDto,
             )),
@@ -139,42 +191,60 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
     );
   }
 
-  newDevelopmentAssessment() {
+  populateOffenceDetailForm(OffenceDetailDto offenceDetailDto) {
     setState(() {
-      labelButtonAddUpdate = 'Add Dev Assessment';
-      belongingController.clear();
-      masteryController.clear();
-      independenceController.clear();
-      generosityController.clear();
-      evaluationController.clear();
-      developmentAssessmentId = null;
+      offenceDetailId = offenceDetailDto.pcmOffenceId;
+      captureOffenceDetailPanelController =
+          ExpandableController(initialExpanded: true);
+      viewOffenceDetailPanelController =
+          ExpandableController(initialExpanded: false);
+      labelButtonAddUpdate = 'Update Offence';
+      valueOfGoodsController.text = offenceDetailDto.valueOfGoods!;
+      valueRecoveredController.text = offenceDetailDto.valueRecovered!;
+      responsibilityDetailsController.text =
+          offenceDetailDto.responsibilityDetails!;
+
+      childResponsibleDropdownButtonFormField =
+          (offenceDetailDto.isChildResponsible != null
+              ? yesNoDtoItemsDto
+                  .where((o) =>
+                      o.value ==
+                      offenceDetailDto.isChildResponsible
+                          .toString()
+                          .replaceAll(' ', ''))
+                  .single
+                  .value
+                  .toString()
+              : null)!;
+      // childResponsibleDropdownButtonFormField =
+      //    offenceDetailDto.isChildResponsible!;
+      offenceTypeDropdownButtonFormField = offenceDetailDto.offenceTypeId!;
+      offenceCategoryDropdownButtonFormField =
+          offenceDetailDto.offenceCategoryId;
+      offenceScheduleDropdownButtonFormField =
+          offenceDetailDto.offenceScheduleId;
     });
   }
 
-  populateDevelopmentAssessmentForm(
-      DevelopmentAssessmentDto developmentAssessmentDto) {
+  newOffenceDetail() {
     setState(() {
-      developmentAssessmentId = developmentAssessmentDto.developmentId;
-      captureDevelopmentAssessmentPanelController =
-          ExpandableController(initialExpanded: true);
-      viewDevelopmentAssessmentPanelController =
-          ExpandableController(initialExpanded: false);
-      labelButtonAddUpdate = 'Update Dev Assessment';
-      belongingController.text = developmentAssessmentDto.belonging!;
-      masteryController.text = developmentAssessmentDto.mastery!;
-      independenceController.text = developmentAssessmentDto.independence!;
-      generosityController.text = developmentAssessmentDto.generosity!;
-      evaluationController.text = developmentAssessmentDto.evaluation!;
+      labelButtonAddUpdate = 'Add Offence';
+      valueOfGoodsController.clear();
+      valueRecoveredController.clear();
+      responsibilityDetailsController.clear();
+      childResponsibleDropdownButtonFormField = null;
+      offenceTypeDropdownButtonFormField = null;
+      offenceCategoryDropdownButtonFormField = null;
+      offenceScheduleDropdownButtonFormField = null;
+      offenceDetailId = null;
     });
   }
 
   @override
   void dispose() {
-    belongingController.dispose();
-    masteryController.dispose();
-    independenceController.dispose();
-    generosityController.dispose();
-    evaluationController.dispose();
+    valueOfGoodsController.dispose();
+    valueRecoveredController.dispose();
+    responsibilityDetailsController.dispose();
     super.dispose();
   }
 
@@ -187,7 +257,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
         child: Scaffold(
             key: scaffoldKey,
             appBar: AppBar(
-              title: const Text("Development Assessment"),
+              title: const Text("Offence Details"),
               leading: IconButton(
                 icon: const Icon(Icons.offline_pin_rounded),
                 onPressed: () {
@@ -227,8 +297,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                const VictimOrganisationPage(),
+                            builder: (context) => const SocioEconomicPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),
@@ -242,7 +311,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const RecommandationPage(),
+                            builder: (context) => const VictimDetailPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),
@@ -276,7 +345,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                   scrollOnCollapse: false,
                                   child: ExpandablePanel(
                                     controller:
-                                        captureDevelopmentAssessmentPanelController,
+                                        captureOffenceDetailPanelController,
                                     theme: const ExpandableThemeData(
                                       headerAlignment:
                                           ExpandablePanelHeaderAlignment.center,
@@ -285,7 +354,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                     header: Padding(
                                         padding: const EdgeInsets.all(10),
                                         child: Text(
-                                          "Capture Development Assessment",
+                                          "Capture Offence Detail",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
@@ -333,7 +402,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                             color: Colors.blue),
                                                       ),
                                                       onPressed: () {
-                                                        newDevelopmentAssessment();
+                                                        newOffenceDetail();
                                                       },
                                                       child: const Text('New',
                                                           style: TextStyle(
@@ -345,12 +414,169 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                         Row(
                                           children: [
                                             Expanded(
+                                                child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10),
+                                                    child:
+                                                        DropdownButtonFormField(
+                                                      value:
+                                                          offenceCategoryDropdownButtonFormField,
+                                                      decoration:
+                                                          const InputDecoration(
+                                                        hintText:
+                                                            'Offence Category',
+                                                        labelText:
+                                                            'Offence Category',
+                                                        border:
+                                                            OutlineInputBorder(
+                                                          borderSide:
+                                                              BorderSide(
+                                                                  width: 1,
+                                                                  color: Colors
+                                                                      .green),
+                                                        ),
+                                                      ),
+                                                      items:
+                                                          offenceCategoriesDto
+                                                              .map((category) {
+                                                        return DropdownMenuItem(
+                                                            value: category
+                                                                .offenceCategoryId,
+                                                            child: Text(category
+                                                                .description
+                                                                .toString()));
+                                                      }).toList(),
+                                                      onChanged:
+                                                          (selectedValue) {
+                                                        offenceCategoryDropdownButtonFormField =
+                                                            selectedValue;
+                                                      },
+                                                      validator: (value) {
+                                                        if (value == null) {
+                                                          return 'Offence Category Required';
+                                                        }
+                                                        return null;
+                                                      },
+                                                    ))),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                                child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10),
+                                                    child:
+                                                        DropdownButtonFormField(
+                                                      value:
+                                                          offenceScheduleDropdownButtonFormField,
+                                                      decoration:
+                                                          const InputDecoration(
+                                                        hintText:
+                                                            'Offence Schedule',
+                                                        labelText:
+                                                            'Offence Schedule',
+                                                        border:
+                                                            OutlineInputBorder(
+                                                          borderSide:
+                                                              BorderSide(
+                                                                  width: 1,
+                                                                  color: Colors
+                                                                      .green),
+                                                        ),
+                                                      ),
+                                                      items: offenceSchedulesDto
+                                                          .map((schedule) {
+                                                        return DropdownMenuItem(
+                                                            value: schedule
+                                                                .offenceScheduleId,
+                                                            child: Text(schedule
+                                                                .description
+                                                                .toString()));
+                                                      }).toList(),
+                                                      onChanged:
+                                                          (selectedValue) {
+                                                        offenceScheduleDropdownButtonFormField =
+                                                            selectedValue;
+                                                      },
+                                                      validator: (value) {
+                                                        if (value == null) {
+                                                          return 'Offence Schedule Required';
+                                                        }
+                                                        return null;
+                                                      },
+                                                    ))),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                                child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10),
+                                                    child:
+                                                        DropdownButtonFormField(
+                                                      //menuMaxHeight: 800,
+                                                      //itemHeight: 300,
+                                                      value:
+                                                          offenceTypeDropdownButtonFormField,
+                                                      decoration:
+                                                          const InputDecoration(
+                                                        hintText:
+                                                            'Offence Type',
+                                                        labelText:
+                                                            'Offence Type',
+                                                        border:
+                                                            OutlineInputBorder(
+                                                          borderSide:
+                                                              BorderSide(
+                                                                  width: 1,
+                                                                  color: Colors
+                                                                      .green),
+                                                        ),
+                                                      ),
+                                                      isDense: true,
+                                                      icon: const Icon(
+                                                        Icons
+                                                            .keyboard_arrow_down,
+                                                      ),
+                                                      isExpanded: true,
+                                                      items: offenceTypesDto
+                                                          .map((offenceType) {
+                                                        return DropdownMenuItem(
+                                                            value: offenceType
+                                                                .offenceTypeId,
+                                                            child: Text(
+                                                                offenceType
+                                                                    .description
+                                                                    .toString()));
+                                                      }).toList(),
+                                                      onChanged:
+                                                          (selectedValue) {
+                                                        offenceTypeDropdownButtonFormField =
+                                                            selectedValue;
+                                                      },
+                                                      validator: (value) {
+                                                        if (value == null) {
+                                                          return 'Offence Type Required';
+                                                        }
+                                                        return null;
+                                                      },
+                                                    ))),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
                                               child: Container(
                                                 padding:
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller:
-                                                      belongingController,
+                                                      offenceCircumstanceController,
                                                   enableInteractiveSelection:
                                                       false,
                                                   maxLines: 1,
@@ -358,12 +584,13 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
-                                                    labelText: 'Belonging',
+                                                    labelText:
+                                                        'Offence Circumstance',
                                                   ),
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Enter Belonging';
+                                                      return 'Offence Circumstance Required';
                                                     }
                                                     return null;
                                                   },
@@ -379,7 +606,8 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                 padding:
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
-                                                  controller: masteryController,
+                                                  controller:
+                                                      valueOfGoodsController,
                                                   enableInteractiveSelection:
                                                       false,
                                                   maxLines: 1,
@@ -387,12 +615,12 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
-                                                    labelText: 'Mastery',
+                                                    labelText: 'Value Of Goods',
                                                   ),
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Enter Mastery';
+                                                      return 'Value Of Goods Required';
                                                     }
                                                     return null;
                                                   },
@@ -409,7 +637,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller:
-                                                      independenceController,
+                                                      valueRecoveredController,
                                                   enableInteractiveSelection:
                                                       false,
                                                   maxLines: 1,
@@ -417,12 +645,13 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
-                                                    labelText: 'Independence',
+                                                    labelText:
+                                                        'Value Recovered',
                                                   ),
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Enter Independence';
+                                                      return 'Value Recovered Required';
                                                     }
                                                     return null;
                                                   },
@@ -431,66 +660,76 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                             ),
                                           ],
                                         ),
-                                        Row(
-                                          children: [
-                                            Expanded(
+                                        Row(children: [
+                                          Expanded(
                                               child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                child: TextFormField(
-                                                  controller:
-                                                      generosityController,
-                                                  enableInteractiveSelection:
-                                                      false,
-                                                  maxLines: 1,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                    labelText: 'Generosity',
-                                                  ),
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Enter Generosity';
-                                                    }
-                                                    return null;
-                                                  },
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  child:
+                                                      DropdownButtonFormField(
+                                                    value:
+                                                        childResponsibleDropdownButtonFormField,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      hintText:
+                                                          'Child Responsible',
+                                                      labelText:
+                                                          'Child Responsible',
+                                                      border:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            width: 1,
+                                                            color:
+                                                                Colors.green),
+                                                      ),
+                                                    ),
+                                                    items: yesNoDtoItemsDto
+                                                        .map((yesNo) {
+                                                      return DropdownMenuItem(
+                                                          value: yesNo.value,
+                                                          child: Text(yesNo
+                                                              .description
+                                                              .toString()));
+                                                    }).toList(),
+                                                    onChanged: (selectedValue) {
+                                                      childResponsibleDropdownButtonFormField =
+                                                          selectedValue;
+                                                    },
+                                                    validator: (value) {
+                                                      if (value == null) {
+                                                        return 'Offence Type Required';
+                                                      }
+                                                      return null;
+                                                    },
+                                                  ))),
+                                        ]),
+                                        Row(children: [
+                                          Expanded(
+                                            child: Container(
+                                              padding: const EdgeInsets.all(10),
+                                              child: TextFormField(
+                                                controller:
+                                                    responsibilityDetailsController,
+                                                enableInteractiveSelection:
+                                                    false,
+                                                maxLines: 1,
+                                                decoration:
+                                                    const InputDecoration(
+                                                  border: OutlineInputBorder(),
+                                                  labelText:
+                                                      'Responsibility Details',
                                                 ),
+                                                validator: (value) {
+                                                  if (value == null ||
+                                                      value.isEmpty) {
+                                                    return 'Responsibility Required';
+                                                  }
+                                                  return null;
+                                                },
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                child: TextFormField(
-                                                  controller:
-                                                      evaluationController,
-                                                  enableInteractiveSelection:
-                                                      false,
-                                                  maxLines: 1,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                    labelText: 'Evaluation',
-                                                  ),
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Enter Evaluation';
-                                                    }
-                                                    return null;
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                          )
+                                        ]),
                                         Row(
                                           children: [
                                             Expanded(
@@ -526,7 +765,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                         if (_loginFormKey
                                                             .currentState!
                                                             .validate()) {
-                                                          addUpdateDevelopmentAssessment();
+                                                          addUpdateOffenceDetails();
                                                         }
                                                       },
                                                       child: Text(
@@ -569,7 +808,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                   scrollOnCollapse: false,
                                   child: ExpandablePanel(
                                     controller:
-                                        viewDevelopmentAssessmentPanelController,
+                                        viewOffenceDetailPanelController,
                                     theme: const ExpandableThemeData(
                                       headerAlignment:
                                           ExpandablePanelHeaderAlignment.center,
@@ -578,7 +817,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                     header: Padding(
                                         padding: const EdgeInsets.all(10),
                                         child: Text(
-                                          "View Development Assessment",
+                                          "View Offence Details",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
@@ -593,27 +832,25 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        if (developmentAssessmentsDto
-                                            .isNotEmpty)
+                                        if (offenceDetailsDto.isNotEmpty)
                                           Row(
                                             children: [
                                               Expanded(
                                                 child: ListView.separated(
                                                   shrinkWrap: true,
                                                   itemCount:
-                                                      developmentAssessmentsDto
-                                                          .length,
+                                                      offenceDetailsDto.length,
                                                   itemBuilder:
                                                       (context, int index) {
-                                                    if (developmentAssessmentsDto
+                                                    if (offenceDetailsDto
                                                         .isEmpty) {
                                                       return const Center(
                                                           child: Text(
-                                                              'No development assessment Found.'));
+                                                              'No offence category Found.'));
                                                     }
                                                     return ListTile(
                                                       title: Text(
-                                                          'Belonging : ${developmentAssessmentsDto[index].belonging ?? ''} ',
+                                                          'Category : ${offenceDetailsDto[index].offenceCategoryDto?.description ?? ''}',
                                                           style: const TextStyle(
                                                               color:
                                                                   Colors.black,
@@ -621,10 +858,10 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                                   FontWeight
                                                                       .bold)),
                                                       subtitle: Text(
-                                                          'Mastery : ${developmentAssessmentsDto[index].mastery ?? ''}. '
-                                                          'Independence : ${developmentAssessmentsDto[index].independence ?? ''}. '
-                                                          'Generosity : ${developmentAssessmentsDto[index].generosity ?? ''}'
-                                                          'Evaluation : ${developmentAssessmentsDto[index].evaluation ?? ''}',
+                                                          'Type : ${offenceDetailsDto[index].offenceTypeDto?.description ?? ''} '
+                                                          'Responsibility details : ${offenceDetailsDto[index].responsibilityDetails ?? ''} '
+                                                          'Value of goods : ${offenceDetailsDto[index].valueOfGoods ?? ''}.'
+                                                          'Value Recoverd ${offenceDetailsDto[index].valueRecovered ?? ''}',
                                                           style:
                                                               const TextStyle(
                                                                   color: Colors
@@ -636,8 +873,8 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                           //IconButton(onPressed: () {}, icon: const Icon(Icons.favorite)),
                                                           IconButton(
                                                               onPressed: () {
-                                                                populateDevelopmentAssessmentForm(
-                                                                    developmentAssessmentsDto[
+                                                                populateOffenceDetailForm(
+                                                                    offenceDetailsDto[
                                                                         index]);
                                                               },
                                                               icon: const Icon(

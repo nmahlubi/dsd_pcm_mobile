@@ -15,10 +15,10 @@ import 'development_assessment.dart';
 import 'family/family.dart';
 import 'general_detail.dart';
 import 'health_detail.dart';
-import 'offence_details/offence_detail.dart';
+import 'offence_detail.dart';
 import 'recommendation.dart';
 import 'socio_economic.dart';
-import 'victim_details/victim_detail.dart';
+import 'victim_detail.dart';
 
 class CaptureAssessmentPage extends StatefulWidget {
   const CaptureAssessmentPage({Key? key}) : super(key: key);

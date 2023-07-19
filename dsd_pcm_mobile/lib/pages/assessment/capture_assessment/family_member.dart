@@ -1,4 +1,3 @@
-import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/socio_economic.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -9,7 +8,6 @@ import '../../../model/intake/person_dto.dart';
 import '../../../model/intake/relationship_type_dto.dart';
 import '../../../model/pcm/accepted_worklist_dto.dart';
 import '../../../model/pcm/family_member_dto.dart';
-import '../../../model/pcm/medical_health_detail_dto.dart';
 import '../../../navigation_drawer/go_to_assessment_drawer.dart';
 import '../../../service/pcm/family_service.dart';
 import '../../../transform_dynamic/transform_lookup.dart';
@@ -19,8 +17,8 @@ import '../../../util/shared/apiresults.dart';
 import '../../../util/shared/loading_overlay.dart';
 import '../../../util/shared/randon_generator.dart';
 import '../../probation_officer/accepted_worklist.dart';
-import 'assessment_details/assessment_detail.dart';
 import 'care_giver_detail.dart';
+import 'family_information.dart';
 
 class FamilyMemberPage extends StatefulWidget {
   const FamilyMemberPage({Key? key}) : super(key: key);
@@ -105,8 +103,8 @@ class _FamilyMemberPageState extends State<FamilyMemberPage> {
         familyMembersDto = (apiResponse.Data as List<FamilyMemberDto>);
       });
     } else {
-      showDialogMessage((apiResponse.ApiError as ApiError));
       overlay.hide();
+      showDialogMessage((apiResponse.ApiError as ApiError));
     }
   }
 
@@ -152,7 +150,7 @@ class _FamilyMemberPageState extends State<FamilyMemberPage> {
         createdBy: preferences!.getInt('userId')!);
     overlay.show();
     apiResponse =
-        await familyServiceClient.addFamilyMember(requestFamilyMemberDto);
+        await familyServiceClient.addUpdateFamilyMember(requestFamilyMemberDto);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       if (!mounted) return;
@@ -240,7 +238,7 @@ class _FamilyMemberPageState extends State<FamilyMemberPage> {
         child: Scaffold(
             key: scaffoldKey,
             appBar: AppBar(
-              title: const Text("Medical Information"),
+              title: const Text("Family Member"),
               leading: IconButton(
                 icon: const Icon(Icons.offline_pin_rounded),
                 onPressed: () {
@@ -294,7 +292,7 @@ class _FamilyMemberPageState extends State<FamilyMemberPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const SocioEconomicPage(),
+                            builder: (context) => const FamilyInformationPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),
@@ -543,6 +541,10 @@ class _FamilyMemberPageState extends State<FamilyMemberPage> {
                                                 ),
                                               ),
                                             ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
                                             Expanded(
                                               child: Container(
                                                   padding:

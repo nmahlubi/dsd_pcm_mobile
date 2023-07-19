@@ -68,12 +68,6 @@ class FamilyService {
         "${AppUrl.pcmURL}/Family/Information/Add", familyInformationDto);
   }
 
-  Future<ApiResponse> addUpdateFamilyInformationOnline(
-      FamilyInformationDto familyInformationDto) async {
-    return await _httpClientService.httpClientPost(
-        "${AppUrl.pcmURL}/Family/Information/AddUpdate", familyInformationDto);
-  }
-
   Future<ApiResponse> addFamilyInformation(
       FamilyInformationDto familyInformationDto) async {
     ApiResponse apiResponse = ApiResponse();
@@ -93,6 +87,34 @@ class FamilyService {
           .getFamilyInformationById(familyInformationDto.familyInformationId!);
     }
     return apiResponse;
+  }
+
+  Future<ApiResponse> addUpdateFamilyInformation(
+      FamilyInformationDto familyInformationDto) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse =
+          await addUpdateFamilyInformationOnline(familyInformationDto);
+      if (apiResponse.ApiError == null) {
+        ApiResults apiResults = (apiResponse.Data as ApiResults);
+        FamilyInformationDto familyInformationDtoResponse =
+            FamilyInformationDto.fromJson(apiResults.data);
+        apiResponse.Data = familyInformationDtoResponse;
+        _familyInformationRepository
+            .saveFamilyInformation(familyInformationDtoResponse);
+      }
+    } on SocketException {
+      _familyInformationRepository.saveFamilyInformation(familyInformationDto);
+      apiResponse.Data = _familyInformationRepository
+          .getFamilyInformationById(familyInformationDto.familyInformationId!);
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> addUpdateFamilyInformationOnline(
+      FamilyInformationDto familyInformationDto) async {
+    return await _httpClientService.httpClientPost(
+        "${AppUrl.pcmURL}/Family/Information/AddUpdate", familyInformationDto);
   }
 
   Future<ApiResponse> getFamilyMembersByAssesmentIdOnline(
@@ -169,8 +191,31 @@ class FamilyService {
   }
 
   Future<ApiResponse> addUpdateFamilyMemberOnline(
-      FamilyMemberDto familyMemberDto, int? personId) async {
+      FamilyMemberDto familyMemberDto) async {
     return await _httpClientService.httpClientPost(
-        "${AppUrl.pcmURL}/Family/Member/AddUpdate/$personId", familyMemberDto);
+        "${AppUrl.pcmURL}/Family/Member/AddUpdate", familyMemberDto);
+  }
+
+  Future<ApiResponse> addUpdateFamilyMember(
+      FamilyMemberDto familyMemberDto) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse = await addUpdateFamilyMemberOnline(familyMemberDto);
+      if (apiResponse.ApiError == null) {
+        ApiResults apiResults = (apiResponse.Data as ApiResults);
+        FamilyMemberDto familyMemberDtoResponse =
+            FamilyMemberDto.fromJson(apiResults.data);
+        apiResponse.Data = familyMemberDtoResponse;
+        _familyMemberRepository.saveFamilyMemberAfterOnline(
+            familyMemberDto,
+            familyMemberDtoResponse.personId!,
+            familyMemberDtoResponse.familyMemberId!);
+      }
+    } on SocketException {
+      _familyMemberRepository.saveFamilyMember(familyMemberDto);
+      apiResponse.Data = _familyInformationRepository
+          .getFamilyInformationById(familyMemberDto.familyMemberId!);
+    }
+    return apiResponse;
   }
 }

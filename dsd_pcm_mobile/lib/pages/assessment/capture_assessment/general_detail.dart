@@ -13,8 +13,6 @@ import '../../../util/shared/loading_overlay.dart';
 import '../../../util/shared/randon_generator.dart';
 import '../../probation_officer/accepted_worklist.dart';
 import 'development_assessment.dart';
-import 'general_details/capture_general_detail.dart';
-import 'general_details/view_general_detail.dart';
 
 class GeneralDetailPage extends StatefulWidget {
   const GeneralDetailPage({Key? key}) : super(key: key);
@@ -176,7 +174,7 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
         child: Scaffold(
             key: scaffoldKey,
             appBar: AppBar(
-              title: const Text("Offence Details"),
+              title: const Text("General Details"),
               leading: IconButton(
                 icon: const Icon(Icons.offline_pin_rounded),
                 onPressed: () {
@@ -213,20 +211,6 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
                 children: <Widget>[
                   FloatingActionButton(
                       onPressed: () {
-                        /*Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SocioEconomicPage(),
-                          settings: RouteSettings(
-                            arguments: acceptedWorklistDto,
-                          ),
-                        ),
-                      );*/
-                      },
-                      heroTag: null,
-                      child: const Icon(Icons.arrow_back)),
-                  FloatingActionButton(
-                      onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -237,6 +221,21 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
                             ),
                           ),
                         );
+                      },
+                      heroTag: null,
+                      child: const Icon(Icons.arrow_back)),
+                  FloatingActionButton(
+                      onPressed: () {
+                        /*Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const DevelopmentAssessmentPage(),
+                            settings: RouteSettings(
+                              arguments: acceptedWorklistDto,
+                            ),
+                          ),
+                        );*/
                       },
                       heroTag: null,
                       child: const Icon(Icons.arrow_forward)),
