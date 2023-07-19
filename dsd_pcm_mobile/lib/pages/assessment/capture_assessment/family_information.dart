@@ -3,18 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../model/pcm/accepted_worklist_dto.dart';
-import '../../../model/pcm/general_detail_dto.dart';
+import '../../../model/pcm/family_information_dto.dart';
 import '../../../navigation_drawer/go_to_assessment_drawer.dart';
-import '../../../service/pcm/general_detail_service.dart';
+import '../../../service/pcm/family_service.dart';
 import '../../../util/shared/apierror.dart';
 import '../../../util/shared/apiresponse.dart';
 import '../../../util/shared/apiresults.dart';
 import '../../../util/shared/loading_overlay.dart';
 import '../../../util/shared/randon_generator.dart';
 import '../../probation_officer/accepted_worklist.dart';
-import 'development_assessment.dart';
-import 'general_details/capture_general_detail.dart';
-import 'general_details/view_general_detail.dart';
+import 'family_member.dart';
+import 'socio_economic.dart';
 
 class FamilyInformationPage extends StatefulWidget {
   const FamilyInformationPage({Key? key}) : super(key: key);
@@ -34,53 +33,51 @@ class _FamilyInformationPageState extends State<FamilyInformationPage> {
 
   late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
   final _randomGenerator = RandomGenerator();
-  final _generalDetailServiceClient = GeneralDetailService();
+  final _familyServiceClient = FamilyService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
-  late List<GeneralDetailDto> generalDetailsDto = [];
+  late List<FamilyInformationDto> familyInformationsDto = [];
 
-  ExpandableController captureGeneralDetailPanelController =
+  ExpandableController captureFamilyInformationPanelController =
       ExpandableController();
-  ExpandableController viewGeneralDetailPanelController =
+  ExpandableController viewFamilyInformationPanelController =
       ExpandableController();
-  final TextEditingController consultedSourcesController =
+  final TextEditingController familyBackgroundController =
       TextEditingController();
-  final TextEditingController traceEffortsController = TextEditingController();
-  final TextEditingController additionalInfoController =
-      TextEditingController();
-  int? generalDetailId;
+  int? familyInformationId;
   String? labelButtonAddUpdate = '';
 
   @override
   void initState() {
     super.initState();
-    captureGeneralDetailPanelController =
+    captureFamilyInformationPanelController =
         ExpandableController(initialExpanded: false);
-    viewGeneralDetailPanelController =
+    viewFamilyInformationPanelController =
         ExpandableController(initialExpanded: true);
-    labelButtonAddUpdate = 'Add General Detail';
-    generalDetailId = null;
+    labelButtonAddUpdate = 'Add Background';
+    familyInformationId = null;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
         setState(() {
           acceptedWorklistDto =
               ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
-          loadGeneralDetailsByIntakeAssessmentId(
+          loadFamilyInformationsByIntakeAssessmentId(
               acceptedWorklistDto.intakeAssessmentId);
         });
       });
     });
   }
 
-  loadGeneralDetailsByIntakeAssessmentId(int? intakeAssessmentId) async {
+  loadFamilyInformationsByIntakeAssessmentId(int? intakeAssessmentId) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await _generalDetailServiceClient
-        .getGeneralDetailByIntakeAssessmentId(intakeAssessmentId);
+    apiResponse = await _familyServiceClient
+        .getFamilyInformationByAssessmentId(intakeAssessmentId);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        generalDetailsDto = (apiResponse.Data as List<GeneralDetailDto>);
+        familyInformationsDto =
+            (apiResponse.Data as List<FamilyInformationDto>);
       });
     } else {
       overlay.hide();
@@ -88,26 +85,24 @@ class _FamilyInformationPageState extends State<FamilyInformationPage> {
     }
   }
 
-  addUpdateGeneralDetail() async {
-    GeneralDetailDto generalDetailDto = GeneralDetailDto(
-        generalDetailsId:
-            generalDetailId ?? _randomGenerator.getRandomGeneratedNumber(),
-        dateCreated: _randomGenerator.getCurrentDateGenerated(),
+  addUpdateFamilyInformation() async {
+    FamilyInformationDto familyInformationDto = FamilyInformationDto(
+        familyInformationId:
+            familyInformationId ?? _randomGenerator.getRandomGeneratedNumber(),
         intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
-        createdBy: preferences!.getInt('userId')!,
-        consultedSources: consultedSourcesController.text,
-        traceEfforts: traceEffortsController.text,
-        commentsBySupervisor: null,
-        additionalInfo: additionalInfoController.text);
+        familyBackground: familyBackgroundController.text,
+        dateCreated: _randomGenerator.getCurrentDateGenerated(),
+        createdBy: preferences!.getInt('userId')!);
 
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
     overlay.show();
-    apiResponse = await _generalDetailServiceClient
-        .addUpdateGeneralDetail(generalDetailDto);
+    apiResponse = await _familyServiceClient
+        .addUpdateFamilyInformation(familyInformationDto);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
-      showSuccessMessage('Successfully $labelButtonAddUpdate.');
+      if (!mounted) return;
+      showSuccessMessage("Successfull $labelButtonAddUpdate");
       navigator.push(
         MaterialPageRoute(
             builder: (context) => const FamilyInformationPage(),
@@ -116,8 +111,8 @@ class _FamilyInformationPageState extends State<FamilyInformationPage> {
             )),
       );
     } else {
-      showDialogMessage((apiResponse.ApiError as ApiError));
       overlay.hide();
+      showDialogMessage((apiResponse.ApiError as ApiError));
     }
   }
 
@@ -135,35 +130,29 @@ class _FamilyInformationPageState extends State<FamilyInformationPage> {
     );
   }
 
-  newGeneralDetail() {
+  newFamilyInformation() {
     setState(() {
-      labelButtonAddUpdate = 'Add General Detail';
-      consultedSourcesController.clear();
-      traceEffortsController.clear();
-      additionalInfoController.clear();
-      generalDetailId = null;
+      labelButtonAddUpdate = 'Add Background';
+      familyBackgroundController.clear();
+      familyInformationId = null;
     });
   }
 
-  populateGeneralDetailForm(GeneralDetailDto generalDetailDto) {
+  populateFamilyInformationForm(FamilyInformationDto familyInformationDto) {
     setState(() {
-      generalDetailId = generalDetailDto.generalDetailsId;
-      captureGeneralDetailPanelController =
+      familyInformationId = familyInformationDto.familyInformationId;
+      captureFamilyInformationPanelController =
           ExpandableController(initialExpanded: true);
-      viewGeneralDetailPanelController =
+      viewFamilyInformationPanelController =
           ExpandableController(initialExpanded: false);
-      labelButtonAddUpdate = 'Update General Detail';
-      consultedSourcesController.text = generalDetailDto.consultedSources!;
-      traceEffortsController.text = generalDetailDto.traceEfforts!;
-      additionalInfoController.text = generalDetailDto.additionalInfo!;
+      labelButtonAddUpdate = 'Update Background';
+      familyBackgroundController.text = familyInformationDto.familyBackground!;
     });
   }
 
   @override
   void dispose() {
-    consultedSourcesController.dispose();
-    traceEffortsController.dispose();
-    additionalInfoController.dispose();
+    familyBackgroundController.dispose();
     super.dispose();
   }
 
@@ -176,7 +165,7 @@ class _FamilyInformationPageState extends State<FamilyInformationPage> {
         child: Scaffold(
             key: scaffoldKey,
             appBar: AppBar(
-              title: const Text("Offence Details"),
+              title: const Text("Family Information"),
               leading: IconButton(
                 icon: const Icon(Icons.offline_pin_rounded),
                 onPressed: () {
@@ -213,15 +202,15 @@ class _FamilyInformationPageState extends State<FamilyInformationPage> {
                 children: <Widget>[
                   FloatingActionButton(
                       onPressed: () {
-                        /*Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SocioEconomicPage(),
-                          settings: RouteSettings(
-                            arguments: acceptedWorklistDto,
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const FamilyMemberPage(),
+                            settings: RouteSettings(
+                              arguments: acceptedWorklistDto,
+                            ),
                           ),
-                        ),
-                      );*/
+                        );
                       },
                       heroTag: null,
                       child: const Icon(Icons.arrow_back)),
@@ -230,8 +219,7 @@ class _FamilyInformationPageState extends State<FamilyInformationPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                const DevelopmentAssessmentPage(),
+                            builder: (context) => const SocioEconomicPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),
@@ -265,7 +253,7 @@ class _FamilyInformationPageState extends State<FamilyInformationPage> {
                                   scrollOnCollapse: false,
                                   child: ExpandablePanel(
                                     controller:
-                                        captureGeneralDetailPanelController,
+                                        captureFamilyInformationPanelController,
                                     theme: const ExpandableThemeData(
                                       headerAlignment:
                                           ExpandablePanelHeaderAlignment.center,
@@ -274,7 +262,7 @@ class _FamilyInformationPageState extends State<FamilyInformationPage> {
                                     header: Padding(
                                         padding: const EdgeInsets.all(10),
                                         child: Text(
-                                          "Capture General Detail",
+                                          "Capture Family Information",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
@@ -322,7 +310,7 @@ class _FamilyInformationPageState extends State<FamilyInformationPage> {
                                                             color: Colors.blue),
                                                       ),
                                                       onPressed: () {
-                                                        newGeneralDetail();
+                                                        newFamilyInformation();
                                                       },
                                                       child: const Text('New',
                                                           style: TextStyle(
@@ -339,78 +327,21 @@ class _FamilyInformationPageState extends State<FamilyInformationPage> {
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller:
-                                                      consultedSourcesController,
+                                                      familyBackgroundController,
                                                   enableInteractiveSelection:
                                                       false,
-                                                  maxLines: 1,
+                                                  maxLines: 4,
                                                   decoration:
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
                                                     labelText:
-                                                        'Consulted Sources',
+                                                        'Family Background',
                                                   ),
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Enter Consulted Sources';
-                                                    }
-                                                    return null;
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                child: TextFormField(
-                                                  controller:
-                                                      traceEffortsController,
-                                                  enableInteractiveSelection:
-                                                      false,
-                                                  maxLines: 1,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                    labelText: 'Trace Efforts',
-                                                  ),
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Enter Trace Efforts';
-                                                    }
-                                                    return null;
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                child: TextFormField(
-                                                  controller:
-                                                      additionalInfoController,
-                                                  enableInteractiveSelection:
-                                                      false,
-                                                  maxLines: 3,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                    labelText:
-                                                        'Additional Information',
-                                                  ),
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Enter Additional Information';
+                                                      return 'Family Background Required';
                                                     }
                                                     return null;
                                                   },
@@ -454,7 +385,7 @@ class _FamilyInformationPageState extends State<FamilyInformationPage> {
                                                         if (_loginFormKey
                                                             .currentState!
                                                             .validate()) {
-                                                          addUpdateGeneralDetail();
+                                                          addUpdateFamilyInformation();
                                                         }
                                                       },
                                                       child: Text(
@@ -497,7 +428,7 @@ class _FamilyInformationPageState extends State<FamilyInformationPage> {
                                   scrollOnCollapse: false,
                                   child: ExpandablePanel(
                                     controller:
-                                        viewGeneralDetailPanelController,
+                                        viewFamilyInformationPanelController,
                                     theme: const ExpandableThemeData(
                                       headerAlignment:
                                           ExpandablePanelHeaderAlignment.center,
@@ -506,7 +437,7 @@ class _FamilyInformationPageState extends State<FamilyInformationPage> {
                                     header: Padding(
                                         padding: const EdgeInsets.all(10),
                                         child: Text(
-                                          "View General Detail",
+                                          "View Family Information",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
@@ -521,36 +452,26 @@ class _FamilyInformationPageState extends State<FamilyInformationPage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        if (generalDetailsDto.isNotEmpty)
+                                        if (familyInformationsDto.isNotEmpty)
                                           Row(
                                             children: [
                                               Expanded(
                                                 child: ListView.separated(
                                                   shrinkWrap: true,
                                                   itemCount:
-                                                      generalDetailsDto.length,
+                                                      familyInformationsDto
+                                                          .length,
                                                   itemBuilder:
                                                       (context, int index) {
-                                                    if (generalDetailsDto
+                                                    if (familyInformationsDto
                                                         .isEmpty) {
                                                       return const Center(
                                                           child: Text(
-                                                              'No general detail Found.'));
+                                                              'No family information Found.'));
                                                     }
                                                     return ListTile(
-                                                      title: Text(
-                                                          'Consulted Sources : ${generalDetailsDto[index].consultedSources ?? ''} '
-                                                          '. ',
-                                                          style: const TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold)),
                                                       subtitle: Text(
-                                                          'Trace Efforts : ${generalDetailsDto[index].traceEfforts ?? ''}  '
-                                                          '. Supervisor Comments : ${generalDetailsDto[index].commentsBySupervisor ?? ''} '
-                                                          '. Addional Information : ${generalDetailsDto[index].additionalInfo ?? ''}',
+                                                          'Background : ${familyInformationsDto[index].familyBackground ?? ''}  .',
                                                           style:
                                                               const TextStyle(
                                                                   color: Colors
@@ -562,8 +483,8 @@ class _FamilyInformationPageState extends State<FamilyInformationPage> {
                                                           //IconButton(onPressed: () {}, icon: const Icon(Icons.favorite)),
                                                           IconButton(
                                                               onPressed: () {
-                                                                populateGeneralDetailForm(
-                                                                    generalDetailsDto[
+                                                                populateFamilyInformationForm(
+                                                                    familyInformationsDto[
                                                                         index]);
                                                               },
                                                               icon: const Icon(

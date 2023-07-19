@@ -117,9 +117,32 @@ class VictimService {
   }
 
   Future<ApiResponse> addUpdateVictimDetailOnline(
-      VictimDetailDto victimDetailDto, int? personId) async {
+      VictimDetailDto victimDetailDto) async {
     return await _httpClientService.httpClientPost(
-        "${AppUrl.pcmURL}/Victim/AddUpdate/$personId", victimDetailDto);
+        "${AppUrl.pcmURL}/Victim/AddUpdate", victimDetailDto);
+  }
+
+  Future<ApiResponse> addUpdateVictimDetail(
+      VictimDetailDto victimDetailDto) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse = await addUpdateVictimDetailOnline(victimDetailDto);
+      if (apiResponse.ApiError == null) {
+        ApiResults apiResults = (apiResponse.Data as ApiResults);
+        VictimDetailDto victimDetailDtoResponse =
+            VictimDetailDto.fromJson(apiResults.data);
+        apiResponse.Data = victimDetailDtoResponse;
+        _victimDetailRepository.saveVictimDetailAfterOnline(
+            victimDetailDto,
+            victimDetailDtoResponse.personId!,
+            victimDetailDtoResponse.victimId!);
+      }
+    } on SocketException {
+      _victimDetailRepository.saveVictimDetail(victimDetailDto);
+      apiResponse.Data = _victimDetailRepository
+          .getVictimDetailById(victimDetailDto.victimId!);
+    }
+    return apiResponse;
   }
 
   Future<ApiResponse> getVictimOrganisationDetailById(
@@ -219,5 +242,30 @@ class VictimService {
     return await _httpClientService.httpClientPost(
         "${AppUrl.pcmURL}/Victim/Organisation/AddUpdate",
         victimOrganisationDetailDto);
+  }
+
+  Future<ApiResponse> addUpdateVictimOrganisation(
+      VictimOrganisationDetailDto victimOrganisationDetailDto) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse =
+          await addUpdateVictimOrganisationOnline(victimOrganisationDetailDto);
+      if (apiResponse.ApiError == null) {
+        ApiResults apiResults = (apiResponse.Data as ApiResults);
+        VictimOrganisationDetailDto victimOrganisationDetailDtoResponse =
+            VictimOrganisationDetailDto.fromJson(apiResults.data);
+        apiResponse.Data = victimOrganisationDetailDtoResponse;
+        _victimOrganisationDetailRepository
+            .saveVictimOrganisationDetailNewRecord(victimOrganisationDetailDto,
+                victimOrganisationDetailDtoResponse.victimOrganisationId);
+      }
+    } on SocketException {
+      _victimOrganisationDetailRepository
+          .saveVictimOrganisationDetail(victimOrganisationDetailDto);
+      apiResponse.Data =
+          _victimOrganisationDetailRepository.getVictimOrganisationDetailById(
+              victimOrganisationDetailDto.victimOrganisationId!);
+    }
+    return apiResponse;
   }
 }

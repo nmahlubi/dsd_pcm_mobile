@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/pcm/accepted_worklist_dto.dart';
-import '../pages/assessment/capture_assessment/assessment_details/assessment_detail.dart';
+import '../pages/assessment/capture_assessment/assessment_detail.dart';
 import '../pages/assessment/capture_assessment/care_giver_detail.dart';
 import '../pages/assessment/capture_assessment/child_detail/update_child_detail.dart';
 import '../pages/assessment/capture_assessment/development_assessment.dart';
@@ -13,10 +13,11 @@ import '../pages/assessment/capture_assessment/family_information.dart';
 import '../pages/assessment/capture_assessment/family_member.dart';
 import '../pages/assessment/capture_assessment/general_detail.dart';
 import '../pages/assessment/capture_assessment/health_detail.dart';
-import '../pages/assessment/capture_assessment/offence_details/offence_detail.dart';
+import '../pages/assessment/capture_assessment/offence_detail.dart';
 import '../pages/assessment/capture_assessment/recommendation.dart';
 import '../pages/assessment/capture_assessment/socio_economic.dart';
-import '../pages/assessment/capture_assessment/victim_details/victim_detail.dart';
+import '../pages/assessment/capture_assessment/victim_detail.dart';
+import '../pages/assessment/capture_assessment/victim_organisation.dart';
 import 'create_drawer_body_item_trail.dart';
 
 // ignore: use_key_in_widget_constructors
@@ -219,6 +220,21 @@ class _GoToAssessmentDrawerPageWidgetState extends State<GoToAssessmentDrawer> {
               status: widget.isCompleted),
           createDrawerBodyItemTrail(
               icon: Icons.arrow_right,
+              text: 'Victim Organisation',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const VictimOrganisationPage(),
+                    settings: RouteSettings(
+                      arguments: widget.acceptedWorklistDto,
+                    ),
+                  ),
+                );
+              },
+              status: widget.isCompleted),
+          createDrawerBodyItemTrail(
+              icon: Icons.arrow_right,
               text: 'Development Assessment',
               onTap: () {
                 Navigator.push(
@@ -262,28 +278,6 @@ class _GoToAssessmentDrawerPageWidgetState extends State<GoToAssessmentDrawer> {
                 );
               },
               status: widget.isCompleted)
-          /*createDrawerBodyItemTrail(
-              icon: Icons.arrow_right,
-              text: 'Victim Details',
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/');
-              },
-              status: widget.isCompleted),
-          createDrawerBodyItemTrail(
-              icon: Icons.arrow_right,
-              text: 'Development Assessment',
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/');
-              },
-              status: widget.isCompleted),
-          createDrawerBodyItemTrail(
-              icon: Icons.arrow_right,
-              text: 'Recommendation',
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/');
-              },
-              status: widget.isCompleted),
-          ,*/
         ],
       ),
     );

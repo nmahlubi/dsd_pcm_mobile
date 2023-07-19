@@ -25,7 +25,7 @@ import '../../../../util/shared/loading_overlay.dart';
 import '../../../../util/shared/randon_generator.dart';
 import '../../../../widgets/alert_dialog_messege_widget.dart';
 import '../../../probation_officer/accepted_worklist.dart';
-import '../assessment_details/assessment_detail.dart';
+import '../assessment_detail.dart';
 
 class UpdateChildDetailPage extends StatefulWidget {
   const UpdateChildDetailPage({Key? key}) : super(key: key);
@@ -37,12 +37,12 @@ class UpdateChildDetailPage extends StatefulWidget {
 class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
   SharedPreferences? preferences;
   final _loginFormKey = GlobalKey<FormState>();
+  final scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future<void> initializePreference() async {
     preferences = await SharedPreferences.getInstance();
   }
 
-  final _updateChildFormKey = GlobalKey<FormState>();
   final _personServiceClient = PersonService();
   final _addressServiceClient = AddressService();
   final _lookupTransform = LookupTransform();
@@ -133,21 +133,23 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
   }
 
   assignControlValues(PersonDto personDto) {
-    firstNameController.text = personDto.firstName ?? '';
-    lastNameController.text = personDto.lastName ?? '';
-    identityNumberController.text = personDto.identificationNumber ?? '';
-    generateDateOfBirth();
-    emailAddressController.text = personDto.emailAddress ?? '';
-    mobileNumberController.text = personDto.mobilePhoneNumber ?? '';
-    phoneNumberController.text = personDto.phoneNumber ?? '';
-    identityTypeDropdownButtonFormField = personDto.identificationTypeId;
-    genderDropdownButtonFormField = personDto.genderId;
-    disabilityTypeDropdownButtonFormField = personDto.disabilityTypeId;
-    preferredContactTypeDropdownButtonFormField =
-        personDto.preferredContactTypeId;
-    languageDropdownButtonFormField = personDto.languageId;
-    nationalityDropdownButtonFormField = personDto.nationalityId;
-    maritalStatusDropdownButtonFormField = personDto.maritalStatusId;
+    setState(() {
+      firstNameController.text = personDto.firstName ?? '';
+      lastNameController.text = personDto.lastName ?? '';
+      identityNumberController.text = personDto.identificationNumber ?? '';
+      generateDateOfBirth();
+      emailAddressController.text = personDto.emailAddress ?? '';
+      mobileNumberController.text = personDto.mobilePhoneNumber ?? '';
+      phoneNumberController.text = personDto.phoneNumber ?? '';
+      identityTypeDropdownButtonFormField = personDto.identificationTypeId;
+      genderDropdownButtonFormField = personDto.genderId;
+      disabilityTypeDropdownButtonFormField = personDto.disabilityTypeId;
+      preferredContactTypeDropdownButtonFormField =
+          personDto.preferredContactTypeId;
+      languageDropdownButtonFormField = personDto.languageId;
+      nationalityDropdownButtonFormField = personDto.nationalityId;
+      maritalStatusDropdownButtonFormField = personDto.maritalStatusId;
+    });
   }
 
   generateDateOfBirth() {
@@ -310,11 +312,9 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
     } else {
       overlay.hide();
       showDialogMessage((apiResponse.ApiError as ApiError));
-      return;
     }
   }
 
-  final scaffoldKey = GlobalKey<ScaffoldState>();
   showDialogMessage(ApiError apiError) {
     final messageDialog = ScaffoldMessenger.of(context);
     messageDialog.showSnackBar(

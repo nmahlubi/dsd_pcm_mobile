@@ -12,9 +12,8 @@ import '../../../util/shared/apiresults.dart';
 import '../../../util/shared/loading_overlay.dart';
 import '../../../util/shared/randon_generator.dart';
 import '../../probation_officer/accepted_worklist.dart';
-import 'family/family.dart';
-import 'family_member.dart';
-import 'offence_details/offence_detail.dart';
+import 'family_information.dart';
+import 'offence_detail.dart';
 
 class SocioEconomicPage extends StatefulWidget {
   const SocioEconomicPage({Key? key}) : super(key: key);
@@ -263,7 +262,7 @@ class _SocioEconomicPageState extends State<SocioEconomicPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const FamilyMemberPage(),
+                            builder: (context) => const FamilyInformationPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),

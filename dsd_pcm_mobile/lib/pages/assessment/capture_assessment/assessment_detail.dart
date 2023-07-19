@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../../model/intake/form_of_notification_dto.dart';
-import '../../../../model/pcm/accepted_worklist_dto.dart';
-import '../../../../model/pcm/assesment_register_dto.dart';
-import '../../../../navigation_drawer/go_to_assessment_drawer.dart';
-import '../../../../service/pcm/assessment_service.dart';
-import '../../../../transform_dynamic/transform_lookup.dart';
-import '../../../../util/shared/apierror.dart';
-import '../../../../util/shared/apiresponse.dart';
-import '../../../../util/shared/apiresults.dart';
-import '../../../../util/shared/loading_overlay.dart';
-import '../../../../util/shared/randon_generator.dart';
-import '../../../probation_officer/accepted_worklist.dart';
-import '../child_detail/update_child_detail.dart';
-import '../health_detail.dart';
+import '../../../model/intake/form_of_notification_dto.dart';
+import '../../../model/pcm/accepted_worklist_dto.dart';
+import '../../../model/pcm/assesment_register_dto.dart';
+import '../../../navigation_drawer/go_to_assessment_drawer.dart';
+import '../../../service/pcm/assessment_service.dart';
+import '../../../transform_dynamic/transform_lookup.dart';
+import '../../../util/shared/apierror.dart';
+import '../../../util/shared/apiresponse.dart';
+import '../../../util/shared/apiresults.dart';
+import '../../../util/shared/loading_overlay.dart';
+import '../../../util/shared/randon_generator.dart';
+import '../../probation_officer/accepted_worklist.dart';
+import 'child_detail/update_child_detail.dart';
+import 'health_detail.dart';
 
 class AssessmentDetailPage extends StatefulWidget {
   const AssessmentDetailPage({Key? key}) : super(key: key);
@@ -39,16 +39,17 @@ class _AssessmentDetailPageState extends State<AssessmentDetailPage> {
   final _lookupTransform = LookupTransform();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
-  late AssesmentRegisterDto assesmentRegisterDto = AssesmentRegisterDto();
   late List<FormOfNotificationDto> formOfNotificationsDto = [];
 
   TextEditingController assessmentDateController = TextEditingController();
   TextEditingController assessmentTimeController = TextEditingController();
   int? formOfNotificationDropdownButtonFormField;
+  int? assesmentRegisterId;
 
   @override
   void initState() {
     super.initState();
+    assesmentRegisterId = null;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
         setState(() {
@@ -79,13 +80,7 @@ class _AssessmentDetailPageState extends State<AssessmentDetailPage> {
       overlay.hide();
       setState(() {
         if (apiResponse.Data != null) {
-          assesmentRegisterDto = (apiResponse.Data as AssesmentRegisterDto);
-          assessmentDateController.text =
-              assesmentRegisterDto.assessmentDate.toString();
-          assessmentTimeController.text =
-              assesmentRegisterDto.assessmentTime.toString();
-          formOfNotificationDropdownButtonFormField =
-              assesmentRegisterDto.formOfNotificationId;
+          populateAssesmentDetailForm(apiResponse.Data as AssesmentRegisterDto);
         }
       });
     } else {
@@ -96,8 +91,8 @@ class _AssessmentDetailPageState extends State<AssessmentDetailPage> {
 
   captureAssesmentRegister() async {
     AssesmentRegisterDto requestAssesmentRegisterDto = AssesmentRegisterDto(
-        assesmentRegisterId: assesmentRegisterDto.assesmentRegisterId ??
-            _randomGenerator.getRandomGeneratedNumber(),
+        assesmentRegisterId:
+            assesmentRegisterId ?? _randomGenerator.getRandomGeneratedNumber(),
         pcmCaseId: acceptedWorklistDto.caseId,
         intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
         probationOfficerId: preferences!.getInt('userId')!,
@@ -132,8 +127,8 @@ class _AssessmentDetailPageState extends State<AssessmentDetailPage> {
             )),
       );
     } else {
-      overlay.hide();
       showDialogMessage((apiResponse.ApiError as ApiError));
+      overlay.hide();
     }
   }
 
@@ -149,6 +144,25 @@ class _AssessmentDetailPageState extends State<AssessmentDetailPage> {
     messageDialog.showSnackBar(
       SnackBar(content: Text(message!), backgroundColor: Colors.green),
     );
+  }
+
+  populateAssesmentDetailForm(AssesmentRegisterDto assesmentRegisterDto) {
+    setState(() {
+      assesmentRegisterId = assesmentRegisterDto.assesmentRegisterId;
+      assessmentDateController.text =
+          assesmentRegisterDto.assessmentDate.toString();
+      assessmentTimeController.text =
+          assesmentRegisterDto.assessmentTime.toString();
+      formOfNotificationDropdownButtonFormField =
+          assesmentRegisterDto.formOfNotificationId;
+    });
+  }
+
+  @override
+  void dispose() {
+    assessmentDateController.dispose();
+    assessmentTimeController.dispose();
+    super.dispose();
   }
 
   @override
@@ -493,19 +507,6 @@ class _AssessmentDetailPageState extends State<AssessmentDetailPage> {
                                   //card inf
                                   )))
                     ]),
-
-                    /*
-
- Row(children: [
-                        Expanded(
-                            child: ExpandableNotifier(
-                                child: Padding(
-                          padding: const EdgeInsets.all(0),
-                          child: Card(
-                            clipBehavior: Clip.antiAlias,
-                            child: Column(
-                              children: <Widget>[
-                */
                   ]))),
         ));
   }

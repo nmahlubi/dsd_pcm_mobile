@@ -163,6 +163,11 @@ class CaptureOffenceDetailPage extends StatelessWidget {
                                           width: 1, color: Colors.green),
                                     ),
                                   ),
+                                  isDense: true,
+                                  icon: const Icon(
+                                    Icons.keyboard_arrow_down,
+                                  ),
+                                  isExpanded: true,
                                   items: offenceTypesDto.map((offenceType) {
                                     return DropdownMenuItem(
                                         value: offenceType.offenceTypeId,
