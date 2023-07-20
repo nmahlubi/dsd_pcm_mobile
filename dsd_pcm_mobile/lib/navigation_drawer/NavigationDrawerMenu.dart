@@ -83,6 +83,14 @@ class _NavigationDrawerMenuWidgetState extends State<NavigationDrawerMenu> {
               onTap: () =>
                   Navigator.pushReplacementNamed(context, '/accepted-worklist'),
             ),
+
+          //if (preferences?.getBool('supervisor') == false)
+          createDrawerBodyItem(
+            icon: Icons.inbox,
+            text: 'Diversion',
+            onTap: () => Navigator.pushReplacementNamed(context, '/Diversion'),
+          ),
+
           const Divider(),
           createDrawerBodyItem(
             icon: Icons.logout,
