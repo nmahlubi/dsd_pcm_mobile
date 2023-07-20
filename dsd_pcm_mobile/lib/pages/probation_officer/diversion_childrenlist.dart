@@ -1,5 +1,5 @@
 import 'package:dsd_pcm_mobile/model/pcm/accepted_worklist_dto.dart';
-import 'package:dsd_pcm_mobile/navigation_drawer/NavigationDrawerMenu.dart';
+import 'package:dsd_pcm_mobile/navigation_drawer/navigationDrawerMenu.dart';
 import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/diversion/diversion.dart';
 import 'package:dsd_pcm_mobile/service/pcm/programs_enrolled_service.dart';
 import 'package:dsd_pcm_mobile/service/pcm/worklist_service.dart';
@@ -112,6 +112,26 @@ class _DiversionChildrenListPageState extends State<DiversionChildrenListPage> {
                             style: const TextStyle(color: Colors.grey)),
                         trailing: const Icon(Icons.play_circle_fill_rounded,
                             color: Colors.green),
+                        /*trailing: Text(
+                            acceptedWorklistDto[index]
+                                .arrestTime
+                                .toString(),
+                            style: const TextStyle(color: Colors.red)),*/
+                        /*
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const ViewChildDetailsPage(),
+                              settings: RouteSettings(
+                                arguments: acceptedWorklistDto[index],
+                              ),
+                            ),
+                          );
+                        }
+                        
+                        */
                         onTap: () {
                           Navigator.push(
                             context,
@@ -119,7 +139,8 @@ class _DiversionChildrenListPageState extends State<DiversionChildrenListPage> {
                               builder: (context) =>
                                   const DiversionChildrenListPage(),
                               settings: RouteSettings(
-                                arguments: acceptedWorklistDto[index],
+                                arguments: acceptedWorklistDto[
+                                    index], //////////////////////////////////////////
                               ),
                             ),
                           );
