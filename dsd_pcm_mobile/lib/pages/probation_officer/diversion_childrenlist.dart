@@ -1,6 +1,7 @@
 import 'package:dsd_pcm_mobile/model/pcm/accepted_worklist_dto.dart';
 import 'package:dsd_pcm_mobile/navigation_drawer/navigationDrawerMenu.dart';
 import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/diversion/diversion.dart';
+import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/program_enrolled/session_page.dart';
 import 'package:dsd_pcm_mobile/service/pcm/programs_enrolled_service.dart';
 import 'package:dsd_pcm_mobile/service/pcm/worklist_service.dart';
 import 'package:flutter/material.dart';
@@ -136,8 +137,7 @@ class _DiversionChildrenListPageState extends State<DiversionChildrenListPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  const DiversionChildrenListPage(),
+                              builder: (context) => const SessionPage(),
                               settings: RouteSettings(
                                 arguments: acceptedWorklistDto[
                                     index], //////////////////////////////////////////
