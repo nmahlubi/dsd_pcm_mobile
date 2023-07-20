@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../background_job/background_job_offline.dart';
 import '../../../background_job/background_job_offline_lookup.dart';
 import '../../../background_job/background_job_offline_school.dart';
 import '../../../util/shared/loading_overlay.dart';

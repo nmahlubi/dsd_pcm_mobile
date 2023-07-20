@@ -97,6 +97,7 @@ class CaptureRecommendationPage extends StatelessWidget {
                                     if (value == null) {
                                       return 'Recommandation Type is required';
                                     }
+                                    return null;
                                   },
                                 ))),
                       ],
@@ -130,6 +131,7 @@ class CaptureRecommendationPage extends StatelessWidget {
                                     if (value == null) {
                                       return 'Placement Type is required';
                                     }
+                                    return null;
                                   },
                                 ))),
                       ],

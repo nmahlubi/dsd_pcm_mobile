@@ -180,6 +180,7 @@ class CaptureVictimDetailPage extends StatelessWidget {
                                   if (value == null) {
                                     return 'Gender is required';
                                   }
+                                  return null;
                                 },
                               )),
                         ),

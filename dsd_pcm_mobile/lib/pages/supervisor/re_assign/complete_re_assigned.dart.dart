@@ -20,17 +20,16 @@ import '../../../service/child_notification/offense_type_service.dart';
 import '../../../service/intake/user_service.dart';
 import '../../../service/pcm/endpoint_inbox_service.dart';
 import '../../../service/pcm/worklist_service.dart';
-import '../../../sessions/session.dart';
 import '../../../util/shared/apierror.dart';
 import '../../../util/shared/apiresponse.dart';
 import '../../../util/shared/apiresults.dart';
 import '../../../util/shared/loading_overlay.dart';
-import '../../welcome/dashboard.dart';
 import '../case_details/panels/allocated_probation_officer_panel.dart';
 import '../case_details/panels/child_details_panel.dart';
 import '../case_details/panels/offence_details_panel.dart';
 import '../case_details/panels/saps_details_panel.dart';
 import '../case_details/panels/saps_official_details_panel.dart';
+import 're_assigned_cases.dart';
 
 class CompleteReAssignedCasesPage extends StatefulWidget {
   const CompleteReAssignedCasesPage({Key? key}) : super(key: key);
@@ -43,6 +42,7 @@ class CompleteReAssignedCasesPage extends StatefulWidget {
 class _CompleteReAssignedCasesPageState
     extends State<CompleteReAssignedCasesPage> {
   SharedPreferences? preferences;
+  final _loginFormKey = GlobalKey<FormState>();
 
   Future<void> initializePreference() async {
     preferences = await SharedPreferences.getInstance();
@@ -70,9 +70,7 @@ class _CompleteReAssignedCasesPageState
   late PoliceStationDto? policeStationDto = PoliceStationDto();
   late OffenseTypeDto offenseTypeDto = OffenseTypeDto();
   late List<ProbationOfficerDto> probationOfficersDto = [];
-  final List<Map<String, dynamic>> probationOfficerItemsDto = [];
-  DropdownEditingController<Map<String, dynamic>>? probationOfficerController =
-      DropdownEditingController();
+  int? probationOfficeDropdownButtonFormField;
 
   @override
   void initState() {
@@ -125,18 +123,16 @@ class _CompleteReAssignedCasesPageState
   loadOffenceByCode(String offenseCode) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-
     apiResponse =
         await offenseTypeServiceClient.getOffenceTypeByCode(offenseCode);
-
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
         offenseTypeDto = (apiResponse.Data as OffenseTypeDto);
       });
     } else {
-      showDialogMessage((apiResponse.ApiError as ApiError));
       overlay.hide();
+      showDialogMessage((apiResponse.ApiError as ApiError));
     }
   }
 
@@ -145,25 +141,9 @@ class _CompleteReAssignedCasesPageState
     overlay.show();
     apiResponse = await userServiceClient
         .getProbationOfficersBySupervisorId(supervisorId);
-
     if ((apiResponse.ApiError) == null) {
       setState(() {
         probationOfficersDto = (apiResponse.Data as List<ProbationOfficerDto>);
-        for (var probationOfficer in probationOfficersDto) {
-          Map<String, dynamic> probationOfficerItem = {
-            "fullNames":
-                '${probationOfficer.firstName} ${probationOfficer.lastName}',
-            "usernameDesc":
-                '${probationOfficer.username} ${probationOfficer.persalNo}',
-            "username": probationOfficer.username,
-            "firstName":
-                '${probationOfficer.firstName} ${probationOfficer.lastName}',
-            "lastName": probationOfficer.lastName,
-            "userId": probationOfficer.userId,
-            "persalNo": probationOfficer.persalNo,
-          };
-          probationOfficerItemsDto.add(probationOfficerItem);
-        }
       });
     }
     overlay.hide();
@@ -174,12 +154,9 @@ class _CompleteReAssignedCasesPageState
     final navigator = Navigator.of(context);
     overlay.show();
 
-    ProbationOfficerDto probationOfficerItem =
-        ProbationOfficerDto.fromJson(probationOfficerController!.value);
-
     ReAllocateCase reAllocateCase = ReAllocateCase(
         endPointPOId: allocatedCaseSupervisorDto.endpointPoId,
-        probationOfficerId: probationOfficerItem.userId,
+        probationOfficerId: probationOfficeDropdownButtonFormField,
         modifiedBy: preferences!.getInt('userId')!);
 
     apiResponse =
@@ -188,12 +165,9 @@ class _CompleteReAssignedCasesPageState
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       apiResults = (apiResponse.Data as ApiResults);
-      await showAlertDialogMessage("Successfull", apiResults.message!);
-      Session session = Session();
-
+      showSuccessMessage("Case Successfull Assign");
       navigator.push(
-        MaterialPageRoute(
-            builder: (context) => DashboardPage(session: session, title: '')),
+        MaterialPageRoute(builder: (context) => const ReAssignedCasesPage()),
       );
     } else {
       showDialogMessage((apiResponse.ApiError as ApiError));
@@ -209,25 +183,10 @@ class _CompleteReAssignedCasesPageState
     );
   }
 
-  showAlertDialogMessage(String? headerMessage, String? message) async {
-    await showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(headerMessage!),
-        content: Text(message!),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-            },
-            child: Container(
-              //color: Colors.green,
-              padding: const EdgeInsets.all(14),
-              child: const Text("okay"),
-            ),
-          ),
-        ],
-      ),
+  showSuccessMessage(String? message) {
+    final messageDialog = ScaffoldMessenger.of(context);
+    messageDialog.showSnackBar(
+      SnackBar(content: Text(message!), backgroundColor: Colors.green),
     );
   }
 
@@ -235,101 +194,121 @@ class _CompleteReAssignedCasesPageState
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: () async {
-          return false;
+          return true;
         },
         child: Scaffold(
-          appBar: AppBar(
-            title: Text('Case For: ${childInformationDto.childName}'),
-          ),
-          body: ListView(
-            children: [
-              AllocatedProbationOfficerPanel(
-                  allocatedCaseSupervisorDto: allocatedCaseSupervisorDto),
-              ChildDetailsPanel(
-                  childInformationDto: childInformationDto,
-                  genderDto: genderDto,
-                  countryDto: countryDto,
-                  raceDto: raceDto,
-                  languageDto: languageDto),
-              SapsDetailsPanel(
-                  caseInformationDto: caseInformationDto,
-                  policeStationDto: policeStationDto),
-              SapsOfficialDetailsPanel(sapsInfoDto: sapsInfoDto),
-              OffenceDetailsPanel(offenseTypeDto: offenseTypeDto),
-              Card(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    const ListTile(
-                        title: Text('Probation Officer To Re Allocate')),
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      child: DropdownFormField<Map<String, dynamic>>(
-                        controller: probationOfficerController,
-                        onEmptyActionPressed: () async {},
-                        decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            suffixIcon: Icon(Icons.arrow_drop_down),
-                            labelText: "Select Probation Officer"),
-                        onSaved: (dynamic str) {},
-                        onChanged: (dynamic str) {},
-                        //validator: (dynamic str) {},
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Select probation officer';
-                          }
-                          return null;
-                        },
-                        displayItemFn: (dynamic item) => Text(
-                          (item ?? {})['fullNames'] ?? '',
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                        findFn: (dynamic str) async => probationOfficerItemsDto,
-                        selectedFn: (dynamic item1, dynamic item2) {
-                          if (item1 != null && item2 != null) {
-                            return item1['username'] == item2['username'];
-                          }
-                          return false;
-                        },
-                        filterFn: (dynamic item, str) =>
-                            item['username']
-                                .toLowerCase()
-                                .indexOf(str.toLowerCase()) >=
-                            0,
-                        dropdownItemFn: (dynamic item,
-                                int position,
-                                bool focused,
-                                bool selected,
-                                Function() onTap) =>
-                            ListTile(
-                          title: Text(item['fullNames']),
-                          subtitle: Text(
-                            item['usernameDesc'] ?? '',
-                          ),
-                          tileColor: focused
-                              ? const Color.fromARGB(20, 0, 0, 0)
-                              : Colors.transparent,
-                          onTap: onTap,
+            appBar: AppBar(
+              title: Text('Case For: ${childInformationDto.childName}'),
+            ),
+            body: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 70),
+                child: Form(
+                  key: _loginFormKey,
+                  child: ListView(
+                    children: [
+                      AllocatedProbationOfficerPanel(
+                          allocatedCaseSupervisorDto:
+                              allocatedCaseSupervisorDto),
+                      ChildDetailsPanel(
+                          childInformationDto: childInformationDto,
+                          genderDto: genderDto,
+                          countryDto: countryDto,
+                          raceDto: raceDto,
+                          languageDto: languageDto),
+                      SapsDetailsPanel(
+                          caseInformationDto: caseInformationDto,
+                          policeStationDto: policeStationDto),
+                      SapsOfficialDetailsPanel(sapsInfoDto: sapsInfoDto),
+                      OffenceDetailsPanel(offenseTypeDto: offenseTypeDto),
+                      Card(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            const ListTile(
+                                title:
+                                    Text('Probation Officer To Re Allocate')),
+                            Row(
+                              children: [
+                                Expanded(
+                                    child: Container(
+                                        padding: const EdgeInsets.all(10),
+                                        child: DropdownButtonFormField(
+                                          value:
+                                              probationOfficeDropdownButtonFormField,
+                                          decoration: const InputDecoration(
+                                            hintText: 'Probation Officer',
+                                            labelText: 'Probation Officer',
+                                            border: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  width: 1,
+                                                  color: Colors.green),
+                                            ),
+                                          ),
+                                          isDense: true,
+                                          icon: const Icon(
+                                            Icons.keyboard_arrow_down,
+                                          ),
+                                          isExpanded: true,
+                                          items: probationOfficersDto
+                                              .map((officer) {
+                                            return DropdownMenuItem(
+                                                value: officer.userId,
+                                                child: Text(
+                                                    '${officer.firstName} ${officer.lastName}'));
+                                          }).toList(),
+                                          onChanged: (selectedValue) {
+                                            probationOfficeDropdownButtonFormField =
+                                                selectedValue;
+                                          },
+                                          validator: (value) {
+                                            if (value == null) {
+                                              return 'Probation Officer Required';
+                                            }
+                                            return null;
+                                          },
+                                        ))),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Expanded(
+                                    child: Container(
+                                  height: 70,
+                                  padding:
+                                      const EdgeInsets.fromLTRB(10, 20, 10, 2),
+                                )),
+                                Expanded(
+                                    child: Container(
+                                        height: 70,
+                                        padding: const EdgeInsets.fromLTRB(
+                                            10, 20, 10, 2),
+                                        child: OutlinedButton(
+                                          style: OutlinedButton.styleFrom(
+                                            backgroundColor:
+                                                const Color.fromARGB(
+                                                    255, 23, 22, 22),
+                                            shape: const StadiumBorder(),
+                                            side: const BorderSide(
+                                                width: 2, color: Colors.blue),
+                                          ),
+                                          onPressed: () {
+                                            if (_loginFormKey.currentState!
+                                                .validate()) {
+                                              reAllocateProbationOfficer();
+                                            }
+                                          },
+                                          child: const Text('Complete'),
+                                        ))),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                    Container(
-                        height: 70,
-                        padding: const EdgeInsets.fromLTRB(10, 20, 10, 2),
-                        child: ElevatedButton(
-                          child: const Text('Complete'),
-                          onPressed: () {
-                            reAllocateProbationOfficer();
-                          },
-                        )),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(10),
-              ),
-            ],
-          ),
-        ));
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                      ),
+                    ],
+                  ),
+                ))));
   }
 }

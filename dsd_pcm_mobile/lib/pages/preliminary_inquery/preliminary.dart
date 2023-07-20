@@ -9,7 +9,7 @@ import '../../../util/shared/apiresponse.dart';
 import '../../../util/shared/apiresults.dart';
 import '../../../util/shared/loading_overlay.dart';
 import '../../../util/shared/randon_generator.dart';
-import '../../navigation_drawer/NavigationDrawerMenu.dart';
+import '../../navigation_drawer/navigation_drawer_menu.dart';
 
 class PreliminaryPage extends StatefulWidget {
   const PreliminaryPage({Key? key}) : super(key: key);

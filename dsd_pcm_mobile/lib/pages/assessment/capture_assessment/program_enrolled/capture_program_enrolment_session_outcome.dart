@@ -3,14 +3,16 @@ import 'package:expandable/expandable.dart';
 import 'package:intl/intl.dart';
 
 class CaptureProgramEnrolmentSessionOutcomePage extends StatelessWidget {
+  // ignore: prefer_typing_uninitialized_variables
   final addProgramEnrollmentSessionOutcome;
 
   CaptureProgramEnrolmentSessionOutcomePage(
-      {super.key,required this.addProgramEnrollmentSessionOutcome});
+      {super.key, required this.addProgramEnrollmentSessionOutcome});
 //controls
 
-  final TextEditingController sessionDateController =TextEditingController();
-  final TextEditingController sessionOutcomeOutcomeController = TextEditingController();
+  final TextEditingController sessionDateController = TextEditingController();
+  final TextEditingController sessionOutcomeOutcomeController =
+      TextEditingController();
 
   void dispose() {
     sessionDateController.dispose();
@@ -60,8 +62,6 @@ class CaptureProgramEnrolmentSessionOutcomePage extends StatelessWidget {
                             fontSize: 21),
                       ),
                     ),
-                   
-                   
                     Row(
                       children: [
                         Expanded(
@@ -89,8 +89,7 @@ class CaptureProgramEnrolmentSessionOutcomePage extends StatelessWidget {
                                   String formattedDate =
                                       DateFormat('yyyy-MM-dd').format(
                                           pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
-                                  sessionDateController.text =
-                                      formattedDate;
+                                  sessionDateController.text = formattedDate;
                                   //You can format date as per your need
                                 }
                               },
@@ -114,17 +113,16 @@ class CaptureProgramEnrolmentSessionOutcomePage extends StatelessWidget {
                                 labelText: 'Session Outcome',
                               ),
                               validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Enter Session outcome';
-                                  }
-                                  return null;
-                                },
+                                if (value == null || value.isEmpty) {
+                                  return 'Enter Session outcome';
+                                }
+                                return null;
+                              },
                             ),
                           ),
                         ),
                       ],
                     ),
-                 
                     Row(
                       children: [
                         Expanded(
@@ -146,10 +144,10 @@ class CaptureProgramEnrolmentSessionOutcomePage extends StatelessWidget {
                                   child: const Text('Save'),
                                   onPressed: () {
                                     addProgramEnrollmentSessionOutcome(
-                                        sessionDateController.text
-                                            .toString(),
-                                        sessionOutcomeOutcomeController.text.toString(),
-                                       );
+                                      sessionDateController.text.toString(),
+                                      sessionOutcomeOutcomeController.text
+                                          .toString(),
+                                    );
                                   },
                                 ))),
                       ],

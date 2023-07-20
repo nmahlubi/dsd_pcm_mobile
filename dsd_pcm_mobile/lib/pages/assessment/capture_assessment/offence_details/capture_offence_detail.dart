@@ -1,4 +1,3 @@
-import 'package:dropdown_plus/dropdown_plus.dart';
 import 'package:dsd_pcm_mobile/model/static_model/yes_no_dto.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
@@ -109,6 +108,7 @@ class CaptureOffenceDetailPage extends StatelessWidget {
                                     if (value == null) {
                                       return 'Offence category is required';
                                     }
+                                    return null;
                                   },
                                 ))),
                       ],
@@ -142,6 +142,7 @@ class CaptureOffenceDetailPage extends StatelessWidget {
                                     if (value == null) {
                                       return 'Offence schedule is required';
                                     }
+                                    return null;
                                   },
                                 ))),
                       ],
@@ -182,6 +183,7 @@ class CaptureOffenceDetailPage extends StatelessWidget {
                                     if (value == null) {
                                       return 'Offence type is required';
                                     }
+                                    return null;
                                   },
                                 ))),
                       ],
@@ -264,6 +266,7 @@ class CaptureOffenceDetailPage extends StatelessWidget {
                                   if (value == null) {
                                     return 'Offence type is required';
                                   }
+                                  return null;
                                 },
                               ))),
                     ]),
