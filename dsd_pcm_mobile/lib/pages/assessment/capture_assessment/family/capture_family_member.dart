@@ -225,6 +225,7 @@ class CaptureFamilyMemberPage extends StatelessWidget {
                                     if (value == null) {
                                       return 'Relationship Type is required';
                                     }
+                                    return null;
                                   },
                                 ))),
                       ],

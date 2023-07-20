@@ -56,6 +56,8 @@ class ChildDetailsPanel extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       child: TextFormField(
+                        readOnly: true,
+                        enabled: true,
                         enableInteractiveSelection: false,
                         maxLines: 1,
                         controller: TextEditingController(
@@ -73,6 +75,8 @@ class ChildDetailsPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
+                              readOnly: true,
+                              enabled: true,
                               enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
@@ -88,6 +92,8 @@ class ChildDetailsPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
+                              readOnly: true,
+                              enabled: true,
                               enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
@@ -105,6 +111,8 @@ class ChildDetailsPanel extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       child: TextFormField(
+                        readOnly: true,
+                        enabled: true,
                         enableInteractiveSelection: false,
                         maxLines: 1,
                         controller: TextEditingController(
@@ -118,6 +126,8 @@ class ChildDetailsPanel extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       child: TextFormField(
+                        readOnly: true,
+                        enabled: true,
                         enableInteractiveSelection: false,
                         maxLines: 1,
                         controller: TextEditingController(
@@ -134,6 +144,8 @@ class ChildDetailsPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
+                              readOnly: true,
+                              enabled: true,
                               enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
@@ -149,6 +161,8 @@ class ChildDetailsPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
+                              readOnly: true,
+                              enabled: true,
                               enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
@@ -160,10 +174,16 @@ class ChildDetailsPanel extends StatelessWidget {
                             ),
                           ),
                         ),
+                      ],
+                    ),
+                    Row(
+                      children: [
                         Expanded(
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
+                              readOnly: true,
+                              enabled: true,
                               enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
@@ -173,6 +193,11 @@ class ChildDetailsPanel extends StatelessWidget {
                                 labelText: 'Language',
                               ),
                             ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
                           ),
                         ),
                       ],

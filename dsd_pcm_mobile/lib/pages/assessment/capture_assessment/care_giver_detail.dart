@@ -159,8 +159,8 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
             )),
       );
     } else {
-      overlay.hide();
       showDialogMessage((apiResponse.ApiError as ApiError));
+      overlay.hide();
     }
   }
 
@@ -213,8 +213,8 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
             )),
       );
     } else {
-      overlay.hide();
       showDialogMessage((apiResponse.ApiError as ApiError));
+      overlay.hide();
     }
   }
 

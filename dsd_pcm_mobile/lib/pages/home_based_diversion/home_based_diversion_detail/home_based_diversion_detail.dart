@@ -1,3 +1,4 @@
+import 'package:dsd_pcm_mobile/navigation_drawer/go_to_home_based_diversion_drawer.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -6,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../model/intake/health_status_dto.dart';
 import '../../../model/pcm/accepted_worklist_dto.dart';
 import '../../../model/pcm/medical_health_detail_dto.dart';
+import '../../../navigation_drawer/navigation_drawer_menu.dart';
 import '../../../navigation_drawer/go_to_assessment_drawer.dart';
 import '../../../service/pcm/medical_health_details_service.dart';
 import '../../../transform_dynamic/transform_lookup.dart';
@@ -14,17 +16,18 @@ import '../../../util/shared/apiresponse.dart';
 import '../../../util/shared/apiresults.dart';
 import '../../../util/shared/loading_overlay.dart';
 import '../../../util/shared/randon_generator.dart';
-import '../../navigation_drawer/navigation_drawer_menu.dart';
-import 'home_based_diversion_detail/home_based_diversion_detail.dart';
+import '../home_based_diversion.dart';
 
-class HomeBasedDiversionPage extends StatefulWidget {
-  const HomeBasedDiversionPage({Key? key}) : super(key: key);
+class HomeBasedDiversionDetailPage extends StatefulWidget {
+  const HomeBasedDiversionDetailPage({Key? key}) : super(key: key);
 
   @override
-  State<HomeBasedDiversionPage> createState() => _HomeBasedDiversionPageState();
+  State<HomeBasedDiversionDetailPage> createState() =>
+      _HomeBasedDiversionDetailPageState();
 }
 
-class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
+class _HomeBasedDiversionDetailPageState
+    extends State<HomeBasedDiversionDetailPage> {
   SharedPreferences? preferences;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final _loginFormKey = GlobalKey<FormState>();
@@ -113,9 +116,34 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
         child: Scaffold(
             key: scaffoldKey,
             appBar: AppBar(
-              title: const Text("Diversion & HBS"),
+              title: const Text("Diversion & HBS - Child Details"),
+              leading: IconButton(
+                icon: const Icon(Icons.offline_pin_rounded),
+                onPressed: () {
+                  if (scaffoldKey.currentState!.isDrawerOpen) {
+                    scaffoldKey.currentState!.closeDrawer();
+                    //close drawer, if drawer is open
+                  } else {
+                    scaffoldKey.currentState!.openDrawer();
+                    //open drawer, if drawer is closed
+                  }
+                },
+              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.home),
+                  tooltip: 'Home Based Diversion',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const HomeBasedDiversionPage()),
+                    );
+                  },
+                ),
+              ],
             ),
-            drawer: const NavigationDrawerMenu(),
+            drawer: const GoToHomeBasedDiversionDrawer(),
             body: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 70),
                 child: Form(
@@ -159,54 +187,6 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(8),
-                                              ),
-                                            ),
-                                            Expanded(
-                                                child: Container(
-                                                    height: 70,
-                                                    padding: const EdgeInsets
-                                                            .fromLTRB(
-                                                        10, 20, 10, 2),
-                                                    child: OutlinedButton(
-                                                      style: OutlinedButton
-                                                          .styleFrom(
-                                                        minimumSize: const Size
-                                                            .fromHeight(10),
-                                                        backgroundColor:
-                                                            const Color
-                                                                    .fromARGB(
-                                                                255,
-                                                                244,
-                                                                248,
-                                                                246),
-                                                        shape:
-                                                            const StadiumBorder(),
-                                                        side: const BorderSide(
-                                                            width: 2,
-                                                            color: Colors.blue),
-                                                      ),
-                                                      onPressed: () {
-                                                        Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  const HomeBasedDiversionDetailPage()),
-                                                        );
-                                                      },
-                                                      child: const Text(
-                                                          'Child Details',
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.blue)),
-                                                    ))),
-                                          ],
-                                        ),
                                         if (medicalHealthDetailsDto.isNotEmpty)
                                           Row(
                                             children: [
