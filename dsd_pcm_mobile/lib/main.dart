@@ -46,6 +46,8 @@ import 'domain/repository/school/school_type_repository.dart';
 import 'domain/repository/worklist/accepted_worklist_repository.dart';
 import 'domain/repository/lookup/health_status_repository.dart';
 import 'pages/authenticate/login_authenticate.dart';
+import 'pages/home_based_diversion/home_based_diversion.dart';
+import 'pages/preliminary_inquery/preliminary.dart';
 import 'pages/probation_officer/accepted_worklist.dart';
 import 'pages/probation_officer/allocated_case.dart';
 import 'pages/supervisor/notification_cases.dart';
@@ -243,7 +245,6 @@ class MyApp extends StatelessWidget {
       onSessionTimeExpired: () {
         if (globalNavigatorKey.currentContext != null &&
             session.enableLoginPage == true) {
-          print('Session Expired');
           ScaffoldMessenger.of(globalNavigatorKey.currentContext!)
               .showSnackBar(SnackBar(
                   content: Container(
@@ -275,7 +276,9 @@ class MyApp extends StatelessWidget {
           '/accepted-worklist': (context) => const AcceptedWorklistPage(),
           '/re-assigned-cases': (context) => const ReAssignedCasesPage(),
           '/overdue-cases': (context) => const OverdueCasesPage(),
-          '/sync-manual-offline': (context) => const SyncingOfflineManualPage()
+          '/sync-manual-offline': (context) => const SyncingOfflineManualPage(),
+          '/preliminary': (context) => const PreliminaryPage(),
+          '/home-based': (context) => const HomeBasedDiversionPage()
         },
       ),
     );
