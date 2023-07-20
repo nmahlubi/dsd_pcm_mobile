@@ -26,6 +26,7 @@ import '../../model/intake/preferred_contact_type_dto.dart';
 import '../../model/intake/recommendation_type_dto.dart';
 import '../../model/intake/relationship_type_dto.dart';
 import '../../model/intake/placement_type_dto.dart';
+import '../../model/pcm/preliminaryStatus_dto.dart';
 import '../../util/app_url.dart';
 import '../../util/auth_intercept/authorization_interceptor.dart';
 import '../../util/shared/apierror.dart';
@@ -505,6 +506,28 @@ class LookUpService {
     } on SocketException {
       apiResponse.Data =
           formOfNotificationRepository.getAllFormOfNotifications();
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> getPreliminaryStatus() async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      final response = await client
+          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/PreliminaryStatus"));
+
+      switch (response.statusCode) {
+        case 200:
+          apiResponse.Data = (json.decode(response.body) as List)
+              .map((data) => PreliminaryStatusDto.fromJson(data))
+              .toList();
+          break;
+        default:
+          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+          break;
+      }
+    } on SocketException {
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
     }
     return apiResponse;
   }
