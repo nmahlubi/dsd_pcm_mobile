@@ -58,26 +58,6 @@ class WorklistService {
     return apiResponse;
   }
 
-/*
-  Future<ApiResponse> getAcceptedWorklistByProbationOfficerOnline(
-      int? probationOfficerId) async {
-    ApiResponse apiResponse = ApiResponse();
-    final response = await client.get(Uri.parse(
-        "${AppUrl.pcmURL}/Worklist/Accepted/All/$probationOfficerId"));
-    switch (response.statusCode) {
-      case 200:
-        apiResponse.Data = (json.decode(response.body) as List)
-            .map((data) => AcceptedWorklistDto.fromJson(data))
-            .toList();
-        break;
-      default:
-        apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
-        break;
-    }
-    return apiResponse;
-  }
-  */
-
   Future<ApiResponse> getAcceptedWorklistByProbationOfficer(
       int? probationOfficerId) async {
     ApiResponse apiResponse = ApiResponse();
@@ -112,6 +92,31 @@ class WorklistService {
           ApiResults apiResults =
               ApiResults.fromJson(json.decode(response.body));
           apiResponse.Data = apiResults;
+          break;
+        default:
+          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+          break;
+      }
+    } on SocketException {
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
+  }
+
+//for preliminary details
+  Future<ApiResponse> getCompleteTaskAllocatedToProbationOfficer(
+      int? probationOfficerId) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      final response = await client.get(Uri.parse(
+          "${AppUrl.pcmURL}/Worklist/CompletedAssessment/All/$probationOfficerId"));
+      switch (response.statusCode) {
+        case 200:
+          List<AcceptedWorklistDto> acceptedWorklistDtoResponse =
+              (json.decode(response.body) as List)
+                  .map((data) => AcceptedWorklistDto.fromJson(data))
+                  .toList();
+          apiResponse.Data = acceptedWorklistDtoResponse;
           break;
         default:
           apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));

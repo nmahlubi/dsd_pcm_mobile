@@ -87,8 +87,8 @@ class _NavigationDrawerMenuWidgetState extends State<NavigationDrawerMenu> {
           createDrawerBodyItem(
             icon: Icons.inbox,
             text: 'Preliminary',
-            onTap: () =>
-                Navigator.pushReplacementNamed(context, '/preliminary'),
+            onTap: () => Navigator.pushReplacementNamed(
+                context, '/childrenCaseListPage'),
           ),
           //if (preferences?.getBool('supervisor') == false)
           createDrawerBodyItem(

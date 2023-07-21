@@ -64,25 +64,6 @@ class _PreliminaryPageState extends State<PreliminaryPage> {
     overlay.hide();
   }
 
-/*
-  loadMedicalHealthDetailsByIntakeAssessmentId(int? intakeAssessmentId) async {
-    final overlay = LoadingOverlay.of(context);
-    overlay.show();
-    apiResponse = await _medicalHealthDetailsServiceClient
-        .getMedicalHealthDetailsByAssessmentId(intakeAssessmentId);
-    if ((apiResponse.ApiError) == null) {
-      overlay.hide();
-      setState(() {
-        medicalHealthDetailsDto =
-            (apiResponse.Data as List<MedicalHealthDetailDto>);
-      });
-    } else {
-      overlay.hide();
-      showDialogMessage((apiResponse.ApiError as ApiError));
-    }
-  }
-  */
-
   showDialogMessage(ApiError apiError) {
     final messageDialog = ScaffoldMessenger.of(context);
     messageDialog.showSnackBar(
