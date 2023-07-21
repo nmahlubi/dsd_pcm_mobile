@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../navigation_drawer/navigationDrawerMenu.dart';
+import '../../navigation_drawer/navigation_drawer_menu.dart';
 import 'sync_offline_pages/lookup_sync_offline_manual.dart';
 import 'sync_offline_pages/worklist_sync_offline_manual.dart';
 
