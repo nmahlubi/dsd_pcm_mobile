@@ -1,3 +1,4 @@
+import 'package:dsd_pcm_mobile/model/pcm/home_based_supervision_dto.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -15,6 +16,7 @@ import '../../../util/shared/apiresults.dart';
 import '../../../util/shared/loading_overlay.dart';
 import '../../../util/shared/randon_generator.dart';
 import '../../navigation_drawer/navigation_drawer_menu.dart';
+import '../../service/pcm/home_based_supervision_service.dart';
 import 'home_based_diversion_detail/home_based_diversion_detail.dart';
 
 class HomeBasedDiversionPage extends StatefulWidget {
@@ -36,7 +38,7 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
   late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
   final _lookupTransform = LookupTransform();
   final _randomGenerator = RandomGenerator();
-  //final _medicalHealthDetailsServiceClient = MedicalHealthDetailsService();
+  final _homeBasedSupervisionServiceClient = HomeBasedSupervisionService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
   /*late MedicalHealthDetailDto captureMedicalHealthDetailDto =
@@ -44,7 +46,7 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
   late List<HealthStatusDto> healthStatusesDto = [];
   
   */
-  late List<MedicalHealthDetailDto> medicalHealthDetailsDto = [];
+  late List<HomeBasedSupervionDto> homeBasedSupervionDto= [];
 
   ExpandableController viewMedicalInfoPanelController = ExpandableController();
 
@@ -57,8 +59,9 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
       initializePreference().whenComplete(() {
         setState(() {
           loadLookUpTransformer();
-          //loadMedicalHealthDetailsByIntakeAssessmentId(
-          // acceptedWorklistDto.intakeAssessmentId);
+          loadHomeBasedSupervisionDetailsByIntakeAssessmentId(
+           acceptedWorklistDto.intakeAssessmentId,
+           );
         });
       });
     });
@@ -71,24 +74,24 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
     overlay.hide();
   }
 
-/*
-  loadMedicalHealthDetailsByIntakeAssessmentId(int? intakeAssessmentId) async {
+
+  loadHomeBasedSupervisionDetailsByIntakeAssessmentId(int? intakeAssessmentId) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await _medicalHealthDetailsServiceClient
-        .getMedicalHealthDetailsByAssessmentId(intakeAssessmentId);
+    apiResponse = await _homeBasedSupervisionServiceClient
+        .getHomeBasedSupervisionDetailsByAssessmentId(intakeAssessmentId,preferences!.getInt('userId')!);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        medicalHealthDetailsDto =
-            (apiResponse.Data as List<MedicalHealthDetailDto>);
+        homeBasedSupervionDto =
+            (apiResponse.Data as List<HomeBasedSupervionDto>);
       });
     } else {
       overlay.hide();
       showDialogMessage((apiResponse.ApiError as ApiError));
     }
   }
-  */
+  
 
   showDialogMessage(ApiError apiError) {
     final messageDialog = ScaffoldMessenger.of(context);
@@ -144,7 +147,7 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
                                     header: Padding(
                                         padding: const EdgeInsets.all(10),
                                         child: Text(
-                                          "List Medical Health",
+                                          "List Home Based Supervision",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
@@ -159,7 +162,7 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        Row(
+                                        /*Row(
                                           children: [
                                             Expanded(
                                               child: Container(
@@ -206,27 +209,27 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
                                                                   Colors.blue)),
                                                     ))),
                                           ],
-                                        ),
-                                        if (medicalHealthDetailsDto.isNotEmpty)
+                                        ),*/
+                                        if (homeBasedSupervionDto.isNotEmpty)
                                           Row(
                                             children: [
                                               Expanded(
                                                 child: ListView.separated(
                                                   shrinkWrap: true,
                                                   itemCount:
-                                                      medicalHealthDetailsDto
+                                                      homeBasedSupervionDto
                                                           .length,
                                                   itemBuilder:
                                                       (context, int index) {
-                                                    if (medicalHealthDetailsDto
+                                                    if (homeBasedSupervionDto
                                                         .isEmpty) {
                                                       return const Center(
                                                           child: Text(
-                                                              'No medical health Found.'));
+                                                              'No home Based Supervision List Found.'));
                                                     }
                                                     return ListTile(
                                                       title: Text(
-                                                          'Health Status : ${medicalHealthDetailsDto[index].healthStatusDto?.description}',
+                                                          'Court Type : ${homeBasedSupervionDto[index].courtType}',
                                                           style: const TextStyle(
                                                               color:
                                                                   Colors.black,
@@ -234,9 +237,8 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
                                                                   FontWeight
                                                                       .bold)),
                                                       subtitle: Text(
-                                                          'Allergy : ${medicalHealthDetailsDto[index].allergies}. '
-                                                          'Injuries : ${medicalHealthDetailsDto[index].injuries}. '
-                                                          'Medication : ${medicalHealthDetailsDto[index].medication}.',
+                                                          'Placement Date : ${homeBasedSupervionDto[index].placementDate}. '
+                                                          'SupervisorId : ${homeBasedSupervionDto[index].supervisorId}.',
                                                           style:
                                                               const TextStyle(
                                                                   color: Colors
@@ -249,7 +251,7 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
                                                           IconButton(
                                                               onPressed: () {
                                                                 /*populateHealthDetailForm(
-                                                                    medicalHealthDetailsDto[
+                                                                    homeBasedSupervionDto[
                                                                         index]);*/
                                                               },
                                                               icon: const Icon(
