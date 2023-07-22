@@ -12,6 +12,7 @@ import '../../../util/shared/apiresults.dart';
 import '../../../util/shared/loading_overlay.dart';
 import '../../../util/shared/randon_generator.dart';
 import '../../probation_officer/accepted_worklist.dart';
+import 'complete_assessment.dart';
 import 'development_assessment.dart';
 
 class GeneralDetailPage extends StatefulWidget {
@@ -226,16 +227,16 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
                       child: const Icon(Icons.arrow_back)),
                   FloatingActionButton(
                       onPressed: () {
-                        /*Navigator.push(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                const DevelopmentAssessmentPage(),
+                                const CompleteAssessmentPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),
                           ),
-                        );*/
+                        );
                       },
                       heroTag: null,
                       child: const Icon(Icons.arrow_forward)),

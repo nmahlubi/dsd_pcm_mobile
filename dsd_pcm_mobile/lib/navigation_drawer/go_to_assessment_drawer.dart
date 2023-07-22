@@ -6,6 +6,7 @@ import '../model/pcm/accepted_worklist_dto.dart';
 import '../pages/assessment/capture_assessment/assessment_detail.dart';
 import '../pages/assessment/capture_assessment/care_giver_detail.dart';
 import '../pages/assessment/capture_assessment/child_detail/update_child_detail.dart';
+import '../pages/assessment/capture_assessment/complete_assessment.dart';
 import '../pages/assessment/capture_assessment/development_assessment.dart';
 import '../pages/assessment/capture_assessment/educational/education.dart';
 import '../pages/assessment/capture_assessment/family/family.dart';
@@ -271,6 +272,21 @@ class _GoToAssessmentDrawerPageWidgetState extends State<GoToAssessmentDrawer> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const GeneralDetailPage(),
+                    settings: RouteSettings(
+                      arguments: widget.acceptedWorklistDto,
+                    ),
+                  ),
+                );
+              },
+              status: widget.isCompleted),
+          createDrawerBodyItemTrail(
+              icon: Icons.arrow_right,
+              text: 'Complete Assessment',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CompleteAssessmentPage(),
                     settings: RouteSettings(
                       arguments: widget.acceptedWorklistDto,
                     ),

@@ -48,8 +48,6 @@ class _RecommandationPageState extends State<RecommandationPage> {
 
   ExpandableController captureRecommandationPanelController =
       ExpandableController();
-  ExpandableController viewRecommandationPanelController =
-      ExpandableController();
 
   final TextEditingController commentsForRecommendationController =
       TextEditingController();
@@ -62,10 +60,8 @@ class _RecommandationPageState extends State<RecommandationPage> {
   void initState() {
     super.initState();
     captureRecommandationPanelController =
-        ExpandableController(initialExpanded: false);
-    viewRecommandationPanelController =
         ExpandableController(initialExpanded: true);
-    labelButtonAddUpdate = 'Add Medical';
+    labelButtonAddUpdate = 'Add Recommandation';
     recommandationId = null;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
@@ -93,11 +89,22 @@ class _RecommandationPageState extends State<RecommandationPage> {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
     apiResponse = await _recommendationsServiceClient
-        .getRecommendationsByIntakeAssessmentId(intakeAssessmentId);
+        .getRecommendationByIntakeAssessmentId(intakeAssessmentId);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        recommendationsDto = (apiResponse.Data as List<RecommendationDto>);
+        if (apiResponse.Data != null) {
+          RecommendationDto recommendationDto =
+              (apiResponse.Data as RecommendationDto);
+          labelButtonAddUpdate = 'Update Recommandation';
+          recommandationId = recommendationDto.recommendationId;
+          commentsForRecommendationController.text =
+              recommendationDto.commentsForRecommendation!;
+          recommendationTypeDropdownButtonFormField =
+              recommendationDto.recommendationTypeId;
+          placementTypeDropdownButtonFormField =
+              recommendationDto.placementTypeId;
+        }
       });
     } else {
       overlay.hide();
@@ -165,6 +172,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
     );
   }
 
+/*
   newMRecommandation() {
     setState(() {
       labelButtonAddUpdate = 'Add Recommandation';
@@ -174,7 +182,9 @@ class _RecommandationPageState extends State<RecommandationPage> {
       recommandationId = null;
     });
   }
+  */
 
+/*
   populateRecommandationForm(RecommendationDto recommendationDto) {
     setState(() {
       recommandationId = recommendationDto.recommendationId;
@@ -190,6 +200,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
       placementTypeDropdownButtonFormField = recommendationDto.placementTypeId;
     });
   }
+  */
 
   @override
   void dispose() {
@@ -319,48 +330,6 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(8),
-                                              ),
-                                            ),
-                                            Expanded(
-                                                child: Container(
-                                                    height: 70,
-                                                    padding: const EdgeInsets
-                                                            .fromLTRB(
-                                                        10, 20, 10, 2),
-                                                    child: OutlinedButton(
-                                                      style: OutlinedButton
-                                                          .styleFrom(
-                                                        minimumSize: const Size
-                                                            .fromHeight(10),
-                                                        backgroundColor:
-                                                            const Color
-                                                                    .fromARGB(
-                                                                255,
-                                                                244,
-                                                                248,
-                                                                246),
-                                                        shape:
-                                                            const StadiumBorder(),
-                                                        side: const BorderSide(
-                                                            width: 2,
-                                                            color: Colors.blue),
-                                                      ),
-                                                      onPressed: () {
-                                                        newMRecommandation();
-                                                      },
-                                                      child: const Text('New',
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.blue)),
-                                                    ))),
-                                          ],
-                                        ),
                                         Row(
                                           children: [
                                             Expanded(
@@ -556,7 +525,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
                           ),
                         )))
                       ]),
-                      Row(children: [
+                      /*Row(children: [
                         Expanded(
                             child: ExpandableNotifier(
                                 child: Padding(
@@ -680,7 +649,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
                             ),
                           ),
                         ))),
-                      ]),
+                      ]),*/
                     ],
                   ),
                 ))));
