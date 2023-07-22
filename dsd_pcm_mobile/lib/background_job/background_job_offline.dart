@@ -9,6 +9,7 @@ import 'syncing/assessment_sync/family_member_sync.dart';
 import 'syncing/assessment_sync/general_detail_sync.dart';
 import 'syncing/assessment_sync/intake_sync/person_education_sync.dart';
 import 'syncing/assessment_sync/offence_details_sync.dart';
+import 'syncing/assessment_sync/recommandation_sync.dart';
 import 'syncing/assessment_sync/socio_economic_sync.dart';
 import 'syncing/assessment_sync/victim_details_sync.dart';
 import 'syncing/worklist_sync/accepted_worklist_sync.dart';
@@ -34,6 +35,7 @@ class BackgroundJobOffline {
   final _developmentAssessmentSync = DevelopmentAssessmentSync();
   final _personEducationSync = PersonEducationSync();
   final _assessmentRegisterSync = AssessmentRegisterSync();
+  final _recommandationSync = RecommandationSync();
 
   Future<void> startRunningBackgroundSyncJob() async {
     var userToken = await _authenticateRepository.getAllAuthTokens();
@@ -113,6 +115,8 @@ class BackgroundJobOffline {
     await _personEducationSync.syncPersonEducationHealth(acceptedWork.personId);
     await _assessmentRegisterSync.syncAssesmentRegister(
         acceptedWork.intakeAssessmentId, acceptedWork.caseId);
+    await _recommandationSync
+        .syncRecommandationByAssessment(acceptedWork.intakeAssessmentId);
   }
 }
   
