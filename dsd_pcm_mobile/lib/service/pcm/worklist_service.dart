@@ -102,4 +102,21 @@ class WorklistService {
     }
     return apiResponse;
   }
+   Future<ApiResponse> getCompletedWorklistByProbationOfficerOnline(
+      int? probationOfficerId) async {
+    ApiResponse apiResponse = ApiResponse();
+    final response = await client.get(Uri.parse(
+        "${AppUrl.pcmURL}/Worklist/CompletedAssessment/All/$probationOfficerId"));
+    switch (response.statusCode) {
+      case 200:
+        apiResponse.Data = (json.decode(response.body) as List)
+            .map((data) => AcceptedWorklistDto.fromJson(data))
+            .toList();
+        break;
+      default:
+        apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+        break;
+    }
+    return apiResponse;
+  }
 }

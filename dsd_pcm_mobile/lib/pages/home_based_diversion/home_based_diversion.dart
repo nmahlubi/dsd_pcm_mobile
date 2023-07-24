@@ -17,6 +17,7 @@ import '../../../util/shared/loading_overlay.dart';
 import '../../../util/shared/randon_generator.dart';
 import '../../navigation_drawer/navigation_drawer_menu.dart';
 import '../../service/pcm/home_based_supervision_service.dart';
+import '../../service/pcm/worklist_service.dart';
 import 'home_based_diversion_detail/home_based_diversion_detail.dart';
 
 class HomeBasedDiversionPage extends StatefulWidget {
@@ -34,20 +35,10 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
   Future<void> initializePreference() async {
     preferences = await SharedPreferences.getInstance();
   }
-
-  late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
-  final _lookupTransform = LookupTransform();
-  final _randomGenerator = RandomGenerator();
-  final _homeBasedSupervisionServiceClient = HomeBasedSupervisionService();
+ final _worklistServiceClient = WorklistService();
   late ApiResponse apiResponse = ApiResponse();
-  late ApiResults apiResults = ApiResults();
-  /*late MedicalHealthDetailDto captureMedicalHealthDetailDto =
-      MedicalHealthDetailDto();
-  late List<HealthStatusDto> healthStatusesDto = [];
-  
-  */
-  late List<HomeBasedSupervionDto> homeBasedSupervionDto= [];
-
+  late List<AcceptedWorklistDto> acceptedWorklistDto = [];
+  String searchString = "";
   ExpandableController viewMedicalInfoPanelController = ExpandableController();
 
   @override
@@ -59,9 +50,7 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
       initializePreference().whenComplete(() {
         setState(() {
           loadLookUpTransformer();
-          loadHomeBasedSupervisionDetailsByIntakeAssessmentId(
-           acceptedWorklistDto.intakeAssessmentId,
-           );
+         loadCompletedCasesByProbationOfficer();
         });
       });
     });
@@ -75,16 +64,16 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
   }
 
 
-  loadHomeBasedSupervisionDetailsByIntakeAssessmentId(int? intakeAssessmentId) async {
+  loadCompletedCasesByProbationOfficer() async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await _homeBasedSupervisionServiceClient
-        .getHomeBasedSupervisionDetailsByAssessmentId(intakeAssessmentId,preferences!.getInt('userId')!);
+    apiResponse = await _worklistServiceClient
+        .getCompletedWorklistByProbationOfficerOnline(preferences!.getInt('userId')!);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        homeBasedSupervionDto =
-            (apiResponse.Data as List<HomeBasedSupervionDto>);
+        acceptedWorklistDto =
+            (apiResponse.Data as List<AcceptedWorklistDto>);
       });
     } else {
       overlay.hide();
@@ -119,187 +108,71 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
               title: const Text("Diversion & HBS"),
             ),
             drawer: const NavigationDrawerMenu(),
-            body: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 0, 0, 70),
-                child: Form(
-                  key: _loginFormKey,
-                  child: ListView(
-                    children: [
-                      Row(children: [
-                        Expanded(
-                            child: ExpandableNotifier(
-                                child: Padding(
-                          padding: const EdgeInsets.all(2),
-                          child: Card(
-                            clipBehavior: Clip.antiAlias,
-                            child: Column(
-                              children: <Widget>[
-                                ScrollOnExpand(
-                                  scrollOnExpand: true,
-                                  scrollOnCollapse: false,
-                                  child: ExpandablePanel(
-                                    controller: viewMedicalInfoPanelController,
-                                    theme: const ExpandableThemeData(
-                                      headerAlignment:
-                                          ExpandablePanelHeaderAlignment.center,
-                                      tapBodyToCollapse: true,
-                                    ),
-                                    header: Padding(
-                                        padding: const EdgeInsets.all(10),
-                                        child: Text(
-                                          "List Home Based Supervision",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyLarge,
-                                        )),
-                                    collapsed: const Text(
-                                      '',
-                                      softWrap: true,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    expanded: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        /*Row(
-                                          children: [
-                                            Expanded(
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(8),
-                                              ),
-                                            ),
-                                            Expanded(
-                                                child: Container(
-                                                    height: 70,
-                                                    padding: const EdgeInsets
-                                                            .fromLTRB(
-                                                        10, 20, 10, 2),
-                                                    child: OutlinedButton(
-                                                      style: OutlinedButton
-                                                          .styleFrom(
-                                                        minimumSize: const Size
-                                                            .fromHeight(10),
-                                                        backgroundColor:
-                                                            const Color
-                                                                    .fromARGB(
-                                                                255,
-                                                                244,
-                                                                248,
-                                                                246),
-                                                        shape:
-                                                            const StadiumBorder(),
-                                                        side: const BorderSide(
-                                                            width: 2,
-                                                            color: Colors.blue),
-                                                      ),
-                                                      onPressed: () {
-                                                        Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  const HomeBasedDiversionDetailPage()),
-                                                        );
-                                                      },
-                                                      child: const Text(
-                                                          'Child Details',
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.blue)),
-                                                    ))),
-                                          ],
-                                        ),*/
-                                        if (homeBasedSupervionDto.isNotEmpty)
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: ListView.separated(
-                                                  shrinkWrap: true,
-                                                  itemCount:
-                                                      homeBasedSupervionDto
-                                                          .length,
-                                                  itemBuilder:
-                                                      (context, int index) {
-                                                    if (homeBasedSupervionDto
-                                                        .isEmpty) {
-                                                      return const Center(
-                                                          child: Text(
-                                                              'No home Based Supervision List Found.'));
-                                                    }
-                                                    return ListTile(
-                                                      title: Text(
-                                                          'Court Type : ${homeBasedSupervionDto[index].courtType}',
-                                                          style: const TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold)),
-                                                      subtitle: Text(
-                                                          'Placement Date : ${homeBasedSupervionDto[index].placementDate}. '
-                                                          'SupervisorId : ${homeBasedSupervionDto[index].supervisorId}.',
-                                                          style:
-                                                              const TextStyle(
-                                                                  color: Colors
-                                                                      .black)),
-                                                      trailing: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          //IconButton(onPressed: () {}, icon: const Icon(Icons.favorite)),
-                                                          IconButton(
-                                                              onPressed: () {
-                                                                /*populateHealthDetailForm(
-                                                                    homeBasedSupervionDto[
-                                                                        index]);*/
-                                                              },
-                                                              icon: const Icon(
-                                                                  Icons.edit,
-                                                                  color: Colors
-                                                                      .blue)),
-                                                          /*IconButton(
-                                                              onPressed: () {},
-                                                              icon: const Icon(
-                                                                  Icons.delete,
-                                                                  color: Colors
-                                                                      .red)),*/
-                                                        ],
-                                                      ),
-                                                    );
-                                                  },
-                                                  separatorBuilder:
-                                                      (context, index) {
-                                                    return const Divider(
-                                                        thickness: 1);
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          )
-                                      ],
-                                    ),
-                                    builder: (_, collapsed, expanded) {
-                                      return Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 10, right: 10, bottom: 10),
-                                        child: Expandable(
-                                          collapsed: collapsed,
-                                          expanded: expanded,
-                                          theme: const ExpandableThemeData(
-                                              crossFadePoint: 0),
-                                        ),
-                                      );
-                                    },
+            body: Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      searchString = value.toLowerCase();
+                    });
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'Search',
+                    suffixIcon: Icon(Icons.search),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: acceptedWorklistDto.length,
+                  itemBuilder: (context, int index) {
+                    if (acceptedWorklistDto.isEmpty) {
+                      return const Center(child: Text('No completed worklist Found.'));
+                    }
+                    return acceptedWorklistDto[index]
+                            .childName!
+                            .toLowerCase()
+                            .contains(searchString)
+                        ? ListTile(
+                            title: Text(acceptedWorklistDto[index]
+                                .childName
+                                .toString()),
+                            subtitle: Text(
+                                acceptedWorklistDto[index]
+                                    .dateAccepted
+                                    .toString(),
+                                style: const TextStyle(color: Colors.grey)),
+                            trailing: const Icon(Icons.play_circle_fill_rounded,
+                                color: Colors.green),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                       const HomeBasedDiversionDetailPage(),
+                                  settings: RouteSettings(
+                                    arguments: acceptedWorklistDto[index],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        ))),
-                      ]),
-                    ],
-                  ),
-                ))));
+                              );
+                            })
+                        : Container();
+                  },
+                  separatorBuilder: (context, index) {
+                    return acceptedWorklistDto[index]
+                            .childName!
+                            .toLowerCase()
+                            .contains(searchString)
+                        ? const Divider(thickness: 1)
+                        : Container();
+                  },
+                ),
+              ),
+            ],
+          ),
+        ));
   }
 }
