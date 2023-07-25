@@ -102,7 +102,8 @@ class WorklistService {
     }
     return apiResponse;
   }
-   Future<ApiResponse> getCompletedWorklistByProbationOfficerOnline(
+
+  Future<ApiResponse> getCompletedWorklistByProbationOfficerOnline(
       int? probationOfficerId) async {
     ApiResponse apiResponse = ApiResponse();
     final response = await client.get(Uri.parse(
@@ -116,6 +117,30 @@ class WorklistService {
       default:
         apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
         break;
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> getCompletedTaskAllocatedToProbationOfficer(
+      int? probationOfficerId) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      final response = await client.get(Uri.parse(
+          "${AppUrl.pcmURL}/Worklist/CompletedAssessment/All/$probationOfficerId"));
+      switch (response.statusCode) {
+        case 200:
+          List<AcceptedWorklistDto> acceptedWorklistDtoResponse =
+              (json.decode(response.body) as List)
+                  .map((data) => AcceptedWorklistDto.fromJson(data))
+                  .toList();
+          apiResponse.Data = acceptedWorklistDtoResponse;
+          break;
+        default:
+          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+          break;
+      }
+    } on SocketException {
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
     }
     return apiResponse;
   }
