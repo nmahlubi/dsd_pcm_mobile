@@ -13,20 +13,17 @@ class SocioEconomicSync {
   late List<SocioEconomicDto> socioEconomicsDto = [];
 
   Future<void> syncSocioEconomic(int? assessmentId) async {
-    var offlineSocioEconomicDto = _socioEconomicRepository
-        .getAllSocioEconomicsByAssessmentId(assessmentId!);
-    if (offlineSocioEconomicDto.isNotEmpty) {
-      for (var socioEconomic in offlineSocioEconomicDto) {
-        try {
-          apiResponse = await _socioEconomicService
-              .addUpdateSocioEconomicOnline(socioEconomic);
-          _socioEconomicRepository
-              .deleteSocioEconomic(socioEconomic.socioEconomyid!);
-        } on SocketException catch (_) {
-          if (kDebugMode) {
-            print(
-                'Unable to access _socioEconomicService.syncSocioEconomic endpoint');
-          }
+    var offlineSocioEconomicDto =
+        _socioEconomicRepository.getSocioEconomicsByAssessmentId(assessmentId!);
+    if (offlineSocioEconomicDto != null) {
+      try {
+        apiResponse = await _socioEconomicService
+            .addUpdateSocioEconomicOnline(offlineSocioEconomicDto);
+        _socioEconomicRepository.deleteSocioEconomicByAssesmentId(assessmentId);
+      } on SocketException catch (_) {
+        if (kDebugMode) {
+          print(
+              'Unable to access _socioEconomicService.syncSocioEconomic endpoint');
         }
       }
     }
@@ -37,13 +34,12 @@ class SocioEconomicSync {
   Future<void> syncSocioEconomicOnlineToOffline(int? assessmentId) async {
     try {
       apiResponse = await _socioEconomicService
-          .getsocioEconomicsByAssessmentIdOnline(assessmentId);
+          .getsocioEconomicByAssessmentIdOnline(assessmentId);
       if ((apiResponse.ApiError) == null) {
-        socioEconomicsDto = (apiResponse.Data as List<SocioEconomicDto>);
-        if (socioEconomicsDto.isNotEmpty) {
-          await _socioEconomicRepository
-              .saveSocioEconomicItems(socioEconomicsDto);
-        }
+        SocioEconomicDto socioEconomicDtoResponse =
+            apiResponse.Data as SocioEconomicDto;
+        await _socioEconomicRepository
+            .saveSocioEconomic(socioEconomicDtoResponse);
       }
     } on SocketException catch (_) {
       if (kDebugMode) {

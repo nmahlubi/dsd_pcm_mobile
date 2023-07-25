@@ -4,14 +4,12 @@ import 'package:flutter/foundation.dart';
 import '../../../../util/shared/apiresponse.dart';
 import '../../../domain/repository/assessment/recommandation_repository.dart';
 import '../../../model/pcm/recommendations_dto.dart';
-import '../../../model/pcm/victim_organisation_detail_dto.dart';
 import '../../../service/pcm/recommendations_service.dart';
 
 class RecommandationSync {
   final _recommendationRepository = RecommendationRepository();
   final _recommendationsServiceClient = RecommendationsService();
   late ApiResponse apiResponse = ApiResponse();
-  late List<VictimOrganisationDetailDto> victimOrganisationDetailsDto = [];
 
   Future<void> syncRecommandationByAssessment(int? assessmentId) async {
     var offlineRecemmandationDto =

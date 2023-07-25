@@ -183,7 +183,7 @@ class _HomePageState extends State<HomePage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                const Text('ReAllocate Cases',
+                                const Text('Allocated Cases',
                                     style: TextStyle(color: Colors.blue)),
                                 Text(
                                     mobileDashboardDto.reAssignedCases
@@ -286,36 +286,36 @@ class _HomePageState extends State<HomePage> {
                 Container(
                   padding: const EdgeInsets.all(10),
                 ),
-                //if (preferences?.getBool('supervisor') == false)
-                _buildTile(
-                  onTap: () => Navigator.pushReplacementNamed(
-                      context, '/sync-manual-offline'),
-                  Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const <Widget>[
-                              Text('Sync(Offline)',
-                                  style: TextStyle(color: Colors.red)),
-                            ],
-                          ),
-                          Material(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(24.0),
-                              child: const Center(
-                                  child: Padding(
-                                padding: EdgeInsets.all(16.0),
-                                child: Icon(Icons.sync,
-                                    color: Colors.white, size: 30.0),
-                              )))
-                        ]),
+                if (preferences?.getBool('supervisor') == false)
+                  _buildTile(
+                    onTap: () => Navigator.pushReplacementNamed(
+                        context, '/sync-manual-offline'),
+                    Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: const <Widget>[
+                                Text('Sync(Offline)',
+                                    style: TextStyle(color: Colors.red)),
+                              ],
+                            ),
+                            Material(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(24.0),
+                                child: const Center(
+                                    child: Padding(
+                                  padding: EdgeInsets.all(16.0),
+                                  child: Icon(Icons.sync,
+                                      color: Colors.white, size: 30.0),
+                                )))
+                          ]),
+                    ),
                   ),
-                ),
               ],
             ))));
   }

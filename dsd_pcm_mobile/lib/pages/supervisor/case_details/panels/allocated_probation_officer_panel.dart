@@ -12,7 +12,12 @@ class AllocatedProbationOfficerPanel extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          const ListTile(title: Text('Probation Officer')),
+          const ListTile(
+              title: Text(
+            'Current Probation Officer',
+            style: TextStyle(
+                color: Colors.blue, fontWeight: FontWeight.w200, fontSize: 21),
+          )),
           Container(
             padding: const EdgeInsets.all(10),
             child: TextFormField(
