@@ -96,6 +96,8 @@ class WorklistService {
       if (apiResponse.ApiError == null) {
         ApiResults apiResults = (apiResponse.Data as ApiResults);
         apiResponse.Data = apiResults;
+        await acceptedWorklistRepository.deleteAcceptedWorklistById(
+            requestToCompleteAssessmentDto.worklistId!);
       }
     } on SocketException {
       apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
