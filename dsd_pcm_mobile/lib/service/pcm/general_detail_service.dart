@@ -41,12 +41,11 @@ class GeneralDetailService {
       int? intakeAssessmentId) async {
     ApiResponse apiResponse = ApiResponse();
     final response = await client.get(
-        Uri.parse("${AppUrl.pcmURL}/GeneralDetail/GetAll/$intakeAssessmentId"));
+        Uri.parse("${AppUrl.pcmURL}/GeneralDetail/Get/$intakeAssessmentId"));
     switch (response.statusCode) {
       case 200:
-        apiResponse.Data = (json.decode(response.body) as List)
-            .map((data) => GeneralDetailDto.fromJson(data))
-            .toList();
+        apiResponse.Data =
+            GeneralDetailDto.fromJson(json.decode(response.body));
         break;
       default:
         apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
@@ -62,15 +61,14 @@ class GeneralDetailService {
       apiResponse =
           await getGeneralDetailByIntakeAssessmentIdOnline(intakeAssessmentId);
       if (apiResponse.ApiError == null) {
-        List<GeneralDetailDto> generalDetailDtoResponse =
-            apiResponse.Data as List<GeneralDetailDto>;
+        GeneralDetailDto generalDetailDtoResponse =
+            apiResponse.Data as GeneralDetailDto;
         apiResponse.Data = generalDetailDtoResponse;
-        _generalDetailRepository
-            .saveGeneralDetailItems(generalDetailDtoResponse);
+        _generalDetailRepository.saveGeneralDetail(generalDetailDtoResponse);
       }
     } on SocketException {
       apiResponse.Data = _generalDetailRepository
-          .getAllGeneralDetailsByAssessmentId(intakeAssessmentId!);
+          .getGeneralDetailByAssessmentId(intakeAssessmentId!);
     }
     return apiResponse;
   }
@@ -91,13 +89,12 @@ class GeneralDetailService {
         GeneralDetailDto generalDetailDtoResponse =
             GeneralDetailDto.fromJson(apiResults.data);
         apiResponse.Data = generalDetailDtoResponse;
-        _generalDetailRepository.saveGeneralDetailNewRecord(
-            generalDetailDto, generalDetailDtoResponse.generalDetailsId);
+        _generalDetailRepository.saveGeneralDetail(generalDetailDto);
       }
     } on SocketException {
       _generalDetailRepository.saveGeneralDetail(generalDetailDto);
       apiResponse.Data = _generalDetailRepository
-          .getGeneralDetailById(generalDetailDto.generalDetailsId!);
+          .getGeneralDetailByAssessmentId(generalDetailDto.intakeAssessmentId!);
     }
     return apiResponse;
   }
@@ -118,13 +115,12 @@ class GeneralDetailService {
         GeneralDetailDto generalDetailDtoResponse =
             GeneralDetailDto.fromJson(apiResults.data);
         apiResponse.Data = generalDetailDtoResponse;
-        _generalDetailRepository.saveGeneralDetailNewRecord(
-            generalDetailDto, generalDetailDtoResponse.generalDetailsId);
+        _generalDetailRepository.saveGeneralDetail(generalDetailDto);
       }
     } on SocketException {
       _generalDetailRepository.saveGeneralDetail(generalDetailDto);
       apiResponse.Data = _generalDetailRepository
-          .getGeneralDetailById(generalDetailDto.generalDetailsId!);
+          .getGeneralDetailByAssessmentId(generalDetailDto.intakeAssessmentId!);
     }
     return apiResponse;
   }
