@@ -1,3 +1,4 @@
+import 'package:dsd_pcm_mobile/model/pcm/hbs_conditions_dto.dart';
 import 'package:dsd_pcm_mobile/navigation_drawer/go_to_home_based_diversion_drawer.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
@@ -6,9 +7,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../model/intake/health_status_dto.dart';
 import '../../../model/pcm/accepted_worklist_dto.dart';
+import '../../../model/pcm/home_based_supervision_dto.dart';
 import '../../../model/pcm/medical_health_detail_dto.dart';
 import '../../../navigation_drawer/navigation_drawer_menu.dart';
 import '../../../navigation_drawer/go_to_assessment_drawer.dart';
+import '../../../service/pcm/home_based_supervision_service.dart';
 import '../../../service/pcm/medical_health_details_service.dart';
 import '../../../transform_dynamic/transform_lookup.dart';
 import '../../../util/shared/apierror.dart';
@@ -39,7 +42,7 @@ class _HomeBasedDiversionDetailPageState
   late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
   final _lookupTransform = LookupTransform();
   final _randomGenerator = RandomGenerator();
-  //final _medicalHealthDetailsServiceClient = MedicalHealthDetailsService();
+  final _homeBasedSupervisionServiceClient = HomeBasedSupervisionService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
   /*late MedicalHealthDetailDto captureMedicalHealthDetailDto =
@@ -47,21 +50,27 @@ class _HomeBasedDiversionDetailPageState
   late List<HealthStatusDto> healthStatusesDto = [];
   
   */
-  late List<MedicalHealthDetailDto> medicalHealthDetailsDto = [];
+  late List<HomeBasedSupervionDto> homeBasedSupervionDto = [];
+   late List<HBSConditionsDto> hBSConditionsDto = [];
 
-  ExpandableController viewMedicalInfoPanelController = ExpandableController();
-
+  ExpandableController viewHomeBasedSupervisionPanelController = ExpandableController();
+  ExpandableController viewHBSConditionPanelController = ExpandableController();
   @override
   void initState() {
     super.initState();
-    viewMedicalInfoPanelController =
-        ExpandableController(initialExpanded: true);
+    viewHomeBasedSupervisionPanelController =ExpandableController(initialExpanded: true);
+    viewHBSConditionPanelController =ExpandableController(initialExpanded: true);
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
         setState(() {
+           acceptedWorklistDto =
+              ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
           loadLookUpTransformer();
-          //loadMedicalHealthDetailsByIntakeAssessmentId(
-          // acceptedWorklistDto.intakeAssessmentId);
+          loadHomeBasedSupervisionDetailsByAssessmentId(
+           acceptedWorklistDto.intakeAssessmentId);
+           loadHBSConditionsDetailsByAssessmentId(
+           acceptedWorklistDto.intakeAssessmentId);
         });
       });
     });
@@ -74,24 +83,39 @@ class _HomeBasedDiversionDetailPageState
     overlay.hide();
   }
 
-/*
-  loadMedicalHealthDetailsByIntakeAssessmentId(int? intakeAssessmentId) async {
+
+  loadHomeBasedSupervisionDetailsByAssessmentId(int? intakeAssessmentId) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await _medicalHealthDetailsServiceClient
-        .getMedicalHealthDetailsByAssessmentId(intakeAssessmentId);
+    apiResponse = await _homeBasedSupervisionServiceClient
+        .getHomeBasedSupervisionDetailsByAssessmentId(intakeAssessmentId);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        medicalHealthDetailsDto =
-            (apiResponse.Data as List<MedicalHealthDetailDto>);
+        homeBasedSupervionDto =
+            (apiResponse.Data as List<HomeBasedSupervionDto>);
       });
     } else {
       overlay.hide();
       showDialogMessage((apiResponse.ApiError as ApiError));
     }
   }
-  */
+  loadHBSConditionsDetailsByAssessmentId(int? intakeAssessmentId) async {
+    final overlay = LoadingOverlay.of(context);
+    overlay.show();
+    apiResponse = await _homeBasedSupervisionServiceClient
+        .getHomeBasedSupervisionConditionsByAssessmentId(intakeAssessmentId);
+    if ((apiResponse.ApiError) == null) {
+      overlay.hide();
+      setState(() {
+        hBSConditionsDto =
+            (apiResponse.Data as List<HBSConditionsDto>);
+      });
+    } else {
+      overlay.hide();
+      showDialogMessage((apiResponse.ApiError as ApiError));
+    }
+  }
 
   showDialogMessage(ApiError apiError) {
     final messageDialog = ScaffoldMessenger.of(context);
@@ -163,7 +187,7 @@ class _HomeBasedDiversionDetailPageState
                                   scrollOnExpand: true,
                                   scrollOnCollapse: false,
                                   child: ExpandablePanel(
-                                    controller: viewMedicalInfoPanelController,
+                                    controller: viewHomeBasedSupervisionPanelController,
                                     theme: const ExpandableThemeData(
                                       headerAlignment:
                                           ExpandablePanelHeaderAlignment.center,
@@ -172,7 +196,7 @@ class _HomeBasedDiversionDetailPageState
                                     header: Padding(
                                         padding: const EdgeInsets.all(10),
                                         child: Text(
-                                          "List Medical Health",
+                                          "List Home Based Supervision",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
@@ -187,26 +211,26 @@ class _HomeBasedDiversionDetailPageState
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        if (medicalHealthDetailsDto.isNotEmpty)
+                                        if (homeBasedSupervionDto.isNotEmpty)
                                           Row(
                                             children: [
                                               Expanded(
                                                 child: ListView.separated(
                                                   shrinkWrap: true,
                                                   itemCount:
-                                                      medicalHealthDetailsDto
+                                                      homeBasedSupervionDto
                                                           .length,
                                                   itemBuilder:
                                                       (context, int index) {
-                                                    if (medicalHealthDetailsDto
+                                                    if (homeBasedSupervionDto
                                                         .isEmpty) {
                                                       return const Center(
                                                           child: Text(
-                                                              'No medical health Found.'));
+                                                              'No home based supervision Found.'));
                                                     }
                                                     return ListTile(
                                                       title: Text(
-                                                          'Health Status : ${medicalHealthDetailsDto[index].healthStatusDto?.description}',
+                                                          'Court Type : ${homeBasedSupervionDto[index].courtType}',
                                                           style: const TextStyle(
                                                               color:
                                                                   Colors.black,
@@ -214,9 +238,8 @@ class _HomeBasedDiversionDetailPageState
                                                                   FontWeight
                                                                       .bold)),
                                                       subtitle: Text(
-                                                          'Allergy : ${medicalHealthDetailsDto[index].allergies}. '
-                                                          'Injuries : ${medicalHealthDetailsDto[index].injuries}. '
-                                                          'Medication : ${medicalHealthDetailsDto[index].medication}.',
+                                                          'Placement Date : ${homeBasedSupervionDto[index].placementDate}. '
+                                                          'Number of Visits : ${homeBasedSupervionDto[index].numberOfVisits}. ',
                                                           style:
                                                               const TextStyle(
                                                                   color: Colors
@@ -229,11 +252,11 @@ class _HomeBasedDiversionDetailPageState
                                                           IconButton(
                                                               onPressed: () {
                                                                 /*populateHealthDetailForm(
-                                                                    medicalHealthDetailsDto[
+                                                                    homeBasedSupervionDto[
                                                                         index]);*/
                                                               },
                                                               icon: const Icon(
-                                                                  Icons.edit,
+                                                                  Icons.play_circle_fill_rounded,
                                                                   color: Colors
                                                                       .blue)),
                                                           /*IconButton(
@@ -255,7 +278,8 @@ class _HomeBasedDiversionDetailPageState
                                               ),
                                             ],
                                           )
-                                      ],
+                                     
+                                     ],
                                     ),
                                     builder: (_, collapsed, expanded) {
                                       return Padding(
@@ -276,6 +300,106 @@ class _HomeBasedDiversionDetailPageState
                           ),
                         ))),
                       ]),
+                    
+                     Row(children: [
+                        Expanded(
+                            child: ExpandableNotifier(
+                                child: Padding(
+                          padding: const EdgeInsets.all(2),
+                          child: Card(
+                            clipBehavior: Clip.antiAlias,
+                            child: Column(
+                              children: <Widget>[
+                                ScrollOnExpand(
+                                  scrollOnExpand: true,
+                                  scrollOnCollapse: false,
+                                  child: ExpandablePanel(
+                                    controller: viewHBSConditionPanelController,
+                                    theme: const ExpandableThemeData(
+                                      headerAlignment:
+                                          ExpandablePanelHeaderAlignment.center,
+                                      tapBodyToCollapse: true,
+                                    ),
+                                    header: Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: Text(
+                                          "List HBS Conditions",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyLarge,
+                                        )),
+                                    collapsed: const Text(
+                                      '',
+                                      softWrap: true,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    expanded: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        if (homeBasedSupervionDto.isNotEmpty)
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: ListView.separated(
+                                                  shrinkWrap: true,
+                                                  itemCount:
+                                                      hBSConditionsDto
+                                                          .length,
+                                                  itemBuilder:
+                                                      (context, int index) {
+                                                    if (hBSConditionsDto
+                                                        .isEmpty) {
+                                                      return const Center(
+                                                          child: Text(
+                                                              'No hbs conditions Found.'));
+                                                    }
+                                                    return ListTile(
+                                                      title: Text(
+                                                          'Condition : ${hBSConditionsDto[index].conditionsDto?.conditions}',
+                                                          style: const TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold)),
+                                                      
+                                                      
+                                                    );
+                                                  },
+                                                  separatorBuilder:
+                                                      (context, index) {
+                                                    return const Divider(
+                                                        thickness: 1);
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                     
+                                     ],
+                                    ),
+                                    builder: (_, collapsed, expanded) {
+                                      return Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 10, right: 10, bottom: 10),
+                                        child: Expandable(
+                                          collapsed: collapsed,
+                                          expanded: expanded,
+                                          theme: const ExpandableThemeData(
+                                              crossFadePoint: 0),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ))),
+                      ]),
+                    
                     ],
                   ),
                 ))));

@@ -7,7 +7,7 @@ class HomeBasedSupervionDto {
     String? placementDate,
     int? supervisorId,
     int? conditionsId,
-
+ int? numberOfVisits
   }) {
     _homeBasedSupervisionId=homeBasedSupervisionId;
     _courtType = courtType;
@@ -24,7 +24,7 @@ class HomeBasedSupervionDto {
     _placementDate= json['placementDate'];
     _supervisorId = json['supervisorId'];
    _conditionsId = json['conditionsId'];
- 
+   _numberOfVisits = json['numberOfVisits'];
   }
   int? _homeBasedSupervisionId;
   String? _courtType;
@@ -32,6 +32,7 @@ class HomeBasedSupervionDto {
   int? _supervisorId;
   int? _intakeAssessmentId;
   int? _conditionsId;
+  int? _numberOfVisits;
 
   int? get homeBasedSupervisionId => _homeBasedSupervisionId;
   String? get courtType => _courtType;
@@ -39,7 +40,8 @@ class HomeBasedSupervionDto {
   int? get supervisorId => _supervisorId;
   int? get intakeAssessmentId => _intakeAssessmentId;
   int? get conditionsId => _conditionsId;
-  
+   int? get numberOfVisits => _numberOfVisits;
+
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
      map['homeBasedSupervisionId'] = _homeBasedSupervisionId;
@@ -48,6 +50,7 @@ class HomeBasedSupervionDto {
     map['supervisorId'] = _supervisorId;
     map['intakeAssessmentId'] = _intakeAssessmentId;
    map['conditionsId'] = _conditionsId;
+     map['numberOfVisits'] = _numberOfVisits;
     return map;
   }
 }
