@@ -46,6 +46,7 @@ class PersonEducationRepository {
               modifiedBy: personEducationDto.modifiedBy,
               isActive: personEducationDto.isActive,
               isDeleted: personEducationDto.isDeleted,
+              schoolName: personEducationDto.schoolName,
               schoolModel: personEducationDto.schoolDto != null
                   ? _schoolRepository.schoolToDb(personEducationDto.schoolDto)
                   : null,
@@ -73,6 +74,7 @@ class PersonEducationRepository {
             modifiedBy: personEducationDto.modifiedBy,
             isActive: personEducationDto.isActive,
             isDeleted: personEducationDto.isDeleted,
+            schoolName: personEducationDto.schoolName,
             schoolModel: personEducationDto.schoolDto != null
                 ? _schoolRepository.schoolToDb(personEducationDto.schoolDto)
                 : null,
@@ -100,6 +102,7 @@ class PersonEducationRepository {
             modifiedBy: personEducationDto.modifiedBy,
             isActive: personEducationDto.isActive,
             isDeleted: personEducationDto.isDeleted,
+            schoolName: personEducationDto.schoolName,
             schoolModel: personEducationDto.schoolDto != null
                 ? _schoolRepository.schoolToDb(personEducationDto.schoolDto)
                 : null,
@@ -151,6 +154,7 @@ class PersonEducationRepository {
           modifiedBy: personEducationModel.modifiedBy,
           isActive: personEducationModel.isActive,
           isDeleted: personEducationModel.isDeleted,
+          schoolName: personEducationModel.schoolName,
           schoolDto: personEducationModel.schoolModel != null
               ? _schoolRepository
                   .schoolFromDb(personEducationModel.schoolModel!)
@@ -175,6 +179,7 @@ class PersonEducationRepository {
           modifiedBy: personEducationDto?.modifiedBy,
           isActive: personEducationDto?.isActive,
           isDeleted: personEducationDto?.isDeleted,
+          schoolName: personEducationDto?.schoolName,
           schoolModel: personEducationDto?.schoolDto != null
               ? _schoolRepository.schoolToDb(personEducationDto!.schoolDto)
               : null,

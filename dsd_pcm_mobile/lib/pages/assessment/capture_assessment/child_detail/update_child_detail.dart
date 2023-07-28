@@ -507,6 +507,7 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
                                       if (value == null) {
                                         return 'Identifycation Type is required';
                                       }
+                                      return null;
                                     },
                                   )),
                             ),

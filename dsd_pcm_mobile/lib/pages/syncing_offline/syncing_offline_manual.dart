@@ -42,7 +42,7 @@ class _SyncingOfflineManualPageWidgetState
             label: 'Look Up',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.work_off_sharp),
+            icon: Icon(Icons.sync),
             label: 'Worklist',
           ),
         ],
