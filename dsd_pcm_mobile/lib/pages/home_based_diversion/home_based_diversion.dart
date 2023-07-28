@@ -1,22 +1,13 @@
 import 'package:dsd_pcm_mobile/model/pcm/home_based_supervision_dto.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../model/intake/health_status_dto.dart';
 import '../../../model/pcm/accepted_worklist_dto.dart';
-import '../../../model/pcm/medical_health_detail_dto.dart';
-import '../../../navigation_drawer/go_to_assessment_drawer.dart';
-import '../../../service/pcm/medical_health_details_service.dart';
-import '../../../transform_dynamic/transform_lookup.dart';
 import '../../../util/shared/apierror.dart';
 import '../../../util/shared/apiresponse.dart';
-import '../../../util/shared/apiresults.dart';
 import '../../../util/shared/loading_overlay.dart';
-import '../../../util/shared/randon_generator.dart';
 import '../../navigation_drawer/navigation_drawer_menu.dart';
-import '../../service/pcm/home_based_supervision_service.dart';
 import '../../service/pcm/worklist_service.dart';
 import 'home_based_diversion_detail/home_based_diversion_detail.dart';
 
@@ -35,7 +26,8 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
   Future<void> initializePreference() async {
     preferences = await SharedPreferences.getInstance();
   }
- final _worklistServiceClient = WorklistService();
+
+  final _worklistServiceClient = WorklistService();
   late ApiResponse apiResponse = ApiResponse();
   late List<AcceptedWorklistDto> acceptedWorklistDto = [];
   String searchString = "";
@@ -50,7 +42,7 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
       initializePreference().whenComplete(() {
         setState(() {
           loadLookUpTransformer();
-         loadCompletedCasesByProbationOfficer();
+          loadCompletedCasesByProbationOfficer();
         });
       });
     });
@@ -63,24 +55,22 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
     overlay.hide();
   }
 
-
   loadCompletedCasesByProbationOfficer() async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
     apiResponse = await _worklistServiceClient
-        .getCompletedWorklistByProbationOfficerOnline(preferences!.getInt('userId')!);
+        .getCompletedWorklistByProbationOfficerOnline(
+            preferences!.getInt('userId')!);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        acceptedWorklistDto =
-            (apiResponse.Data as List<AcceptedWorklistDto>);
+        acceptedWorklistDto = (apiResponse.Data as List<AcceptedWorklistDto>);
       });
     } else {
       overlay.hide();
       showDialogMessage((apiResponse.ApiError as ApiError));
     }
   }
-  
 
   showDialogMessage(ApiError apiError) {
     final messageDialog = ScaffoldMessenger.of(context);
@@ -103,12 +93,12 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
           return false;
         },
         child: Scaffold(
-            key: scaffoldKey,
-            appBar: AppBar(
-              title: const Text("Diversion & HBS"),
-            ),
-            drawer: const NavigationDrawerMenu(),
-            body: Column(
+          key: scaffoldKey,
+          appBar: AppBar(
+            title: const Text("Diversion & HBS"),
+          ),
+          drawer: const NavigationDrawerMenu(),
+          body: Column(
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -130,7 +120,8 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
                   itemCount: acceptedWorklistDto.length,
                   itemBuilder: (context, int index) {
                     if (acceptedWorklistDto.isEmpty) {
-                      return const Center(child: Text('No completed worklist Found.'));
+                      return const Center(
+                          child: Text('No completed worklist Found.'));
                     }
                     return acceptedWorklistDto[index]
                             .childName!
@@ -152,7 +143,7 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                       const HomeBasedDiversionDetailPage(),
+                                      const HomeBasedDiversionDetailPage(),
                                   settings: RouteSettings(
                                     arguments: acceptedWorklistDto[index],
                                   ),

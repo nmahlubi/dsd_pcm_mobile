@@ -20,7 +20,6 @@ import '../../service/pcm/family_service.dart';
 import '../../service/pcm/medical_health_details_service.dart';
 import 'capture_assessment/capture_assessment.dart';
 import 'panel_child_details/co_accused_details_panel.dart';
-import 'panel_child_details/education_info_panel.dart';
 import 'panel_child_details/family_info_panel.dart';
 import 'panel_child_details/family_member_panel.dart';
 import 'panel_child_details/medical_info_panel.dart';

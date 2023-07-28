@@ -16,6 +16,7 @@ class PersonEducationDto {
     String? modifiedBy,
     bool? isActive,
     bool? isDeleted,
+    String? schoolName,
     SchoolDto? schoolDto,
     GradeDto? gradeDto,
   }) {
@@ -32,6 +33,7 @@ class PersonEducationDto {
     _modifiedBy = modifiedBy;
     _isActive = isActive;
     _isDeleted = isDeleted;
+    _schoolName = schoolName;
     _schoolDto = schoolDto;
     _gradeDto = gradeDto;
   }
@@ -50,6 +52,7 @@ class PersonEducationDto {
     _modifiedBy = json['modifiedBy'];
     _isActive = json['isActive'];
     _isDeleted = json['isDeleted'];
+    _schoolName = json['schoolName'];
     _schoolDto = json['schoolDto'] != null
         ? SchoolDto.fromJson(json['schoolDto'])
         : null;
@@ -69,6 +72,7 @@ class PersonEducationDto {
   String? _modifiedBy;
   bool? _isActive;
   bool? _isDeleted;
+  String? _schoolName;
   SchoolDto? _schoolDto;
   GradeDto? _gradeDto;
 
@@ -85,6 +89,7 @@ class PersonEducationDto {
   String? get modifiedBy => _modifiedBy;
   bool? get isActive => _isActive;
   bool? get isDeleted => _isDeleted;
+  String? get schoolName => _schoolName;
   SchoolDto? get schoolDto => _schoolDto;
   GradeDto? get gradeDto => _gradeDto;
 
@@ -104,6 +109,7 @@ class PersonEducationDto {
     map['isActive'] = _isActive;
     map['isDeleted'] = _isDeleted;
     map['modifiedBy'] = _modifiedBy;
+    map['schoolName'] = _schoolName;
     if (_schoolDto != null) {
       map['schoolDto'] = _schoolDto?.toJson();
     }

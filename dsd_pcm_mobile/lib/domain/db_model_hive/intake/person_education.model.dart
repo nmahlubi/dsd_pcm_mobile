@@ -6,7 +6,7 @@ import 'person.model.dart';
 
 part 'person_education.model.g.dart';
 
-@HiveType(typeId: 42)
+@HiveType(typeId: 45)
 class PersonEducationModel {
   @HiveField(0)
   int? personEducationId;
@@ -40,6 +40,8 @@ class PersonEducationModel {
   final SchoolModel? schoolModel;
   @HiveField(15)
   final GradeModel? gradeModel;
+  @HiveField(16)
+  String? schoolName;
 
   PersonEducationModel(
       {this.personEducationId,
@@ -57,5 +59,6 @@ class PersonEducationModel {
       this.isDeleted,
       this.personModel,
       this.schoolModel,
-      this.gradeModel});
+      this.gradeModel,
+      this.schoolName});
 }

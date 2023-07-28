@@ -2,17 +2,11 @@ import 'package:dsd_pcm_mobile/model/pcm/hbs_conditions_dto.dart';
 import 'package:dsd_pcm_mobile/navigation_drawer/go_to_home_based_diversion_drawer.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../model/intake/health_status_dto.dart';
 import '../../../model/pcm/accepted_worklist_dto.dart';
 import '../../../model/pcm/home_based_supervision_dto.dart';
-import '../../../model/pcm/medical_health_detail_dto.dart';
-import '../../../navigation_drawer/navigation_drawer_menu.dart';
-import '../../../navigation_drawer/go_to_assessment_drawer.dart';
 import '../../../service/pcm/home_based_supervision_service.dart';
-import '../../../service/pcm/medical_health_details_service.dart';
 import '../../../transform_dynamic/transform_lookup.dart';
 import '../../../util/shared/apierror.dart';
 import '../../../util/shared/apiresponse.dart';
@@ -51,26 +45,29 @@ class _HomeBasedDiversionDetailPageState
   
   */
   late List<HomeBasedSupervionDto> homeBasedSupervionDto = [];
-   late List<HBSConditionsDto> hBSConditionsDto = [];
+  late List<HBSConditionsDto> hBSConditionsDto = [];
 
-  ExpandableController viewHomeBasedSupervisionPanelController = ExpandableController();
+  ExpandableController viewHomeBasedSupervisionPanelController =
+      ExpandableController();
   ExpandableController viewHBSConditionPanelController = ExpandableController();
   @override
   void initState() {
     super.initState();
-    viewHomeBasedSupervisionPanelController =ExpandableController(initialExpanded: true);
-    viewHBSConditionPanelController =ExpandableController(initialExpanded: true);
+    viewHomeBasedSupervisionPanelController =
+        ExpandableController(initialExpanded: true);
+    viewHBSConditionPanelController =
+        ExpandableController(initialExpanded: true);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
         setState(() {
-           acceptedWorklistDto =
+          acceptedWorklistDto =
               ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
           loadLookUpTransformer();
           loadHomeBasedSupervisionDetailsByAssessmentId(
-           acceptedWorklistDto.intakeAssessmentId);
-           loadHBSConditionsDetailsByAssessmentId(
-           acceptedWorklistDto.intakeAssessmentId);
+              acceptedWorklistDto.intakeAssessmentId);
+          loadHBSConditionsDetailsByAssessmentId(
+              acceptedWorklistDto.intakeAssessmentId);
         });
       });
     });
@@ -82,7 +79,6 @@ class _HomeBasedDiversionDetailPageState
     //healthStatusesDto = await _lookupTransform.transformHealthStatusesDto();
     overlay.hide();
   }
-
 
   loadHomeBasedSupervisionDetailsByAssessmentId(int? intakeAssessmentId) async {
     final overlay = LoadingOverlay.of(context);
@@ -100,6 +96,7 @@ class _HomeBasedDiversionDetailPageState
       showDialogMessage((apiResponse.ApiError as ApiError));
     }
   }
+
   loadHBSConditionsDetailsByAssessmentId(int? intakeAssessmentId) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
@@ -108,8 +105,7 @@ class _HomeBasedDiversionDetailPageState
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        hBSConditionsDto =
-            (apiResponse.Data as List<HBSConditionsDto>);
+        hBSConditionsDto = (apiResponse.Data as List<HBSConditionsDto>);
       });
     } else {
       overlay.hide();
@@ -187,7 +183,8 @@ class _HomeBasedDiversionDetailPageState
                                   scrollOnExpand: true,
                                   scrollOnCollapse: false,
                                   child: ExpandablePanel(
-                                    controller: viewHomeBasedSupervisionPanelController,
+                                    controller:
+                                        viewHomeBasedSupervisionPanelController,
                                     theme: const ExpandableThemeData(
                                       headerAlignment:
                                           ExpandablePanelHeaderAlignment.center,
@@ -256,7 +253,8 @@ class _HomeBasedDiversionDetailPageState
                                                                         index]);*/
                                                               },
                                                               icon: const Icon(
-                                                                  Icons.play_circle_fill_rounded,
+                                                                  Icons
+                                                                      .play_circle_fill_rounded,
                                                                   color: Colors
                                                                       .blue)),
                                                           /*IconButton(
@@ -278,8 +276,7 @@ class _HomeBasedDiversionDetailPageState
                                               ),
                                             ],
                                           )
-                                     
-                                     ],
+                                      ],
                                     ),
                                     builder: (_, collapsed, expanded) {
                                       return Padding(
@@ -300,8 +297,7 @@ class _HomeBasedDiversionDetailPageState
                           ),
                         ))),
                       ]),
-                    
-                     Row(children: [
+                      Row(children: [
                         Expanded(
                             child: ExpandableNotifier(
                                 child: Padding(
@@ -345,8 +341,7 @@ class _HomeBasedDiversionDetailPageState
                                                 child: ListView.separated(
                                                   shrinkWrap: true,
                                                   itemCount:
-                                                      hBSConditionsDto
-                                                          .length,
+                                                      hBSConditionsDto.length,
                                                   itemBuilder:
                                                       (context, int index) {
                                                     if (hBSConditionsDto
@@ -364,8 +359,6 @@ class _HomeBasedDiversionDetailPageState
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold)),
-                                                      
-                                                      
                                                     );
                                                   },
                                                   separatorBuilder:
@@ -377,8 +370,7 @@ class _HomeBasedDiversionDetailPageState
                                               ),
                                             ],
                                           )
-                                     
-                                     ],
+                                      ],
                                     ),
                                     builder: (_, collapsed, expanded) {
                                       return Padding(
@@ -399,7 +391,6 @@ class _HomeBasedDiversionDetailPageState
                           ),
                         ))),
                       ]),
-                    
                     ],
                   ),
                 ))));

@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../background_job/background_job_offline.dart';
 import '../../../model/pcm/accepted_worklist_dto.dart';
 import '../../../model/pcm/request/request_complete_assessment.dart';
 import '../../../navigation_drawer/go_to_assessment_drawer.dart';
@@ -31,6 +34,7 @@ class _CompleteAssessmentPageState extends State<CompleteAssessmentPage> {
 
   late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
   final _worklistServiceClient = WorklistService();
+  final _backgroundJobOffline = BackgroundJobOffline();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
 
@@ -42,9 +46,25 @@ class _CompleteAssessmentPageState extends State<CompleteAssessmentPage> {
         setState(() {
           acceptedWorklistDto =
               ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
+          syncToCompleteAssessment(acceptedWorklistDto);
         });
       });
     });
+  }
+
+  syncToCompleteAssessment(AcceptedWorklistDto acceptedWorklist) async {
+    final overlay = LoadingOverlay.of(context);
+    overlay.show();
+    try {
+      await _backgroundJobOffline.syncAcceptedWorklist(
+          acceptedWorklist, preferences!.getInt('userId')!);
+      overlay.hide();
+      if (!mounted) return;
+      showSuccessMessage("Synced successfully");
+    } on SocketException {
+      overlay.hide();
+      showDialogMessage('Unable to sync offline data.');
+    }
   }
 
   completeWorklist() async {
@@ -75,15 +95,15 @@ class _CompleteAssessmentPageState extends State<CompleteAssessmentPage> {
             )),
       );
     } else {
-      showDialogMessage((apiResponse.ApiError as ApiError));
       overlay.hide();
+      showDialogMessage((apiResponse.ApiError as ApiError).error);
     }
   }
 
-  showDialogMessage(ApiError apiError) {
+  showDialogMessage(String? message) {
     final messageDialog = ScaffoldMessenger.of(context);
     messageDialog.showSnackBar(
-      SnackBar(content: Text(apiError.error!), backgroundColor: Colors.red),
+      SnackBar(content: Text(message!), backgroundColor: Colors.red),
     );
   }
 
