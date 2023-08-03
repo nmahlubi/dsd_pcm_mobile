@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dsd_pcm_mobile/model/pcm/query/preliminary_detail_query_dto.dart';
 import 'package:http_interceptor/http/intercepted_client.dart';
 
 import '../../domain/repository/worklist/accepted_worklist_repository.dart';
@@ -128,14 +129,14 @@ class WorklistService {
     ApiResponse apiResponse = ApiResponse();
     try {
       final response = await client.get(Uri.parse(
-          "${AppUrl.pcmURL}/Worklist/CompletedAssessment/All/$probationOfficerId"));
+          "${AppUrl.pcmURL}/PreliminaryDetails/GetAll/$probationOfficerId"));
       switch (response.statusCode) {
         case 200:
-          List<AcceptedWorklistDto> acceptedWorklistDtoResponse =
+          List<PreliminaryDetailQueryDto> preliminaryDetailQueryDtoResponse =
               (json.decode(response.body) as List)
-                  .map((data) => AcceptedWorklistDto.fromJson(data))
+                  .map((data) => PreliminaryDetailQueryDto.fromJson(data))
                   .toList();
-          apiResponse.Data = acceptedWorklistDtoResponse;
+          apiResponse.Data = preliminaryDetailQueryDtoResponse;
           break;
         default:
           apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));

@@ -1,10 +1,14 @@
+import 'package:dsd_pcm_mobile/model/pcm/preliminary_detail_dto.dart';
+import 'package:dsd_pcm_mobile/pages/preliminary_inquery/court_decision/court_decision.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../util/shared/apierror.dart';
 import '../../../util/shared/apiresponse.dart';
 import '../../../util/shared/loading_overlay.dart';
+import '../../../util/shared/randon_generator.dart';
 import '../../model/pcm/accepted_worklist_dto.dart';
+import '../../model/pcm/query/preliminary_detail_query_dto.dart';
 import '../../navigation_drawer/navigation_drawer_menu.dart';
 import '../../service/pcm/worklist_service.dart';
 
@@ -26,7 +30,8 @@ class _PreliminaryPageState extends State<PreliminaryPage> {
 
   final WorklistService worklistServiceClient = WorklistService();
   late ApiResponse apiResponse = ApiResponse();
-  late List<AcceptedWorklistDto> acceptedWorklistDto = [];
+  //late List<AcceptedWorklistDto> acceptedWorklistDto = [];
+  late List<PreliminaryDetailQueryDto> prelimanaryDetailsQuery = [];
 
   String searchString = "";
 
@@ -54,7 +59,8 @@ class _PreliminaryPageState extends State<PreliminaryPage> {
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        acceptedWorklistDto = (apiResponse.Data as List<AcceptedWorklistDto>);
+        prelimanaryDetailsQuery =
+            (apiResponse.Data as List<PreliminaryDetailQueryDto>);
       });
     } else {
       showDialogMessage((apiResponse.ApiError as ApiError));
@@ -112,21 +118,21 @@ class _PreliminaryPageState extends State<PreliminaryPage> {
               Expanded(
                 child: ListView.separated(
                   shrinkWrap: true,
-                  itemCount: acceptedWorklistDto.length,
+                  itemCount: prelimanaryDetailsQuery.length,
                   itemBuilder: (context, int index) {
-                    if (acceptedWorklistDto.isEmpty) {
+                    if (prelimanaryDetailsQuery.isEmpty) {
                       return const Center(child: Text('No worklist Found.'));
                     }
-                    return acceptedWorklistDto[index]
+                    return prelimanaryDetailsQuery[index]
                             .childName!
                             .toLowerCase()
                             .contains(searchString)
                         ? ListTile(
-                            title: Text(acceptedWorklistDto[index]
+                            title: Text(prelimanaryDetailsQuery[index]
                                 .childName
                                 .toString()),
                             subtitle: Text(
-                                acceptedWorklistDto[index]
+                                prelimanaryDetailsQuery[index]
                                     .dateAccepted
                                     .toString(),
                                 style: const TextStyle(color: Colors.grey)),
@@ -137,9 +143,9 @@ class _PreliminaryPageState extends State<PreliminaryPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      const PreliminaryPage(), ///////////////////////will change later
+                                      const CourtDecisionPage(),
                                   settings: RouteSettings(
-                                    arguments: acceptedWorklistDto[index],
+                                    arguments: prelimanaryDetailsQuery[index],
                                   ),
                                 ),
                               );
@@ -147,7 +153,7 @@ class _PreliminaryPageState extends State<PreliminaryPage> {
                         : Container();
                   },
                   separatorBuilder: (context, index) {
-                    return acceptedWorklistDto[index]
+                    return prelimanaryDetailsQuery[index]
                             .childName!
                             .toLowerCase()
                             .contains(searchString)
