@@ -10,23 +10,21 @@ class DevelopmentAssessmentSync {
   final _developmentAssessmentRepository = DevelopmentAssessmentRepository();
   final _developmentAssessmentServiceClient = DevelopmentAssessmentService();
   late ApiResponse apiResponse = ApiResponse();
-  late List<DevelopmentAssessmentDto> developmentAssessmentsDto = [];
 
   Future<void> syncDevelopmentAssessment(int? assessmentId) async {
     var offlineDevelopmentAssessmentDto = _developmentAssessmentRepository
-        .getAllDevelopmentAssessmentsByAssessmentId(assessmentId!);
-    if (offlineDevelopmentAssessmentDto.isNotEmpty) {
-      for (var developmentAssessment in offlineDevelopmentAssessmentDto) {
-        try {
-          apiResponse = await _developmentAssessmentServiceClient
-              .addUpdateDevelopmentAssessmentOnline(developmentAssessment);
-          _developmentAssessmentRepository.deleteDevelopmentAssessment(
-              developmentAssessment.developmentId!);
-        } on SocketException catch (_) {
-          if (kDebugMode) {
-            print(
-                'Unable to access _developmentAssessmentServiceClient.syncDevelopmentAssessment endpoint');
-          }
+        .getDevelopmentAssessmentById(assessmentId!);
+    if (offlineDevelopmentAssessmentDto != null) {
+      try {
+        apiResponse = await _developmentAssessmentServiceClient
+            .addUpdateDevelopmentAssessmentOnline(
+                offlineDevelopmentAssessmentDto);
+        _developmentAssessmentRepository
+            .deleteDevelopmentAssessmentByAssessmentId(assessmentId);
+      } on SocketException catch (_) {
+        if (kDebugMode) {
+          print(
+              'Unable to access _developmentAssessmentServiceClient.syncDevelopmentAssessment endpoint');
         }
       }
     }
@@ -38,14 +36,12 @@ class DevelopmentAssessmentSync {
       int? assessmentId) async {
     try {
       apiResponse = await _developmentAssessmentServiceClient
-          .getDevelopmentAssessmentsByIntakeAssessmentIdOnline(assessmentId);
+          .getDevelopmentAssessmentByIntakeAssessmentId(assessmentId);
       if ((apiResponse.ApiError) == null) {
-        developmentAssessmentsDto =
-            (apiResponse.Data as List<DevelopmentAssessmentDto>);
-        if (developmentAssessmentsDto.isNotEmpty) {
-          await _developmentAssessmentRepository
-              .saveDevelopmentAssessmentItems(developmentAssessmentsDto);
-        }
+        DevelopmentAssessmentDto developmentAssessmentDtoResponse =
+            apiResponse.Data as DevelopmentAssessmentDto;
+        _developmentAssessmentRepository
+            .saveDevelopmentAssessment(developmentAssessmentDtoResponse);
       }
     } on SocketException catch (_) {
       if (kDebugMode) {

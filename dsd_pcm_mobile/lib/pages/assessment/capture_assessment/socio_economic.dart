@@ -36,11 +36,8 @@ class _SocioEconomicPageState extends State<SocioEconomicPage> {
   final _socioEconomicServiceClient = SocioEconomicService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
-  late List<SocioEconomicDto> socioEconomicsDto = [];
 
   ExpandableController captureSocioEconomicPanelController =
-      ExpandableController();
-  ExpandableController viewSocioEconomicPanelController =
       ExpandableController();
   final TextEditingController familyBackgroundCommentController =
       TextEditingController();
@@ -67,32 +64,52 @@ class _SocioEconomicPageState extends State<SocioEconomicPage> {
   void initState() {
     super.initState();
     captureSocioEconomicPanelController =
-        ExpandableController(initialExpanded: false);
-    viewSocioEconomicPanelController =
         ExpandableController(initialExpanded: true);
-    labelButtonAddUpdate = 'Add Socio Economic';
+    labelButtonAddUpdate = 'Add Economic';
     socioEconomicId = null;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
         setState(() {
           acceptedWorklistDto =
               ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
-          loadSocioEconomicsByIntakeAssessmentId(
+          loadSocioEconomicByIntakeAssessmentId(
               acceptedWorklistDto.intakeAssessmentId);
         });
       });
     });
   }
 
-  loadSocioEconomicsByIntakeAssessmentId(int? intakeAssessmentId) async {
+  loadSocioEconomicByIntakeAssessmentId(int? intakeAssessmentId) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
     apiResponse = await _socioEconomicServiceClient
-        .getsocioEconomicsByAssessmentId(intakeAssessmentId);
+        .getsocioEconomicByAssessmentId(intakeAssessmentId);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        socioEconomicsDto = (apiResponse.Data as List<SocioEconomicDto>);
+        if (apiResponse.Data != null) {
+          SocioEconomicDto socioEconomicDto =
+              (apiResponse.Data as SocioEconomicDto);
+          labelButtonAddUpdate = 'Update Economic';
+          socioEconomicId = socioEconomicDto.socioEconomyid;
+          familyBackgroundCommentController.text =
+              socioEconomicDto.familyBackgroundComment!;
+          financeWorkRecordController.text =
+              socioEconomicDto.financeWorkRecord!;
+          housingController.text = socioEconomicDto.housing!;
+          socialCircumsancesController.text =
+              socioEconomicDto.socialCircumsances!;
+          previousInterventionController.text =
+              socioEconomicDto.previousIntervention!;
+          interPersonalRelationshipController.text =
+              socioEconomicDto.interPersonalRelationship!;
+          peerPresureController.text = socioEconomicDto.peerPresure!;
+          substanceAbuseController.text = socioEconomicDto.substanceAbuse!;
+          religiousInvolveController.text = socioEconomicDto.religiousInvolve!;
+          childBehaviorController.text = socioEconomicDto.childBehavior!;
+          otherController.text = socioEconomicDto.other!;
+          socioEconomicId = socioEconomicDto.socioEconomyid;
+        }
       });
     } else {
       overlay.hide();
@@ -152,49 +169,6 @@ class _SocioEconomicPageState extends State<SocioEconomicPage> {
     messageDialog.showSnackBar(
       SnackBar(content: Text(message!), backgroundColor: Colors.green),
     );
-  }
-
-  newSocioEconomic() {
-    setState(() {
-      labelButtonAddUpdate = 'Add Socio Economic';
-      familyBackgroundCommentController.clear();
-      financeWorkRecordController.clear();
-      housingController.clear();
-      socialCircumsancesController.clear();
-      previousInterventionController.clear();
-      interPersonalRelationshipController.clear();
-      peerPresureController.clear();
-      substanceAbuseController.clear();
-      religiousInvolveController.clear();
-      childBehaviorController.clear();
-      otherController.clear();
-      socioEconomicId = null;
-    });
-  }
-
-  populateSocioEconomicForm(SocioEconomicDto socioEconomicDto) {
-    setState(() {
-      socioEconomicId = socioEconomicDto.socioEconomyid;
-      captureSocioEconomicPanelController =
-          ExpandableController(initialExpanded: true);
-      viewSocioEconomicPanelController =
-          ExpandableController(initialExpanded: false);
-      labelButtonAddUpdate = 'Update Socio Economic';
-      familyBackgroundCommentController.text =
-          socioEconomicDto.familyBackgroundComment!;
-      financeWorkRecordController.text = socioEconomicDto.financeWorkRecord!;
-      housingController.text = socioEconomicDto.housing!;
-      socialCircumsancesController.text = socioEconomicDto.socialCircumsances!;
-      previousInterventionController.text =
-          socioEconomicDto.previousIntervention!;
-      interPersonalRelationshipController.text =
-          socioEconomicDto.interPersonalRelationship!;
-      peerPresureController.text = socioEconomicDto.peerPresure!;
-      substanceAbuseController.text = socioEconomicDto.substanceAbuse!;
-      religiousInvolveController.text = socioEconomicDto.religiousInvolve!;
-      childBehaviorController.text = socioEconomicDto.childBehavior!;
-      otherController.text = socioEconomicDto.other!;
-    });
   }
 
   @override
@@ -334,48 +308,6 @@ class _SocioEconomicPageState extends State<SocioEconomicPage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(8),
-                                              ),
-                                            ),
-                                            Expanded(
-                                                child: Container(
-                                                    height: 70,
-                                                    padding: const EdgeInsets
-                                                            .fromLTRB(
-                                                        10, 20, 10, 2),
-                                                    child: OutlinedButton(
-                                                      style: OutlinedButton
-                                                          .styleFrom(
-                                                        minimumSize: const Size
-                                                            .fromHeight(10),
-                                                        backgroundColor:
-                                                            const Color
-                                                                    .fromARGB(
-                                                                255,
-                                                                244,
-                                                                248,
-                                                                246),
-                                                        shape:
-                                                            const StadiumBorder(),
-                                                        side: const BorderSide(
-                                                            width: 2,
-                                                            color: Colors.blue),
-                                                      ),
-                                                      onPressed: () {
-                                                        newSocioEconomic();
-                                                      },
-                                                      child: const Text('New',
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.blue)),
-                                                    ))),
-                                          ],
-                                        ),
                                         Row(
                                           children: [
                                             Expanded(
@@ -774,133 +706,6 @@ class _SocioEconomicPageState extends State<SocioEconomicPage> {
                             ),
                           ),
                         )))
-                      ]),
-                      Row(children: [
-                        Expanded(
-                            child: ExpandableNotifier(
-                                child: Padding(
-                          padding: const EdgeInsets.all(2),
-                          child: Card(
-                            clipBehavior: Clip.antiAlias,
-                            child: Column(
-                              children: <Widget>[
-                                ScrollOnExpand(
-                                  scrollOnExpand: true,
-                                  scrollOnCollapse: false,
-                                  child: ExpandablePanel(
-                                    controller:
-                                        viewSocioEconomicPanelController,
-                                    theme: const ExpandableThemeData(
-                                      headerAlignment:
-                                          ExpandablePanelHeaderAlignment.center,
-                                      tapBodyToCollapse: true,
-                                    ),
-                                    header: Padding(
-                                        padding: const EdgeInsets.all(10),
-                                        child: Text(
-                                          "View Socio Economic",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyLarge,
-                                        )),
-                                    collapsed: const Text(
-                                      '',
-                                      softWrap: true,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    expanded: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        if (socioEconomicsDto.isNotEmpty)
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: ListView.separated(
-                                                  shrinkWrap: true,
-                                                  itemCount:
-                                                      socioEconomicsDto.length,
-                                                  itemBuilder:
-                                                      (context, int index) {
-                                                    if (socioEconomicsDto
-                                                        .isEmpty) {
-                                                      return const Center(
-                                                          child: Text(
-                                                              'No socio economics Found.'));
-                                                    }
-                                                    return ListTile(
-                                                      title: Text(
-                                                          'Family Background Comments : ${socioEconomicsDto[index].familyBackgroundComment ?? ''}',
-                                                          style: const TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold)),
-                                                      subtitle: Text(
-                                                          'Finance Work Record : ${socioEconomicsDto[index].financeWorkRecord ?? ''}. '
-                                                          'Peer Presure : ${socioEconomicsDto[index].peerPresure ?? ''}. '
-                                                          'Religious Involve : ${socioEconomicsDto[index].religiousInvolve ?? ''}. '
-                                                          'Substance Abuse : ${socioEconomicsDto[index].substanceAbuse ?? ''}. ',
-                                                          style:
-                                                              const TextStyle(
-                                                                  color: Colors
-                                                                      .black)),
-                                                      trailing: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          //IconButton(onPressed: () {}, icon: const Icon(Icons.favorite)),
-                                                          IconButton(
-                                                              onPressed: () {
-                                                                populateSocioEconomicForm(
-                                                                    socioEconomicsDto[
-                                                                        index]);
-                                                              },
-                                                              icon: const Icon(
-                                                                  Icons.edit,
-                                                                  color: Colors
-                                                                      .blue)),
-                                                          /*IconButton(
-                                                              onPressed: () {},
-                                                              icon: const Icon(
-                                                                  Icons.delete,
-                                                                  color: Colors
-                                                                      .red)),*/
-                                                        ],
-                                                      ),
-                                                    );
-                                                  },
-                                                  separatorBuilder:
-                                                      (context, index) {
-                                                    return const Divider(
-                                                        thickness: 1);
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          )
-                                      ],
-                                    ),
-                                    builder: (_, collapsed, expanded) {
-                                      return Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 10, right: 10, bottom: 10),
-                                        child: Expandable(
-                                          collapsed: collapsed,
-                                          expanded: expanded,
-                                          theme: const ExpandableThemeData(
-                                              crossFadePoint: 0),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ))),
                       ]),
                     ],
                   ),

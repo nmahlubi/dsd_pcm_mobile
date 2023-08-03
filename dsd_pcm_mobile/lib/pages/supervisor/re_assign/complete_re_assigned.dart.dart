@@ -165,7 +165,7 @@ class _CompleteReAssignedCasesPageState
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       apiResults = (apiResponse.Data as ApiResults);
-      showSuccessMessage("Case Successfull Assign");
+      showSuccessMessage("Case Successfully Re-allocated.");
       navigator.push(
         MaterialPageRoute(builder: (context) => const ReAssignedCasesPage()),
       );
@@ -198,7 +198,7 @@ class _CompleteReAssignedCasesPageState
         },
         child: Scaffold(
             appBar: AppBar(
-              title: Text('Case For: ${childInformationDto.childName}'),
+              title: Text('ReAllocate Case : ${childInformationDto.childName}'),
             ),
             body: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 70),
@@ -297,7 +297,7 @@ class _CompleteReAssignedCasesPageState
                                               reAllocateProbationOfficer();
                                             }
                                           },
-                                          child: const Text('Complete'),
+                                          child: const Text('Reallocate'),
                                         ))),
                               ],
                             ),

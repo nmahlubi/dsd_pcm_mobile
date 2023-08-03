@@ -58,14 +58,14 @@ class _NavigationDrawerMenuWidgetState extends State<NavigationDrawerMenu> {
           if (preferences?.getBool('supervisor') == true)
             createDrawerBodyItem(
               icon: Icons.inbox,
-              text: 'Overdue Cases',
+              text: 'Overdue/Escalated  Cases',
               onTap: () =>
                   Navigator.pushReplacementNamed(context, '/overdue-cases'),
             ),
           if (preferences?.getBool('supervisor') == true)
             createDrawerBodyItem(
               icon: Icons.inbox,
-              text: 'Re_Allocate Cases',
+              text: 'Allocated Cases',
               onTap: () =>
                   Navigator.pushReplacementNamed(context, '/re-assigned-cases'),
             ),
@@ -83,19 +83,20 @@ class _NavigationDrawerMenuWidgetState extends State<NavigationDrawerMenu> {
               onTap: () =>
                   Navigator.pushReplacementNamed(context, '/accepted-worklist'),
             ),
-          //if (preferences?.getBool('supervisor') == false)
-          createDrawerBodyItem(
-            icon: Icons.inbox,
-            text: 'Preliminary',
-            onTap: () =>
-                Navigator.pushReplacementNamed(context, '/preliminary'),
-          ),
-          //if (preferences?.getBool('supervisor') == false)
-          createDrawerBodyItem(
-            icon: Icons.inbox,
-            text: 'Diversion & HBS',
-            onTap: () => Navigator.pushReplacementNamed(context, '/home-based'),
-          ),
+          if (preferences?.getBool('supervisor') == false)
+            createDrawerBodyItem(
+              icon: Icons.inbox,
+              text: 'Preliminary',
+              onTap: () =>
+                  Navigator.pushReplacementNamed(context, '/preliminary'),
+            ),
+          if (preferences?.getBool('supervisor') == false)
+            createDrawerBodyItem(
+              icon: Icons.inbox,
+              text: 'Diversion & HBS',
+              onTap: () =>
+                  Navigator.pushReplacementNamed(context, '/home-based'),
+            ),
           const Divider(),
           createDrawerBodyItem(
             icon: Icons.logout,

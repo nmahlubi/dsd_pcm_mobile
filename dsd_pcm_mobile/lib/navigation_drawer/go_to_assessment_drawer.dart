@@ -8,7 +8,7 @@ import '../pages/assessment/capture_assessment/care_giver_detail.dart';
 import '../pages/assessment/capture_assessment/child_detail/update_child_detail.dart';
 import '../pages/assessment/capture_assessment/complete_assessment.dart';
 import '../pages/assessment/capture_assessment/development_assessment.dart';
-import '../pages/assessment/capture_assessment/educational/education.dart';
+import '../pages/assessment/capture_assessment/education.dart';
 import '../pages/assessment/capture_assessment/family/family.dart';
 import '../pages/assessment/capture_assessment/family_information.dart';
 import '../pages/assessment/capture_assessment/family_member.dart';

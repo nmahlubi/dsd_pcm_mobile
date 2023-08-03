@@ -83,7 +83,7 @@ class _OverdueCasesPageState extends State<OverdueCasesPage> {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: const Text('Overdue Cases'),
+            title: const Text('Overdue/Escalated Cases'),
           ),
           drawer: const NavigationDrawerMenu(),
           body: Column(

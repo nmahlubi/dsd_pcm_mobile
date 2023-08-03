@@ -21,36 +21,9 @@ class SocioEconomicRepository {
         await Hive.openBox<SocioEconomicModel>(socioEconomicBox);
   }
 
-  Future<void> saveSocioEconomicItems(
-      List<SocioEconomicDto> socioEconomicsDto) async {
-    for (var socioEconomicDto in socioEconomicsDto) {
-      await _socioEconomicsBox.put(
-          socioEconomicDto.socioEconomyid,
-          (SocioEconomicModel(
-              socioEconomyid: socioEconomicDto.socioEconomyid,
-              intakeAssessmentId: socioEconomicDto.intakeAssessmentId,
-              familyBackgroundComment: socioEconomicDto.familyBackgroundComment,
-              financeWorkRecord: socioEconomicDto.financeWorkRecord,
-              housing: socioEconomicDto.housing,
-              socialCircumsances: socioEconomicDto.socialCircumsances,
-              previousIntervention: socioEconomicDto.previousIntervention,
-              interPersonalRelationship:
-                  socioEconomicDto.interPersonalRelationship,
-              peerPresure: socioEconomicDto.peerPresure,
-              substanceAbuse: socioEconomicDto.substanceAbuse,
-              religiousInvolve: socioEconomicDto.religiousInvolve,
-              childBehavior: socioEconomicDto.childBehavior,
-              other: socioEconomicDto.other,
-              createdBy: socioEconomicDto.createdBy,
-              dateCreated: socioEconomicDto.dateCreated,
-              modifiedBy: socioEconomicDto.modifiedBy,
-              dateModified: socioEconomicDto.dateModified)));
-    }
-  }
-
   Future<void> saveSocioEconomic(SocioEconomicDto socioEconomicDto) async {
     await _socioEconomicsBox.put(
-        socioEconomicDto.socioEconomyid,
+        socioEconomicDto.intakeAssessmentId,
         SocioEconomicModel(
             socioEconomyid: socioEconomicDto.socioEconomyid,
             intakeAssessmentId: socioEconomicDto.intakeAssessmentId,
@@ -72,7 +45,7 @@ class SocioEconomicRepository {
             dateModified: socioEconomicDto.dateModified));
   }
 
-  SocioEconomicDto? getSocioEconomicsById(int id) {
+  SocioEconomicDto? getSocioEconomicsByAssessmentId(int id) {
     final socioEconomicDb = _socioEconomicsBox.get(id);
     if (socioEconomicDb != null) {
       return socioEconomicFromDb(socioEconomicDb);
@@ -93,12 +66,7 @@ class SocioEconomicRepository {
     return socioEconomicDtoItems.map(socioEconomicFromDb).toList();
   }
 
-  List<SocioEconomicDto> getAllSocioEconomicsByAssessmentId(
-      int intakeAssessmentId) {
-    return _socioEconomicsBox.values.map(socioEconomicFromDb).toList();
-  }
-
-  Future<void> deleteSocioEconomic(int id) async {
+  Future<void> deleteSocioEconomicByAssesmentId(int id) async {
     await _socioEconomicsBox.delete(id);
   }
 

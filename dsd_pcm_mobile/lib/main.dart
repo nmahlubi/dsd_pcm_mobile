@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:dsd_pcm_mobile/pages/probation_officer/diversion_childrenlist.dart';
 import 'package:dsd_pcm_mobile/sessions/session.dart';
 import 'package:dsd_pcm_mobile/sessions/session_manager.dart';
 import 'package:flutter/material.dart';
@@ -167,9 +166,9 @@ Future<void> main() async {
   await _gradeRepository.initialize(); //39
   await _schoolTypeRepository.initialize(); //40
   await _schoolRepository.initialize(); //41
-  await _personEducationRepository.initialize(); //42
   await _formOfNotificationRepository.initialize(); //43
   await _assesmentRegisterRepository.initialize(); //44
+  await _personEducationRepository.initialize(); //45
 
 /*
   Workmanager().initialize(
@@ -261,7 +260,7 @@ class MyApp extends StatelessWidget {
         }
       },
       //active time 5000= 5 minutes
-      duration: const Duration(seconds: 5000),
+      duration: const Duration(seconds: 1000),
       streamController: streamController,
       child: MaterialApp(
         title: 'PCM',

@@ -7,7 +7,6 @@ import '../../../model/pcm/family_member_dto.dart';
 import '../../../service/intake/person_service.dart';
 import '../../../service/pcm/family_service.dart';
 import '../../../util/shared/apiresponse.dart';
-import '../../../util/shared/apiresults.dart';
 
 class FamilyMemberSync {
   final _familyMemberRepository = FamilyMemberRepository();
@@ -27,8 +26,6 @@ class FamilyMemberSync {
             apiResponse = await _personService
                 .searchAddUdatePersonOnline(familyMember.personDto!);
             if ((apiResponse.ApiError) == null) {
-              ApiResults apiResults = (apiResponse.Data as ApiResults);
-              PersonDto personDto = PersonDto.fromJson(apiResults.data);
               apiResponse = await _familyServiceService
                   .addUpdateFamilyMemberOnline(familyMember);
               _familyMemberRepository

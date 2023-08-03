@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
 
 import '../../../../model/intake/person_education_dto.dart';
-import '../../../../model/pcm/medical_health_detail_dto.dart';
 
 class ViewEducation extends StatelessWidget {
   final List<PersonEducationDto>? personEducationsDto;
