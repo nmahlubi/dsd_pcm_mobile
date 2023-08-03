@@ -1,4 +1,4 @@
-import 'package:dsd_pcm_mobile/model/pcm/preliminary_detailQuery_dto.dart';
+import 'package:dsd_pcm_mobile/model/pcm/query/preliminary_detail_query_dto.dart';
 import 'package:dsd_pcm_mobile/pages/preliminary_inquery/preliminary.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';

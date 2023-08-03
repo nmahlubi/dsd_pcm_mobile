@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:dsd_pcm_mobile/model/pcm/preliminary_detailQuery_dto.dart';
+import 'package:dsd_pcm_mobile/model/pcm/query/preliminary_detail_query_dto.dart';
 import 'package:http_interceptor/http/intercepted_client.dart';
 
 import '../../domain/repository/worklist/accepted_worklist_repository.dart';
