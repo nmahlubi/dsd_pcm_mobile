@@ -5,13 +5,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../background_job/background_job_offline.dart';
 import '../../../model/pcm/accepted_worklist_dto.dart';
+import '../../../model/pcm/query/assessment_count_query_dto.dart';
 import '../../../model/pcm/request/request_complete_assessment.dart';
 import '../../../navigation_drawer/go_to_assessment_drawer.dart';
+import '../../../service/pcm/assessment_service.dart';
 import '../../../service/pcm/worklist_service.dart';
 import '../../../util/shared/apierror.dart';
 import '../../../util/shared/apiresponse.dart';
 import '../../../util/shared/apiresults.dart';
 import '../../../util/shared/loading_overlay.dart';
+import '../../../widgets/list_tile_widget.dart';
 import '../../probation_officer/accepted_worklist.dart';
 import 'child_detail/update_child_detail.dart';
 import 'health_detail.dart';
@@ -35,8 +38,24 @@ class _CompleteAssessmentPageState extends State<CompleteAssessmentPage> {
   late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
   final _worklistServiceClient = WorklistService();
   final _backgroundJobOffline = BackgroundJobOffline();
+  final _assessmentService = AssessmentService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
+  int? intakeAssessmentId = 0;
+  int? childDetails = 0;
+  int? assesmentDetails = 0;
+  int? medicalInformation = 0;
+  int? educationInformation = 0;
+  int? careGiverDetail = 0;
+  int? familyMember = 0;
+  int? familyInformation = 0;
+  int? socioEconomicDetails = 0;
+  int? offenceDetails = 0;
+  int? victimDetails = 0;
+  int? victimOrganizationDetails = 0;
+  int? developmentAssessment = 0;
+  int? recommendation = 0;
+  int? generalDetails = 0;
 
   @override
   void initState() {
@@ -47,6 +66,8 @@ class _CompleteAssessmentPageState extends State<CompleteAssessmentPage> {
           acceptedWorklistDto =
               ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
           syncToCompleteAssessment(acceptedWorklistDto);
+          //loadAssessmentStatus(acceptedWorklistDto.intakeAssessmentId,
+          //   acceptedWorklistDto.personId);
         });
       });
     });
@@ -64,6 +85,29 @@ class _CompleteAssessmentPageState extends State<CompleteAssessmentPage> {
     } on SocketException {
       overlay.hide();
       showDialogMessage('Unable to sync offline data.');
+    }
+
+    loadAssessmentStatus(
+        acceptedWorklistDto.intakeAssessmentId, acceptedWorklistDto.personId);
+  }
+
+  loadAssessmentStatus(int? intakeAssessmentId, int? personId) async {
+    final overlay = LoadingOverlay.of(context);
+    overlay.show();
+    apiResponse = await _assessmentService.getAssessmentCountById(
+        intakeAssessmentId, personId);
+    if ((apiResponse.ApiError) == null) {
+      overlay.hide();
+      setState(() {
+        if (apiResponse.Data != null) {
+          AssessmentCountQueryDto responseAssessmentCountQueryDto =
+              (apiResponse.Data as AssessmentCountQueryDto);
+          childDetails = responseAssessmentCountQueryDto.childDetails;
+        }
+      });
+    } else {
+      overlay.hide();
+      showDialogMessage((apiResponse.ApiError as ApiError).error);
     }
   }
 
@@ -214,6 +258,48 @@ class _CompleteAssessmentPageState extends State<CompleteAssessmentPage> {
                                                 fontSize: 21),
                                           ),
                                         ),
+                                        listTileWidget(
+                                            icon: Icons.arrow_right,
+                                            text: 'Child Details',
+                                            status: childDetails == 0
+                                                ? false
+                                                : true),
+                                        listTileWidget(
+                                            icon: Icons.arrow_right,
+                                            text: 'Assessment Details',
+                                            status: true),
+                                        listTileWidget(
+                                            icon: Icons.arrow_right,
+                                            text: 'Medical Information',
+                                            status: true),
+                                        listTileWidget(
+                                            icon: Icons.arrow_right,
+                                            text: 'Educational Information',
+                                            status: true),
+                                        listTileWidget(
+                                            icon: Icons.arrow_right,
+                                            text: 'Family Member',
+                                            status: true),
+                                        listTileWidget(
+                                            icon: Icons.arrow_right,
+                                            text: 'Family Information',
+                                            status: true),
+                                        listTileWidget(
+                                            icon: Icons.arrow_right,
+                                            text: 'Child Details',
+                                            status: true),
+                                        listTileWidget(
+                                            icon: Icons.arrow_right,
+                                            text: 'Child Details',
+                                            status: true),
+                                        listTileWidget(
+                                            icon: Icons.arrow_right,
+                                            text: 'Child Details',
+                                            status: true),
+                                        listTileWidget(
+                                            icon: Icons.arrow_right,
+                                            text: 'Child Details',
+                                            status: true),
                                         Row(
                                           children: [
                                             Expanded(
