@@ -47,6 +47,7 @@ class LookUpService {
   final placementTypeRepository = PlacementTypeRepository();
   final recommendationTypeRepository = RecommendationTypeRepository();
   final formOfNotificationRepository = FormOfNotificationRepository();
+  // final preliminaryStatusRepository = PreliminaryStatusRepository();
 
   Future<ApiResponse> getGendersOnline() async {
     ApiResponse apiResponse = ApiResponse();
@@ -531,4 +532,27 @@ class LookUpService {
     }
     return apiResponse;
   }
+
+  //   Future<ApiResponse> getPreliminaryStatusOnline() async {
+  //   ApiResponse apiResponse = ApiResponse();
+  //   try {
+  //     if (formOfNotificationRepository.getAllFormOfNotifications().isNotEmpty) {
+  //       apiResponse.Data =
+  //           formOfNotificationRepository.getAllFormOfNotifications();
+  //       return apiResponse;
+  //     }
+  //     apiResponse = await getFormOfNotificationsOnline();
+  //     if (apiResponse.ApiError == null) {
+  //       List<FormOfNotificationDto> formOfNotificationsDtoResponse =
+  //           apiResponse.Data as List<FormOfNotificationDto>;
+  //       apiResponse.Data = formOfNotificationsDtoResponse;
+  //       formOfNotificationRepository
+  //           .saveFormOfNotificationItems(formOfNotificationsDtoResponse);
+  //     }
+  //   } on SocketException {
+  //     apiResponse.Data =
+  //         formOfNotificationRepository.getAllFormOfNotifications();
+  //   }
+  //   return apiResponse;
+  // }
 }

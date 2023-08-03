@@ -1,3 +1,6 @@
+import 'package:dsd_pcm_mobile/model/pcm/preliminaryStatus_dto.dart';
+import 'package:dsd_pcm_mobile/model/pcm/preliminary_detail_dto.dart';
+
 import '../model/intake/address_type_dto.dart';
 import '../model/intake/disability_type_dto.dart';
 import '../model/intake/form_of_notification_dto.dart';
@@ -34,6 +37,7 @@ class LookupTransform {
   late List<RecommendationTypeDto> recommendationTypesDto = [];
   late List<GradeDto> gradesDto = [];
   late List<FormOfNotificationDto> formOfNotificationsDto = [];
+  late List<PreliminaryStatusDto> preliminayStatusDto = [];
 
   Future<List<IdentificationTypeDto>> transformIdentificationTypeDto() async {
     apiResponse = await _lookUpServiceClient.getIdentificationTypes();
@@ -134,5 +138,13 @@ class LookupTransform {
           (apiResponse.Data as List<FormOfNotificationDto>);
     }
     return formOfNotificationsDto;
+  }
+
+  Future<List<PreliminaryStatusDto>> transformPreliminaryStatusDto() async {
+    apiResponse = await _lookUpServiceClient.getPreliminaryStatus();
+    if ((apiResponse.ApiError) == null) {
+      preliminayStatusDto = (apiResponse.Data as List<PreliminaryStatusDto>);
+    }
+    return preliminayStatusDto;
   }
 }

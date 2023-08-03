@@ -67,13 +67,13 @@ class PreliminaryDetailDto {
     ;
     _pCMPreliminaryDate = json['pcmPreliminaryDate'];
     ;
-    _pCMPreliminaryStatusId = json['pcmPreliminaryStatusId'];
+    _pCMPreliminaryStatusId = json['preliminaryStatusId'];
     ;
     _pCMOutcomeReason = json['pcmOutcomeReason'];
     ;
     _pCMOffenceId = json['pcmOffenceId'];
     ;
-    _pCMRecommendationId = json['pcmRecommendationId'];
+    _pCMRecommendationId = json['recommendationTypeId'];
     ;
     _placementPreStatusId = json['placementPreStatusId'];
     ;
@@ -82,7 +82,7 @@ class PreliminaryDetailDto {
 
     _pretrialDate = json['pretrialDate'];
 
-    _placementPreRecommendedId = json['placementPreRecommendedId'];
+    _placementPreRecommendedId = json['placementTypeId'];
     ;
     _createdBy = json['createdBy'];
     ;
@@ -157,14 +157,14 @@ class PreliminaryDetailDto {
     map['preInquiryConducted'] = _preInquiryConducted;
     map['reasonPreInquiryConducted'] = _reasonPreInquiryConducted;
     map['pcmPreliminaryDate'] = _pCMPreliminaryDate;
-    map['pcmPreliminaryStatusId'] = _pCMPreliminaryStatusId;
+    map['preliminaryStatusId'] = _pCMPreliminaryStatusId;
     map['pcmOutcomeReason'] = _pCMOutcomeReason;
     map['pcmOffenceId'] = _pCMOffenceId;
-    map['pcmRecommendationId'] = _pCMRecommendationId;
+    map['recommendationTypeId'] = _pCMRecommendationId;
     map['placementPreStatusId'] = _placementPreStatusId;
     map['pretrialReason'] = _pretrialReason;
     map['pretrialDate'] = _pretrialDate;
-    map['placementPreRecommendedId'] = _placementPreRecommendedId;
+    map['placementTypeId'] = _placementPreRecommendedId;
     map['createdBy'] = _createdBy;
     map['dateCreated'] = _dateCreated;
     map['modifiedBy'] = _modifiedBy;
