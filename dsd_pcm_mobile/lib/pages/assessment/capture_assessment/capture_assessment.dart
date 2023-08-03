@@ -59,23 +59,6 @@ class _CaptureAssessmentPageState extends State<CaptureAssessmentPage> {
     //   acceptedWorklistDto.intakeAssessmentId, acceptedWorklistDto.personId);
   }
 
-  loadAssessmentCountByIntakeAssessmentId(
-      int? intakeAssessmentId, int? personId) async {
-    final overlay = LoadingOverlay.of(context);
-    overlay.show();
-    apiResponse = await assessmentServiceClient
-        .getAssessmentCountByIntakeAssessmentId(intakeAssessmentId, personId);
-    if ((apiResponse.ApiError) == null) {
-      overlay.hide();
-      setState(() {
-        assessmentCountQueryDto = (apiResponse.Data as AssessmentCountQueryDto);
-      });
-    } else {
-      overlay.hide();
-      showDialogMessage((apiResponse.ApiError as ApiError));
-    }
-  }
-
   showDialogMessage(ApiError apiError) {
     final messageDialog = ScaffoldMessenger.of(context);
     messageDialog.showSnackBar(
