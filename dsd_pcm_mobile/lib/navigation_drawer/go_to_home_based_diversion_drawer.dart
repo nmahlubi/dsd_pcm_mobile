@@ -1,10 +1,13 @@
+import 'package:dsd_pcm_mobile/model/pcm/query/homebased_diversion_query_dto.dart';
 import 'package:dsd_pcm_mobile/navigation_drawer/create_drawer_body_item.dart';
+import 'package:dsd_pcm_mobile/pages/home_based_diversion/home_based_diversion_detail/home_based_diversion_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // ignore: use_key_in_widget_constructors
 class GoToHomeBasedDiversionDrawer extends StatefulWidget {
-  const GoToHomeBasedDiversionDrawer({Key? key, serverIP}) : super(key: key);
+   final HomebasedDiversionQueryDto homebasedDiversionQueryDto;
+  const GoToHomeBasedDiversionDrawer({Key? key, serverIP, required this.homebasedDiversionQueryDto}) : super(key: key);
 
   @override
   State<GoToHomeBasedDiversionDrawer> createState() =>
@@ -47,33 +50,26 @@ class _GoToHomeBasedDiversionDrawerPageWidgetState
           createDrawerBodyItem(
             icon: Icons.inbox,
             text: 'Diversion',
-            /*onTap: () =>
-                Navigator.pushReplacementNamed(context, '/re-assigned-cases'),*/
+            onTap: () =>
+                Navigator.pushReplacementNamed(context, '/preliminary'),
           ),
-          createDrawerBodyItem(
-            icon: Icons.inbox,
-            text: 'Session',
-            /*onTap: () =>
-                Navigator.pushReplacementNamed(context, '/re-assigned-cases'),*/
-          ),
+      
           createDrawerBodyItem(
             icon: Icons.inbox,
             text: 'HomeBased',
-            /*onTap: () =>
-                Navigator.pushReplacementNamed(context, '/re-assigned-cases'),*/
+            onTap: () =>
+               // Navigator.pushReplacementNamed(context, '/home-based'),
+                 Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const HomeBasedDiversionDetailPage(),
+                    settings: RouteSettings(
+                      arguments: widget.homebasedDiversionQueryDto,
+                    ),
+                  ),
+                ),
           ),
-          createDrawerBodyItem(
-            icon: Icons.inbox,
-            text: 'Other Items',
-            /*onTap: () =>
-                Navigator.pushReplacementNamed(context, '/re-assigned-cases'),*/
-          ),
-          createDrawerBodyItem(
-            icon: Icons.inbox,
-            text: 'Enrollment Ex',
-            /*onTap: () =>
-                Navigator.pushReplacementNamed(context, '/re-assigned-cases'),*/
-          ),
+          
         ],
       ),
     );

@@ -7,9 +7,11 @@ import '../../../model/pcm/accepted_worklist_dto.dart';
 import '../../../util/shared/apierror.dart';
 import '../../../util/shared/apiresponse.dart';
 import '../../../util/shared/loading_overlay.dart';
+import '../../model/pcm/query/homebased_diversion_query_dto.dart';
 import '../../navigation_drawer/navigation_drawer_menu.dart';
 import '../../service/pcm/worklist_service.dart';
 import 'home_based_diversion_detail/home_based_diversion_detail.dart';
+import 'home_based_diversion_detail/homebased_diversion_child_details.dart';
 
 class HomeBasedDiversionPage extends StatefulWidget {
   const HomeBasedDiversionPage({Key? key}) : super(key: key);
@@ -29,7 +31,7 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
 
   final _worklistServiceClient = WorklistService();
   late ApiResponse apiResponse = ApiResponse();
-  late List<AcceptedWorklistDto> acceptedWorklistDto = [];
+  late List<HomebasedDiversionQueryDto> homebasedDiversionQueryDto = [];
   String searchString = "";
   ExpandableController viewMedicalInfoPanelController = ExpandableController();
 
@@ -41,30 +43,21 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
         setState(() {
-          loadLookUpTransformer();
-          loadCompletedCasesByProbationOfficer();
+          loadHBSDiversionyProbationOfficer();
         });
       });
     });
   }
-
-  loadLookUpTransformer() async {
-    final overlay = LoadingOverlay.of(context);
-    overlay.show();
-    //healthStatusesDto = await _lookupTransform.transformHealthStatusesDto();
-    overlay.hide();
-  }
-
-  loadCompletedCasesByProbationOfficer() async {
+  loadHBSDiversionyProbationOfficer() async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
     apiResponse = await _worklistServiceClient
-        .getCompletedWorklistByProbationOfficerOnline(
+        .getHomebasedDiversionListByProbationOfficer(
             preferences!.getInt('userId')!);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        acceptedWorklistDto = (apiResponse.Data as List<AcceptedWorklistDto>);
+        homebasedDiversionQueryDto = (apiResponse.Data as List<HomebasedDiversionQueryDto>);
       });
     } else {
       overlay.hide();
@@ -117,22 +110,22 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
               Expanded(
                 child: ListView.separated(
                   shrinkWrap: true,
-                  itemCount: acceptedWorklistDto.length,
+                  itemCount: homebasedDiversionQueryDto.length,
                   itemBuilder: (context, int index) {
-                    if (acceptedWorklistDto.isEmpty) {
+                    if (homebasedDiversionQueryDto.isEmpty) {
                       return const Center(
-                          child: Text('No completed worklist Found.'));
+                          child: Text('No HBS and  Diversionlist Found.'));
                     }
-                    return acceptedWorklistDto[index]
+                    return homebasedDiversionQueryDto[index]
                             .childName!
                             .toLowerCase()
                             .contains(searchString)
                         ? ListTile(
-                            title: Text(acceptedWorklistDto[index]
+                            title: Text(homebasedDiversionQueryDto[index]
                                 .childName
                                 .toString()),
                             subtitle: Text(
-                                acceptedWorklistDto[index]
+                                homebasedDiversionQueryDto[index]
                                     .dateAccepted
                                     .toString(),
                                 style: const TextStyle(color: Colors.grey)),
@@ -143,9 +136,9 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      const HomeBasedDiversionDetailPage(),
+                                      const DiversionHbsChildDetails(),
                                   settings: RouteSettings(
-                                    arguments: acceptedWorklistDto[index],
+                                    arguments: homebasedDiversionQueryDto[index],
                                   ),
                                 ),
                               );
@@ -153,7 +146,7 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
                         : Container();
                   },
                   separatorBuilder: (context, index) {
-                    return acceptedWorklistDto[index]
+                    return homebasedDiversionQueryDto[index]
                             .childName!
                             .toLowerCase()
                             .contains(searchString)

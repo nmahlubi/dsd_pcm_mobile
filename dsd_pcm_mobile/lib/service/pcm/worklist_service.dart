@@ -5,6 +5,7 @@ import 'package:http_interceptor/http/intercepted_client.dart';
 
 import '../../domain/repository/worklist/accepted_worklist_repository.dart';
 import '../../model/pcm/accepted_worklist_dto.dart';
+import '../../model/pcm/query/homebased_diversion_query_dto.dart';
 import '../../model/pcm/request/create_worklist.dart';
 import '../../model/pcm/request/request_complete_assessment.dart';
 import '../../util/app_url.dart';
@@ -144,6 +145,24 @@ class WorklistService {
       }
     } on SocketException {
       apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
+  }
+
+   Future<ApiResponse> getHomebasedDiversionListByProbationOfficer(
+       int? probationOfficerId) async {
+    ApiResponse apiResponse = ApiResponse();
+    final response = await client.get(Uri.parse(
+        "${AppUrl.pcmURL}/Worklist/HBSDiversion/All/$probationOfficerId"));
+    switch (response.statusCode) {
+      case 200:
+        apiResponse.Data = (json.decode(response.body) as List)
+            .map((data) => HomebasedDiversionQueryDto.fromJson(data))
+            .toList();
+        break;
+      default:
+        apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+        break;
     }
     return apiResponse;
   }

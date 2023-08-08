@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../model/pcm/accepted_worklist_dto.dart';
 import '../../../model/pcm/home_based_supervision_dto.dart';
+import '../../../model/pcm/query/homebased_diversion_query_dto.dart';
 import '../../../service/pcm/home_based_supervision_service.dart';
 import '../../../transform_dynamic/transform_lookup.dart';
 import '../../../util/shared/apierror.dart';
@@ -33,7 +34,7 @@ class _HomeBasedDiversionDetailPageState
     preferences = await SharedPreferences.getInstance();
   }
 
-  late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
+  late HomebasedDiversionQueryDto homebasedDiversionQueryDto = HomebasedDiversionQueryDto();
   final _lookupTransform = LookupTransform();
   final _randomGenerator = RandomGenerator();
   final _homeBasedSupervisionServiceClient = HomeBasedSupervisionService();
@@ -61,13 +62,13 @@ class _HomeBasedDiversionDetailPageState
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
         setState(() {
-          acceptedWorklistDto =
-              ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
+          homebasedDiversionQueryDto =
+              ModalRoute.of(context)!.settings.arguments as HomebasedDiversionQueryDto;
           loadLookUpTransformer();
           loadHomeBasedSupervisionDetailsByAssessmentId(
-              acceptedWorklistDto.intakeAssessmentId);
+              homebasedDiversionQueryDto.intakeAssessmentId);
           loadHBSConditionsDetailsByAssessmentId(
-              acceptedWorklistDto.intakeAssessmentId);
+              homebasedDiversionQueryDto.intakeAssessmentId);
         });
       });
     });
@@ -163,7 +164,7 @@ class _HomeBasedDiversionDetailPageState
                 ),
               ],
             ),
-            drawer: const GoToHomeBasedDiversionDrawer(),
+            drawer: GoToHomeBasedDiversionDrawer(homebasedDiversionQueryDto: homebasedDiversionQueryDto),
             body: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 70),
                 child: Form(
@@ -359,6 +360,12 @@ class _HomeBasedDiversionDetailPageState
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold)),
+                                                                      subtitle: Text(
+                                                          'Date Created: ${hBSConditionsDto[index].dateCreated}. ',
+                                                          style:
+                                                              const TextStyle(
+                                                                  color: Colors
+                                                                      .black)),
                                                     );
                                                   },
                                                   separatorBuilder:
