@@ -1,25 +1,27 @@
-import 'package:dsd_pcm_mobile/model/pcm/preliminary_detail_dto.dart';
-import 'package:dsd_pcm_mobile/pages/preliminary_inquery/court_decision/court_decision.dart';
+import 'package:dsd_pcm_mobile/model/pcm/program_enrolment_session_outcome_dto.dart';
+import 'package:dsd_pcm_mobile/model/pcm/programme_module_dto.dart';
+import 'package:dsd_pcm_mobile/service/pcm/program_enrolment_session_outcome_service.dart';
+import 'package:dsd_pcm_mobile/service/pcm/programme_module_service.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../util/shared/apierror.dart';
-import '../../../util/shared/apiresponse.dart';
-import '../../../util/shared/loading_overlay.dart';
-import '../../../util/shared/randon_generator.dart';
-import '../../model/pcm/accepted_worklist_dto.dart';
-import '../../model/pcm/query/preliminary_detail_query_dto.dart';
-import '../../navigation_drawer/navigation_drawer_menu.dart';
-import '../../service/pcm/worklist_service.dart';
+import '../../../../navigation_drawer/navigation_drawer_menu.dart';
+import '../../../../service/pcm/worklist_service.dart';
+import '../../../../transform_dynamic/transform_lookup.dart';
+import '../../../../util/shared/apierror.dart';
+import '../../../../util/shared/apiresponse.dart';
+import '../../../../util/shared/loading_overlay.dart';
 
-class PreliminaryPage extends StatefulWidget {
-  const PreliminaryPage({Key? key}) : super(key: key);
+class ProgramEnrolledSessionOutcomePage extends StatefulWidget {
+  const ProgramEnrolledSessionOutcomePage({Key? key}) : super(key: key);
 
   @override
-  State<PreliminaryPage> createState() => _PreliminaryPageState();
+  State<ProgramEnrolledSessionOutcomePage> createState() =>
+      _ProgramEnrolledSessionOutcomePageState();
 }
 
-class _PreliminaryPageState extends State<PreliminaryPage> {
+class _ProgramEnrolledSessionOutcomePageState
+    extends State<ProgramEnrolledSessionOutcomePage> {
   SharedPreferences? preferences;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final _loginFormKey = GlobalKey<FormState>();
@@ -28,10 +30,16 @@ class _PreliminaryPageState extends State<PreliminaryPage> {
     preferences = await SharedPreferences.getInstance();
   }
 
-  final WorklistService worklistServiceClient = WorklistService();
+  final ProgramEnrollmentSessionOutcomeService
+      programEnrollmentSessionOutcomeService =
+      ProgramEnrollmentSessionOutcomeService();
+  final ProgramModuleService programModuleService = ProgramModuleService();
   late ApiResponse apiResponse = ApiResponse();
+  final _lookupTransform = LookupTransform();
   //late List<AcceptedWorklistDto> acceptedWorklistDto = [];
-  late List<PreliminaryDetailQueryDto> prelimanaryDetailsQuery = [];
+  late List<ProgramEnrolmentSessionOutcomeDto>
+      programEnrolmentSessionOutcomeDto = [];
+  late List<ProgrammeModuleDto> programmeModuleDto = [];
 
   String searchString = "";
 
@@ -43,6 +51,7 @@ class _PreliminaryPageState extends State<PreliminaryPage> {
         setState(() {
           loadCompletedTaskAllocatedToProbationOfficer();
           loadLookUpTransformer();
+          // loadProgrammeModule(1);
         });
       });
     });
@@ -52,21 +61,33 @@ class _PreliminaryPageState extends State<PreliminaryPage> {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
 
-    apiResponse =
-        await worklistServiceClient.getCompletedTaskAllocatedToProbationOfficer(
-            preferences!.getInt('userId')!);
+    apiResponse = await programEnrollmentSessionOutcomeService
+        .getProgramEnrollmentSessionOutcome(preferences!.getInt('userId')!);
 
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        prelimanaryDetailsQuery =
-            (apiResponse.Data as List<PreliminaryDetailQueryDto>);
+        programEnrolmentSessionOutcomeDto =
+            (apiResponse.Data as List<ProgramEnrolmentSessionOutcomeDto>);
       });
     } else {
       showDialogMessage((apiResponse.ApiError as ApiError));
       overlay.hide();
     }
   }
+
+  // loadProgrammeModule(int programmeModuleByid) async {
+  //   final overlay = LoadingOverlay.of(context);
+  //   overlay.show();
+  //   apiResponse =
+  //       await programModuleService.getProgrammeModuleById(programmeModuleByid);
+  //   if ((apiResponse.ApiError) == null) {
+  //     setState(() {
+  //       programmeModuleDto = (apiResponse.Data as List<ProgrammeModuleDto>);
+  //     });
+  //   }
+  //   overlay.hide();
+  // }
 
   loadLookUpTransformer() async {
     final overlay = LoadingOverlay.of(context);
@@ -96,7 +117,7 @@ class _PreliminaryPageState extends State<PreliminaryPage> {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: const Text('Preliminary Inquiry'),
+            title: const Text('Sessions Enrolled'),
           ),
           drawer: const NavigationDrawerMenu(),
           body: Column(
@@ -118,24 +139,26 @@ class _PreliminaryPageState extends State<PreliminaryPage> {
               Expanded(
                 child: ListView.separated(
                   shrinkWrap: true,
-                  itemCount: prelimanaryDetailsQuery.length,
+                  itemCount: programEnrolmentSessionOutcomeDto.length,
                   itemBuilder: (context, int index) {
-                    if (prelimanaryDetailsQuery.isEmpty) {
+                    if (programEnrolmentSessionOutcomeDto.isEmpty) {
                       return const Center(
-                          child: Text('No Completed Assessment Found.'));
+                          child: Text('No Session Enrolled Found.'));
                     }
-                    return prelimanaryDetailsQuery[index]
-                            .childName!
+                    return programEnrolmentSessionOutcomeDto[index]
+                            .sessionOutCome!
                             .toLowerCase()
                             .contains(searchString)
                         ? ListTile(
-                            title: Text(prelimanaryDetailsQuery[index]
-                                .childName
+                            title: Text(programEnrolmentSessionOutcomeDto[index]
+                                .programModuleId
                                 .toString()),
                             subtitle: Text(
-                                prelimanaryDetailsQuery[index]
-                                    .dateAccepted
-                                    .toString(),
+                                //programmeModuleDto?.description
+                                'Module Name : ${programEnrolmentSessionOutcomeDto![index].programModuleId}.  \n'
+                                'Session: ${programEnrolmentSessionOutcomeDto![index].sessionId}  \n'
+                                'Session date : ${programEnrolmentSessionOutcomeDto![index].sessionDate}  \n'
+                                'Session outcomes : ${programEnrolmentSessionOutcomeDto![index].sessionOutCome}',
                                 style: const TextStyle(color: Colors.grey)),
                             trailing: const Icon(Icons.play_circle_fill_rounded,
                                 color: Colors.green),
@@ -144,9 +167,11 @@ class _PreliminaryPageState extends State<PreliminaryPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      const CourtDecisionPage(),
+                                      const ProgramEnrolledSessionOutcomePage(), //////////////////////////////////////update
                                   settings: RouteSettings(
-                                    arguments: prelimanaryDetailsQuery[index],
+                                    arguments:
+                                        programEnrolmentSessionOutcomeDto[
+                                            index],
                                   ),
                                 ),
                               );
@@ -154,8 +179,8 @@ class _PreliminaryPageState extends State<PreliminaryPage> {
                         : Container();
                   },
                   separatorBuilder: (context, index) {
-                    return prelimanaryDetailsQuery[index]
-                            .childName!
+                    return programEnrolmentSessionOutcomeDto[index]
+                            .sessionOutCome!
                             .toLowerCase()
                             .contains(searchString)
                         ? const Divider(thickness: 1)

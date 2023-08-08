@@ -1,5 +1,6 @@
 import 'package:dsd_pcm_mobile/model/pcm/preliminaryStatus_dto.dart';
 import 'package:dsd_pcm_mobile/model/pcm/preliminary_detail_dto.dart';
+import 'package:dsd_pcm_mobile/model/pcm/programme_module_dto.dart';
 
 import '../model/intake/address_type_dto.dart';
 import '../model/intake/disability_type_dto.dart';

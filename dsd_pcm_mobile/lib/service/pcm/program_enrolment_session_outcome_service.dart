@@ -9,11 +9,13 @@ import '../../util/shared/apiresponse.dart';
 
 import '../../util/shared/apiresults.dart';
 
-class ProgramEnrollmentSessionOutcomeService{
-     final client =
+class ProgramEnrollmentSessionOutcomeService {
+  final client =
       InterceptedClient.build(interceptors: [AuthorizationInterceptor()]);
 
-  Future<ApiResponse> addProgramEnrollmentSessionOutcome(ProgramEnrolmentSessionOutcomeDto programEnrollmentSessionOutcomeDto) async {
+  Future<ApiResponse> addProgramEnrollmentSessionOutcome(
+      ProgramEnrolmentSessionOutcomeDto
+          programEnrollmentSessionOutcomeDto) async {
     ApiResponse apiResponse = ApiResponse();
     try {
       final response = await client.post(
@@ -41,7 +43,8 @@ class ProgramEnrollmentSessionOutcomeService{
     ApiResponse apiResponse = ApiResponse();
     try {
       final response = await client.get(Uri.parse(
-          "${AppUrl.pcmURL}/ProgramEnrolmentSessionOutcome/$sessionId"));
+          //$sessionId
+          "${AppUrl.pcmURL}/ProgramEnrolmentSessionOutcome/1"));
 
       switch (response.statusCode) {
         case 200:
