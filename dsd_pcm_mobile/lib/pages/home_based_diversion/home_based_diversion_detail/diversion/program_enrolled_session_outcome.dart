@@ -1,16 +1,14 @@
 import 'package:dsd_pcm_mobile/model/pcm/program_enrolment_session_outcome_dto.dart';
 import 'package:dsd_pcm_mobile/model/pcm/programme_module_dto.dart';
+import 'package:dsd_pcm_mobile/navigation_drawer/navigation_drawer_menu.dart';
 import 'package:dsd_pcm_mobile/service/pcm/program_enrolment_session_outcome_service.dart';
 import 'package:dsd_pcm_mobile/service/pcm/programme_module_service.dart';
+import 'package:dsd_pcm_mobile/transform_dynamic/transform_lookup.dart';
+import 'package:dsd_pcm_mobile/util/shared/apierror.dart';
+import 'package:dsd_pcm_mobile/util/shared/apiresponse.dart';
+import 'package:dsd_pcm_mobile/util/shared/loading_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../../../navigation_drawer/navigation_drawer_menu.dart';
-import '../../../../service/pcm/worklist_service.dart';
-import '../../../../transform_dynamic/transform_lookup.dart';
-import '../../../../util/shared/apierror.dart';
-import '../../../../util/shared/apiresponse.dart';
-import '../../../../util/shared/loading_overlay.dart';
 
 class ProgramEnrolledSessionOutcomePage extends StatefulWidget {
   const ProgramEnrolledSessionOutcomePage({Key? key}) : super(key: key);
@@ -36,7 +34,6 @@ class _ProgramEnrolledSessionOutcomePageState
   final ProgramModuleService programModuleService = ProgramModuleService();
   late ApiResponse apiResponse = ApiResponse();
   final _lookupTransform = LookupTransform();
-  //late List<AcceptedWorklistDto> acceptedWorklistDto = [];
   late List<ProgramEnrolmentSessionOutcomeDto>
       programEnrolmentSessionOutcomeDto = [];
   late List<ProgrammeModuleDto> programmeModuleDto = [];
@@ -51,7 +48,6 @@ class _ProgramEnrolledSessionOutcomePageState
         setState(() {
           loadCompletedTaskAllocatedToProbationOfficer();
           loadLookUpTransformer();
-          // loadProgrammeModule(1);
         });
       });
     });
@@ -75,19 +71,6 @@ class _ProgramEnrolledSessionOutcomePageState
       overlay.hide();
     }
   }
-
-  // loadProgrammeModule(int programmeModuleByid) async {
-  //   final overlay = LoadingOverlay.of(context);
-  //   overlay.show();
-  //   apiResponse =
-  //       await programModuleService.getProgrammeModuleById(programmeModuleByid);
-  //   if ((apiResponse.ApiError) == null) {
-  //     setState(() {
-  //       programmeModuleDto = (apiResponse.Data as List<ProgrammeModuleDto>);
-  //     });
-  //   }
-  //   overlay.hide();
-  // }
 
   loadLookUpTransformer() async {
     final overlay = LoadingOverlay.of(context);
@@ -154,7 +137,6 @@ class _ProgramEnrolledSessionOutcomePageState
                                 .programModuleId
                                 .toString()),
                             subtitle: Text(
-                                //programmeModuleDto?.description
                                 'Module Name : ${programEnrolmentSessionOutcomeDto![index].programModuleId}.  \n'
                                 'Session: ${programEnrolmentSessionOutcomeDto![index].sessionId}  \n'
                                 'Session date : ${programEnrolmentSessionOutcomeDto![index].sessionDate}  \n'
@@ -167,7 +149,7 @@ class _ProgramEnrolledSessionOutcomePageState
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      const ProgramEnrolledSessionOutcomePage(), //////////////////////////////////////update
+                                      const ProgramEnrolledSessionOutcomePage(), //////////////////////////////////////will be update
                                   settings: RouteSettings(
                                     arguments:
                                         programEnrolmentSessionOutcomeDto[

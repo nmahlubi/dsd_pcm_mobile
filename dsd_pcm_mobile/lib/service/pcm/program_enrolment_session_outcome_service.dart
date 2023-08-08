@@ -44,7 +44,7 @@ class ProgramEnrollmentSessionOutcomeService {
     try {
       final response = await client.get(Uri.parse(
           //$sessionId
-          "${AppUrl.pcmURL}/ProgramEnrolmentSessionOutcome/1"));
+          "${AppUrl.pcmURL}/ProgramEnrolmentSessionOutcome/$sessionId"));
 
       switch (response.statusCode) {
         case 200:
