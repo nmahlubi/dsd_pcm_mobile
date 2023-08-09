@@ -1,7 +1,6 @@
 import 'dart:async';
 
-import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/program_enrolled/session_page.dart';
-import 'package:dsd_pcm_mobile/pages/home_based_diversion/home_based_diversion_detail/diversion/program_enrolled_session_outcome.dart';
+import 'package:dsd_pcm_mobile/pages/probation_officer/accepted_children_caselist.dart';
 import 'package:dsd_pcm_mobile/sessions/session.dart';
 import 'package:dsd_pcm_mobile/sessions/session_manager.dart';
 import 'package:flutter/material.dart';
@@ -279,7 +278,7 @@ class MyApp extends StatelessWidget {
           '/re-assigned-cases': (context) => const ReAssignedCasesPage(),
           '/overdue-cases': (context) => const OverdueCasesPage(),
           '/sync-manual-offline': (context) => const SyncingOfflineManualPage(),
-          '/preliminary': (context) => const PreliminaryPage(),
+          '/childrenCaseListPage': (context) => const ChildrenCaseListPage(),
           '/home-based': (context) => const HomeBasedDiversionPage()
         },
       ),
