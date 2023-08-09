@@ -1,11 +1,10 @@
+import 'package:dsd_pcm_mobile/model/pcm/preliminary_detail_dto.dart';
 import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
 
-import '../../../../model/intake/person_education_dto.dart';
-
-class ViewEducation extends StatelessWidget {
-  final List<PersonEducationDto>? personEducationsDto;
-  const ViewEducation({super.key, this.personEducationsDto});
+class ViewFinalCourtDecisionPage extends StatelessWidget {
+  final List<PreliminaryDetailDto>? preliminaryDetailsDto;
+  const ViewFinalCourtDecisionPage({super.key, this.preliminaryDetailsDto});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +26,7 @@ class ViewEducation extends StatelessWidget {
                 header: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Text(
-                      "View Educational",
+                      "View Final Recommandation Assessment Details",
                       style: Theme.of(context).textTheme.bodyLarge,
                     )),
                 collapsed: const Text(
@@ -39,28 +38,35 @@ class ViewEducation extends StatelessWidget {
                 expanded: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    if (personEducationsDto!.isNotEmpty)
+                    if (preliminaryDetailsDto!.isNotEmpty)
                       Row(
                         children: [
                           Expanded(
                             child: ListView.separated(
                               shrinkWrap: true,
-                              itemCount: personEducationsDto!.length,
+                              itemCount: preliminaryDetailsDto!.length,
                               itemBuilder: (context, int index) {
-                                if (personEducationsDto!.isEmpty) {
+                                if (preliminaryDetailsDto!.isEmpty) {
                                   return const Center(
-                                      child: Text('No education Found.'));
+                                      child: Text(
+                                          'No Assessment recommendation Found.'));
                                 }
+
                                 return ListTile(
-                                  title: Text(
-                                      'School Name : ${personEducationsDto![index].schoolDto?.schoolName ?? ''}'),
-                                  subtitle: Text(
-                                      'Highest Grade Passes : ${personEducationsDto![index].gradeDto?.description ?? ''} '
-                                      'Year Completed : ${personEducationsDto![index].yearCompleted ?? ''} '
-                                      'Last Attended : ${personEducationsDto![index].dateLastAttended ?? ''}',
-                                      style:
-                                          const TextStyle(color: Colors.grey)),
-                                );
+                                    title: Text(
+                                        'Preliminary Details Recommendation. ${preliminaryDetailsDto![index].intakeAssessmentId}'),
+                                    subtitle: Text(
+                                        // 'Preliminary Status: ${preliminaryDetailsDto![index].preliminaryStatusDto?.description ?? ''}.'
+                                        // 'Reason Outcome : ${preliminaryDetailsDto![index].pCMOutcomeReason ?? ''}.'
+                                        // 'Recommendation Type : ${preliminaryDetailsDto![index].recommendationTypeDto?.description ?? ''}.'
+                                        // 'Placement Type: ${preliminaryDetailsDto![index].placementTypeDto?.description ?? ''}.'
+                                        'Modified Date : ${preliminaryDetailsDto![index].dateModified ?? ''}.'
+                                        'Modified by : ${preliminaryDetailsDto![index].modifiedBy ?? ''}.'
+                                        'Preliminary Date : ${preliminaryDetailsDto![index].pCMPreliminaryDate ?? ''}.',
+                                        style: const TextStyle(
+                                            color: Colors.grey)),
+                                    trailing: const Icon(Icons.edit,
+                                        color: Colors.green));
                               },
                               separatorBuilder: (context, index) {
                                 return const Divider(thickness: 1);

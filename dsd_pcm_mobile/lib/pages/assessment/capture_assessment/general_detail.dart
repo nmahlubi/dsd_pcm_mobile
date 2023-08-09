@@ -12,6 +12,7 @@ import '../../../util/shared/apiresults.dart';
 import '../../../util/shared/loading_overlay.dart';
 import '../../../util/shared/randon_generator.dart';
 import '../../probation_officer/accepted_worklist.dart';
+import 'complete_assessment.dart';
 import 'development_assessment.dart';
 
 class GeneralDetailPage extends StatefulWidget {
@@ -35,11 +36,8 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
   final _generalDetailServiceClient = GeneralDetailService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
-  late List<GeneralDetailDto> generalDetailsDto = [];
 
   ExpandableController captureGeneralDetailPanelController =
-      ExpandableController();
-  ExpandableController viewGeneralDetailPanelController =
       ExpandableController();
   final TextEditingController consultedSourcesController =
       TextEditingController();
@@ -53,8 +51,6 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
   void initState() {
     super.initState();
     captureGeneralDetailPanelController =
-        ExpandableController(initialExpanded: false);
-    viewGeneralDetailPanelController =
         ExpandableController(initialExpanded: true);
     labelButtonAddUpdate = 'Add General Detail';
     generalDetailId = null;
@@ -78,7 +74,15 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        generalDetailsDto = (apiResponse.Data as List<GeneralDetailDto>);
+        if (apiResponse.Data != null) {
+          GeneralDetailDto generalDetailDto =
+              (apiResponse.Data as GeneralDetailDto);
+          labelButtonAddUpdate = 'Update General Detail';
+          generalDetailId = generalDetailDto.generalDetailsId;
+          consultedSourcesController.text = generalDetailDto.consultedSources!;
+          traceEffortsController.text = generalDetailDto.traceEfforts!;
+          additionalInfoController.text = generalDetailDto.additionalInfo!;
+        }
       });
     } else {
       overlay.hide();
@@ -114,8 +118,8 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
             )),
       );
     } else {
-      showDialogMessage((apiResponse.ApiError as ApiError));
       overlay.hide();
+      showDialogMessage((apiResponse.ApiError as ApiError));
     }
   }
 
@@ -131,30 +135,6 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
     messageDialog.showSnackBar(
       SnackBar(content: Text(message!), backgroundColor: Colors.green),
     );
-  }
-
-  newGeneralDetail() {
-    setState(() {
-      labelButtonAddUpdate = 'Add General Detail';
-      consultedSourcesController.clear();
-      traceEffortsController.clear();
-      additionalInfoController.clear();
-      generalDetailId = null;
-    });
-  }
-
-  populateGeneralDetailForm(GeneralDetailDto generalDetailDto) {
-    setState(() {
-      generalDetailId = generalDetailDto.generalDetailsId;
-      captureGeneralDetailPanelController =
-          ExpandableController(initialExpanded: true);
-      viewGeneralDetailPanelController =
-          ExpandableController(initialExpanded: false);
-      labelButtonAddUpdate = 'Update General Detail';
-      consultedSourcesController.text = generalDetailDto.consultedSources!;
-      traceEffortsController.text = generalDetailDto.traceEfforts!;
-      additionalInfoController.text = generalDetailDto.additionalInfo!;
-    });
   }
 
   @override
@@ -226,16 +206,16 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
                       child: const Icon(Icons.arrow_back)),
                   FloatingActionButton(
                       onPressed: () {
-                        /*Navigator.push(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                const DevelopmentAssessmentPage(),
+                                const CompleteAssessmentPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),
                           ),
-                        );*/
+                        );
                       },
                       heroTag: null,
                       child: const Icon(Icons.arrow_forward)),
@@ -293,48 +273,6 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
                                             Expanded(
                                               child: Container(
                                                 padding:
-                                                    const EdgeInsets.all(8),
-                                              ),
-                                            ),
-                                            Expanded(
-                                                child: Container(
-                                                    height: 70,
-                                                    padding: const EdgeInsets
-                                                            .fromLTRB(
-                                                        10, 20, 10, 2),
-                                                    child: OutlinedButton(
-                                                      style: OutlinedButton
-                                                          .styleFrom(
-                                                        minimumSize: const Size
-                                                            .fromHeight(10),
-                                                        backgroundColor:
-                                                            const Color
-                                                                    .fromARGB(
-                                                                255,
-                                                                244,
-                                                                248,
-                                                                246),
-                                                        shape:
-                                                            const StadiumBorder(),
-                                                        side: const BorderSide(
-                                                            width: 2,
-                                                            color: Colors.blue),
-                                                      ),
-                                                      onPressed: () {
-                                                        newGeneralDetail();
-                                                      },
-                                                      child: const Text('New',
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.blue)),
-                                                    ))),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Container(
-                                                padding:
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller:
@@ -359,6 +297,10 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
                                                 ),
                                               ),
                                             ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
                                             Expanded(
                                               child: Container(
                                                 padding:
@@ -481,133 +423,6 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
                             ),
                           ),
                         )))
-                      ]),
-                      Row(children: [
-                        Expanded(
-                            child: ExpandableNotifier(
-                                child: Padding(
-                          padding: const EdgeInsets.all(2),
-                          child: Card(
-                            clipBehavior: Clip.antiAlias,
-                            child: Column(
-                              children: <Widget>[
-                                ScrollOnExpand(
-                                  scrollOnExpand: true,
-                                  scrollOnCollapse: false,
-                                  child: ExpandablePanel(
-                                    controller:
-                                        viewGeneralDetailPanelController,
-                                    theme: const ExpandableThemeData(
-                                      headerAlignment:
-                                          ExpandablePanelHeaderAlignment.center,
-                                      tapBodyToCollapse: true,
-                                    ),
-                                    header: Padding(
-                                        padding: const EdgeInsets.all(10),
-                                        child: Text(
-                                          "View General Detail",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyLarge,
-                                        )),
-                                    collapsed: const Text(
-                                      '',
-                                      softWrap: true,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    expanded: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        if (generalDetailsDto.isNotEmpty)
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: ListView.separated(
-                                                  shrinkWrap: true,
-                                                  itemCount:
-                                                      generalDetailsDto.length,
-                                                  itemBuilder:
-                                                      (context, int index) {
-                                                    if (generalDetailsDto
-                                                        .isEmpty) {
-                                                      return const Center(
-                                                          child: Text(
-                                                              'No general detail Found.'));
-                                                    }
-                                                    return ListTile(
-                                                      title: Text(
-                                                          'Consulted Sources : ${generalDetailsDto[index].consultedSources ?? ''} '
-                                                          '. ',
-                                                          style: const TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold)),
-                                                      subtitle: Text(
-                                                          'Trace Efforts : ${generalDetailsDto[index].traceEfforts ?? ''}  '
-                                                          '. Supervisor Comments : ${generalDetailsDto[index].commentsBySupervisor ?? ''} '
-                                                          '. Addional Information : ${generalDetailsDto[index].additionalInfo ?? ''}',
-                                                          style:
-                                                              const TextStyle(
-                                                                  color: Colors
-                                                                      .black)),
-                                                      trailing: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          //IconButton(onPressed: () {}, icon: const Icon(Icons.favorite)),
-                                                          IconButton(
-                                                              onPressed: () {
-                                                                populateGeneralDetailForm(
-                                                                    generalDetailsDto[
-                                                                        index]);
-                                                              },
-                                                              icon: const Icon(
-                                                                  Icons.edit,
-                                                                  color: Colors
-                                                                      .blue)),
-                                                          /*IconButton(
-                                                              onPressed: () {},
-                                                              icon: const Icon(
-                                                                  Icons.delete,
-                                                                  color: Colors
-                                                                      .red)),*/
-                                                        ],
-                                                      ),
-                                                    );
-                                                  },
-                                                  separatorBuilder:
-                                                      (context, index) {
-                                                    return const Divider(
-                                                        thickness: 1);
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          )
-                                      ],
-                                    ),
-                                    builder: (_, collapsed, expanded) {
-                                      return Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 10, right: 10, bottom: 10),
-                                        child: Expandable(
-                                          collapsed: collapsed,
-                                          expanded: expanded,
-                                          theme: const ExpandableThemeData(
-                                              crossFadePoint: 0),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ))),
                       ]),
                     ],
                   ),

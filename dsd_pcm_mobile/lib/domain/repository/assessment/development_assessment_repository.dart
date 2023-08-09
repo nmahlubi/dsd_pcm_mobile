@@ -22,49 +22,10 @@ class DevelopmentAssessmentRepository {
         developmentAssessmentBox);
   }
 
-  Future<void> saveDevelopmentAssessmentItems(
-      List<DevelopmentAssessmentDto> developmentAssessmentsDto) async {
-    for (var developmentAssessmentDto in developmentAssessmentsDto) {
-      await _developmentAssessmentsBox.put(
-          developmentAssessmentDto.developmentId,
-          (DevelopmentAssessmentModel(
-              developmentId: developmentAssessmentDto.developmentId,
-              intakeAssessmentId: developmentAssessmentDto.intakeAssessmentId,
-              belonging: developmentAssessmentDto.belonging,
-              mastery: developmentAssessmentDto.mastery,
-              independence: developmentAssessmentDto.independence,
-              generosity: developmentAssessmentDto.generosity,
-              evaluation: developmentAssessmentDto.evaluation,
-              createdBy: developmentAssessmentDto.createdBy,
-              modifiedBy: developmentAssessmentDto.modifiedBy,
-              dateCreated: developmentAssessmentDto.dateCreated,
-              dateModified: developmentAssessmentDto.dateModified)));
-    }
-  }
-
-  Future<void> saveDevelopmentAssessmentNewRecord(
-      DevelopmentAssessmentDto developmentAssessmentDto,
-      int? developmentId) async {
-    await _developmentAssessmentsBox.put(
-        developmentId,
-        DevelopmentAssessmentModel(
-            developmentId: developmentId,
-            intakeAssessmentId: developmentAssessmentDto.intakeAssessmentId,
-            belonging: developmentAssessmentDto.belonging,
-            mastery: developmentAssessmentDto.mastery,
-            independence: developmentAssessmentDto.independence,
-            generosity: developmentAssessmentDto.generosity,
-            evaluation: developmentAssessmentDto.evaluation,
-            createdBy: developmentAssessmentDto.createdBy,
-            modifiedBy: developmentAssessmentDto.modifiedBy,
-            dateCreated: developmentAssessmentDto.dateCreated,
-            dateModified: developmentAssessmentDto.dateModified));
-  }
-
   Future<void> saveDevelopmentAssessment(
       DevelopmentAssessmentDto developmentAssessmentDto) async {
     await _developmentAssessmentsBox.put(
-        developmentAssessmentDto.developmentId,
+        developmentAssessmentDto.intakeAssessmentId,
         DevelopmentAssessmentModel(
             developmentId: developmentAssessmentDto.developmentId,
             intakeAssessmentId: developmentAssessmentDto.intakeAssessmentId,
@@ -79,7 +40,7 @@ class DevelopmentAssessmentRepository {
             dateModified: developmentAssessmentDto.dateModified));
   }
 
-  Future<void> deleteDevelopmentAssessment(int id) async {
+  Future<void> deleteDevelopmentAssessmentByAssessmentId(int id) async {
     await _developmentAssessmentsBox.delete(id);
   }
 
@@ -89,16 +50,6 @@ class DevelopmentAssessmentRepository {
 
   List<DevelopmentAssessmentDto> getAllDevelopmentAssessments() {
     return _developmentAssessmentsBox.values
-        .map(developmentAssessmentFromDb)
-        .toList();
-  }
-
-  List<DevelopmentAssessmentDto> getAllDevelopmentAssessmentsByAssessmentId(
-      int? intakeAssessmentId) {
-    var developmentAssessmentDtoItems = _developmentAssessmentsBox.values
-        .where((medical) => medical.intakeAssessmentId == intakeAssessmentId)
-        .toList();
-    return developmentAssessmentDtoItems
         .map(developmentAssessmentFromDb)
         .toList();
   }

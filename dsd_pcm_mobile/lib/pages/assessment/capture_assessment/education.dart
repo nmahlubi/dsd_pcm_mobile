@@ -4,22 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../../model/intake/grade_dto.dart';
-import '../../../../model/intake/school_dto.dart';
-import '../../../../model/intake/school_type_dto.dart';
-import '../../../../model/pcm/accepted_worklist_dto.dart';
-import '../../../../navigation_drawer/go_to_assessment_drawer.dart';
-import '../../../../service/intake/person_education_service.dart';
-import '../../../../transform_dynamic/tranform_school.dart';
-import '../../../../util/shared/apierror.dart';
-import '../../../../util/shared/apiresponse.dart';
-import '../../../../util/shared/apiresults.dart';
-import '../../../../util/shared/loading_overlay.dart';
-import '../../../../util/shared/randon_generator.dart';
-import '../../../probation_officer/accepted_worklist.dart';
-import '../care_giver_detail.dart';
-import '../health_detail.dart';
-import 'view_education.dart';
+import '../../../model/intake/grade_dto.dart';
+import '../../../model/intake/school_type_dto.dart';
+import '../../../model/pcm/accepted_worklist_dto.dart';
+import '../../../navigation_drawer/go_to_assessment_drawer.dart';
+import '../../../service/intake/person_education_service.dart';
+import '../../../transform_dynamic/tranform_school.dart';
+import '../../../util/shared/apierror.dart';
+import '../../../util/shared/apiresponse.dart';
+import '../../../util/shared/apiresults.dart';
+import '../../../util/shared/loading_overlay.dart';
+import '../../../util/shared/randon_generator.dart';
+import '../../probation_officer/accepted_worklist.dart';
+import 'care_giver_detail.dart';
+import 'health_detail.dart';
 
 class EducationPage extends StatefulWidget {
   const EducationPage({Key? key}) : super(key: key);
@@ -45,20 +43,28 @@ class _EducationPagePageState extends State<EducationPage> {
   late ApiResults apiResults = ApiResults();
   late List<GradeDto> gradesDto = [];
   late List<SchoolTypeDto> schoolTypesDto = [];
-  late List<SchoolDto> schoolsDto = [];
   late List<PersonEducationDto> personEducationsDto = [];
 
+  ExpandableController captureEducationPanelController = ExpandableController();
+  ExpandableController viewEducationPanelController = ExpandableController();
   TextEditingController yearCompletedController = TextEditingController();
   TextEditingController dateLastAttendedController = TextEditingController();
   TextEditingController additionalInformationController =
       TextEditingController();
+  TextEditingController schoolNameController = TextEditingController();
   int? gradeDropdownButtonFormField;
   int? schoolTypeDropdownButtonFormField;
-  int? schoolDropdownButtonFormField;
+  int? qualificationId;
+  String? labelButtonAddUpdate = '';
 
   @override
   void initState() {
     super.initState();
+    captureEducationPanelController =
+        ExpandableController(initialExpanded: false);
+    viewEducationPanelController = ExpandableController(initialExpanded: true);
+    labelButtonAddUpdate = 'Add Qualification';
+    qualificationId = null;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
         setState(() {
@@ -79,15 +85,6 @@ class _EducationPagePageState extends State<EducationPage> {
     overlay.hide();
   }
 
-  loadSchoolTransformerByTypeId(int? schoolTypeId) async {
-    final overlay = LoadingOverlay.of(context);
-    overlay.show();
-    schoolDropdownButtonFormField = null;
-    schoolsDto = [];
-    schoolsDto = await _schoolTransform.transformSchoolsDto(schoolTypeId);
-    overlay.hide();
-  }
-
   loadPersonEducationsByPersonId(int? personId) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
@@ -99,25 +96,28 @@ class _EducationPagePageState extends State<EducationPage> {
         personEducationsDto = (apiResponse.Data as List<PersonEducationDto>);
       });
     } else {
-      showDialogMessage((apiResponse.ApiError as ApiError));
       overlay.hide();
+      showDialogMessage((apiResponse.ApiError as ApiError));
     }
   }
 
-  capturePersonEducation() async {
+  addUpdatePersonEducation() async {
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
     overlay.show();
 
     PersonEducationDto requestPersonEducationDto = PersonEducationDto(
-        personEducationId: _randomGenerator.getRandomGeneratedNumber(),
+        personEducationId:
+            qualificationId ?? _randomGenerator.getRandomGeneratedNumber(),
         personId: acceptedWorklistDto.personId,
-        schoolId: schoolDropdownButtonFormField,
+        schoolName: schoolNameController.text,
+        schoolId: _randomGenerator.getRandomGeneratedNumber(),
+        /*schoolId: schoolDropdownButtonFormField,ss
         schoolDto: schoolDropdownButtonFormField != null
             ? schoolsDto
                 .where((i) => i.schoolId == schoolDropdownButtonFormField)
                 .single
-            : null,
+            : null,*/
         gradeId: gradeDropdownButtonFormField,
         gradeDto: gradeDropdownButtonFormField != null
             ? gradesDto
@@ -133,12 +133,12 @@ class _EducationPagePageState extends State<EducationPage> {
         isDeleted: false);
 
     apiResponse = await _personEducationServiceClient
-        .addPersonEducation(requestPersonEducationDto);
+        .addUdatePersonEducation(requestPersonEducationDto);
 
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       if (!mounted) return;
-      showSuccessMessage('Person Education Is Successfully Created.');
+      showSuccessMessage('Successfully $labelButtonAddUpdate.');
       navigator.push(
         MaterialPageRoute(
             builder: (context) => const EducationPage(),
@@ -164,6 +164,49 @@ class _EducationPagePageState extends State<EducationPage> {
     messageDialog.showSnackBar(
       SnackBar(content: Text(message!), backgroundColor: Colors.green),
     );
+  }
+
+  newQualification() {
+    setState(() {
+      labelButtonAddUpdate = 'Add Qualification';
+      schoolNameController.clear();
+      yearCompletedController.clear();
+      dateLastAttendedController.clear();
+      additionalInformationController.clear();
+      qualificationId = null;
+      schoolTypeDropdownButtonFormField = null;
+      gradeDropdownButtonFormField = null;
+    });
+  }
+
+  populateFamilyMemberForm(PersonEducationDto personEducationDto) {
+    setState(() {
+      qualificationId = personEducationDto.personEducationId;
+      captureEducationPanelController =
+          ExpandableController(initialExpanded: true);
+      viewEducationPanelController =
+          ExpandableController(initialExpanded: false);
+      labelButtonAddUpdate = 'Update Qualification';
+      schoolNameController.text = (personEducationDto.schoolId == null
+          ? personEducationDto.schoolName!
+          : personEducationDto.schoolDto?.schoolName)!;
+      yearCompletedController.text = personEducationDto.yearCompleted!;
+      dateLastAttendedController.text = personEducationDto.dateLastAttended!;
+      additionalInformationController.text =
+          personEducationDto.additionalInformation!;
+      gradeDropdownButtonFormField = personEducationDto.gradeId;
+      schoolTypeDropdownButtonFormField =
+          personEducationDto.schoolDto!.schoolTypeId;
+    });
+  }
+
+  @override
+  void dispose() {
+    yearCompletedController.dispose();
+    dateLastAttendedController.dispose();
+    yearCompletedController.dispose();
+    additionalInformationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -262,6 +305,7 @@ class _EducationPagePageState extends State<EducationPage> {
                                   scrollOnExpand: true,
                                   scrollOnCollapse: false,
                                   child: ExpandablePanel(
+                                    controller: captureEducationPanelController,
                                     theme: const ExpandableThemeData(
                                       headerAlignment:
                                           ExpandablePanelHeaderAlignment.center,
@@ -270,7 +314,7 @@ class _EducationPagePageState extends State<EducationPage> {
                                     header: Padding(
                                         padding: const EdgeInsets.all(10),
                                         child: Text(
-                                          "Capture Educational",
+                                          "Capture Education Qualification",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
@@ -285,15 +329,47 @@ class _EducationPagePageState extends State<EducationPage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        Container(
-                                          padding: const EdgeInsets.all(8),
-                                          child: const Text(
-                                            'Educational Information',
-                                            style: TextStyle(
-                                                color: Colors.blue,
-                                                fontWeight: FontWeight.w200,
-                                                fontSize: 21),
-                                          ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(8),
+                                              ),
+                                            ),
+                                            Expanded(
+                                                child: Container(
+                                                    height: 70,
+                                                    padding: const EdgeInsets
+                                                            .fromLTRB(
+                                                        10, 20, 10, 2),
+                                                    child: OutlinedButton(
+                                                      style: OutlinedButton
+                                                          .styleFrom(
+                                                        minimumSize: const Size
+                                                            .fromHeight(10),
+                                                        backgroundColor:
+                                                            const Color
+                                                                    .fromARGB(
+                                                                255,
+                                                                244,
+                                                                248,
+                                                                246),
+                                                        shape:
+                                                            const StadiumBorder(),
+                                                        side: const BorderSide(
+                                                            width: 2,
+                                                            color: Colors.blue),
+                                                      ),
+                                                      onPressed: () {
+                                                        newQualification();
+                                                      },
+                                                      child: const Text('New',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.blue)),
+                                                    ))),
+                                          ],
                                         ),
                                         Row(
                                           children: [
@@ -330,8 +406,6 @@ class _EducationPagePageState extends State<EducationPage> {
                                                       setState(() {
                                                         schoolTypeDropdownButtonFormField =
                                                             selectedValue;
-                                                        loadSchoolTransformerByTypeId(
-                                                            selectedValue);
                                                       });
                                                     },
                                                     validator: (value) {
@@ -348,46 +422,29 @@ class _EducationPagePageState extends State<EducationPage> {
                                           children: [
                                             Expanded(
                                               child: Container(
-                                                  padding:
-                                                      const EdgeInsets.all(10),
-                                                  child:
-                                                      DropdownButtonFormField(
-                                                    value:
-                                                        schoolDropdownButtonFormField,
-                                                    decoration:
-                                                        const InputDecoration(
-                                                      hintText: 'School',
-                                                      labelText: 'School',
-                                                      border:
-                                                          OutlineInputBorder(
-                                                        borderSide: BorderSide(
-                                                            width: 1,
-                                                            color:
-                                                                Colors.green),
-                                                      ),
-                                                    ),
-                                                    items: schoolsDto
-                                                        .map((school) {
-                                                      return DropdownMenuItem(
-                                                          value:
-                                                              school.schoolId,
-                                                          child: Text(school
-                                                              .schoolName
-                                                              .toString()));
-                                                    }).toList(),
-                                                    onChanged: (selectedValue) {
-                                                      setState(() {
-                                                        schoolDropdownButtonFormField =
-                                                            selectedValue;
-                                                      });
-                                                    },
-                                                    validator: (value) {
-                                                      if (value == null) {
-                                                        return 'School required';
-                                                      }
-                                                      return null;
-                                                    },
-                                                  )),
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: TextFormField(
+                                                  controller:
+                                                      schoolNameController,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  maxLines: 1,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                    labelText: 'School Name',
+                                                  ),
+                                                  validator: (value) {
+                                                    if (value == null ||
+                                                        value.isEmpty) {
+                                                      return 'School Name Required';
+                                                    }
+                                                    return null;
+                                                  },
+                                                ),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -427,7 +484,7 @@ class _EducationPagePageState extends State<EducationPage> {
                                                     },
                                                     validator: (value) {
                                                       if (value == null) {
-                                                        return 'Grade required';
+                                                        return 'Grade Required';
                                                       }
                                                       return null;
                                                     },
@@ -610,11 +667,11 @@ class _EducationPagePageState extends State<EducationPage> {
                                                         if (_loginFormKey
                                                             .currentState!
                                                             .validate()) {
-                                                          capturePersonEducation();
+                                                          addUpdatePersonEducation();
                                                         }
                                                       },
-                                                      child: const Text(
-                                                          'Add Qualification'),
+                                                      child: Text(
+                                                          labelButtonAddUpdate!),
                                                     ))),
                                           ],
                                         ),
@@ -639,7 +696,130 @@ class _EducationPagePageState extends State<EducationPage> {
                           ),
                         )))
                       ]),
-                      ViewEducation(personEducationsDto: personEducationsDto)
+                      Row(children: [
+                        Expanded(
+                            child: ExpandableNotifier(
+                                child: Padding(
+                          padding: const EdgeInsets.all(2),
+                          child: Card(
+                            clipBehavior: Clip.antiAlias,
+                            child: Column(
+                              children: <Widget>[
+                                ScrollOnExpand(
+                                  scrollOnExpand: true,
+                                  scrollOnCollapse: false,
+                                  child: ExpandablePanel(
+                                    controller: viewEducationPanelController,
+                                    theme: const ExpandableThemeData(
+                                      headerAlignment:
+                                          ExpandablePanelHeaderAlignment.center,
+                                      tapBodyToCollapse: true,
+                                    ),
+                                    header: Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: Text(
+                                          "View Educations",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyLarge,
+                                        )),
+                                    collapsed: const Text(
+                                      '',
+                                      softWrap: true,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    expanded: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        if (personEducationsDto.isNotEmpty)
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: ListView.separated(
+                                                  shrinkWrap: true,
+                                                  itemCount: personEducationsDto
+                                                      .length,
+                                                  itemBuilder:
+                                                      (context, int index) {
+                                                    if (personEducationsDto
+                                                        .isEmpty) {
+                                                      return const Center(
+                                                          child: Text(
+                                                              'No person education Found.'));
+                                                    }
+                                                    return ListTile(
+                                                      title: Text(
+                                                          'School : ${personEducationsDto[index].schoolName ?? personEducationsDto[index].schoolDto?.schoolName ?? ''} ',
+                                                          style: const TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold)),
+                                                      subtitle: Text(
+                                                          'Year : ${personEducationsDto[index].yearCompleted ?? ''} '
+                                                          'Grade :${personEducationsDto[index].gradeDto!.description ?? ''}',
+                                                          style:
+                                                              const TextStyle(
+                                                                  color: Colors
+                                                                      .black)),
+                                                      trailing: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          //IconButton(onPressed: () {}, icon: const Icon(Icons.favorite)),
+                                                          IconButton(
+                                                              onPressed: () {
+                                                                populateFamilyMemberForm(
+                                                                    personEducationsDto[
+                                                                        index]);
+                                                              },
+                                                              icon: const Icon(
+                                                                  Icons.edit,
+                                                                  color: Colors
+                                                                      .blue)),
+                                                          /*IconButton(
+                                                              onPressed: () {},
+                                                              icon: const Icon(
+                                                                  Icons.delete,
+                                                                  color: Colors
+                                                                      .red)),*/
+                                                        ],
+                                                      ),
+                                                    );
+                                                  },
+                                                  separatorBuilder:
+                                                      (context, index) {
+                                                    return const Divider(
+                                                        thickness: 1);
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                      ],
+                                    ),
+                                    builder: (_, collapsed, expanded) {
+                                      return Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 10, right: 10, bottom: 10),
+                                        child: Expandable(
+                                          collapsed: collapsed,
+                                          expanded: expanded,
+                                          theme: const ExpandableThemeData(
+                                              crossFadePoint: 0),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ))),
+                      ]),
                     ],
                   ),
                 ))));

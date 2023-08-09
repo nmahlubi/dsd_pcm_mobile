@@ -18,16 +18,15 @@ class SocioEconomicService {
   final _httpClientService = HttpClientService();
   final _socioEconomicRepository = SocioEconomicRepository();
 
-  Future<ApiResponse> getsocioEconomicsByAssessmentIdOnline(
+  Future<ApiResponse> getsocioEconomicByAssessmentIdOnline(
       int? intakeAssessmentId) async {
     ApiResponse apiResponse = ApiResponse();
     final response = await client.get(
-        Uri.parse("${AppUrl.pcmURL}/SocioEconomic/GetAll/$intakeAssessmentId"));
+        Uri.parse("${AppUrl.pcmURL}/SocioEconomic/Get/$intakeAssessmentId"));
     switch (response.statusCode) {
       case 200:
-        apiResponse.Data = (json.decode(response.body) as List)
-            .map((data) => SocioEconomicDto.fromJson(data))
-            .toList();
+        apiResponse.Data =
+            SocioEconomicDto.fromJson(json.decode(response.body));
         break;
       default:
         apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
@@ -36,22 +35,21 @@ class SocioEconomicService {
     return apiResponse;
   }
 
-  Future<ApiResponse> getsocioEconomicsByAssessmentId(
+  Future<ApiResponse> getsocioEconomicByAssessmentId(
       int? intakeAssessmentId) async {
     ApiResponse apiResponse = ApiResponse();
     try {
       apiResponse =
-          await getsocioEconomicsByAssessmentIdOnline(intakeAssessmentId);
+          await getsocioEconomicByAssessmentIdOnline(intakeAssessmentId);
       if (apiResponse.ApiError == null) {
-        List<SocioEconomicDto> socioEconomicDtoResponse =
-            apiResponse.Data as List<SocioEconomicDto>;
-        apiResponse.Data = socioEconomicDtoResponse;
-        _socioEconomicRepository
-            .saveSocioEconomicItems(socioEconomicDtoResponse);
+        SocioEconomicDto recommendationDtoResponse =
+            apiResponse.Data as SocioEconomicDto;
+        apiResponse.Data = recommendationDtoResponse;
+        _socioEconomicRepository.saveSocioEconomic(recommendationDtoResponse);
       }
     } on SocketException {
       apiResponse.Data = _socioEconomicRepository
-          .getAllSocioEconomicsByAssessmentId(intakeAssessmentId!);
+          .getSocioEconomicsByAssessmentId(intakeAssessmentId!);
     }
     return apiResponse;
   }
@@ -77,7 +75,7 @@ class SocioEconomicService {
     } on SocketException {
       _socioEconomicRepository.saveSocioEconomic(socioEconomicDto);
       apiResponse.Data = _socioEconomicRepository
-          .getSocioEconomicsById(socioEconomicDto.socioEconomyid!);
+          .getSocioEconomicsByAssessmentId(socioEconomicDto.socioEconomyid!);
     }
     return apiResponse;
   }
@@ -103,7 +101,7 @@ class SocioEconomicService {
     } on SocketException {
       _socioEconomicRepository.saveSocioEconomic(socioEconomicDto);
       apiResponse.Data = _socioEconomicRepository
-          .getSocioEconomicsById(socioEconomicDto.socioEconomyid!);
+          .getSocioEconomicsByAssessmentId(socioEconomicDto.socioEconomyid!);
     }
     return apiResponse;
   }

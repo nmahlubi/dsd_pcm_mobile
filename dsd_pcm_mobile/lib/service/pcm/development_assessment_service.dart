@@ -37,16 +37,15 @@ class DevelopmentAssessmentService {
     return apiResponse;
   }
 
-  Future<ApiResponse> getDevelopmentAssessmentsByIntakeAssessmentIdOnline(
+  Future<ApiResponse> getDevelopmentAssessmentByIntakeAssessmentIdOnline(
       int? intakeAssessmentId) async {
     ApiResponse apiResponse = ApiResponse();
     final response = await client.get(Uri.parse(
-        "${AppUrl.pcmURL}/DevelopmentAssessment/GetAll/$intakeAssessmentId"));
+        "${AppUrl.pcmURL}/DevelopmentAssessment/Get/$intakeAssessmentId"));
     switch (response.statusCode) {
       case 200:
-        apiResponse.Data = (json.decode(response.body) as List)
-            .map((data) => DevelopmentAssessmentDto.fromJson(data))
-            .toList();
+        apiResponse.Data =
+            DevelopmentAssessmentDto.fromJson(json.decode(response.body));
         break;
       default:
         apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
@@ -55,22 +54,22 @@ class DevelopmentAssessmentService {
     return apiResponse;
   }
 
-  Future<ApiResponse> getDevelopmentAssessmentsByIntakeAssessmentId(
+  Future<ApiResponse> getDevelopmentAssessmentByIntakeAssessmentId(
       int? intakeAssessmentId) async {
     ApiResponse apiResponse = ApiResponse();
     try {
-      apiResponse = await getDevelopmentAssessmentsByIntakeAssessmentIdOnline(
+      apiResponse = await getDevelopmentAssessmentByIntakeAssessmentIdOnline(
           intakeAssessmentId);
       if (apiResponse.ApiError == null) {
-        List<DevelopmentAssessmentDto> developmentAssessmentDtoResponse =
-            apiResponse.Data as List<DevelopmentAssessmentDto>;
+        DevelopmentAssessmentDto developmentAssessmentDtoResponse =
+            apiResponse.Data as DevelopmentAssessmentDto;
         apiResponse.Data = developmentAssessmentDtoResponse;
         _developmentAssessmentRepository
-            .saveDevelopmentAssessmentItems(developmentAssessmentDtoResponse);
+            .saveDevelopmentAssessment(developmentAssessmentDtoResponse);
       }
     } on SocketException {
       apiResponse.Data = _developmentAssessmentRepository
-          .getAllDevelopmentAssessmentsByAssessmentId(intakeAssessmentId!);
+          .getDevelopmentAssessmentById(intakeAssessmentId!);
     }
     return apiResponse;
   }

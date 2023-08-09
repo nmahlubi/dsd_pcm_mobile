@@ -47,6 +47,7 @@ class LookUpService {
   final placementTypeRepository = PlacementTypeRepository();
   final recommendationTypeRepository = RecommendationTypeRepository();
   final formOfNotificationRepository = FormOfNotificationRepository();
+  // final preliminaryStatusRepository = PreliminaryStatusRepository();
 
   Future<ApiResponse> getGendersOnline() async {
     ApiResponse apiResponse = ApiResponse();

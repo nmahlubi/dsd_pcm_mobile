@@ -52,7 +52,7 @@ class RecommendationRepository {
 
   Future<void> saveRecommendation(RecommendationDto recommendationDto) async {
     await _recommendationsBox.put(
-        recommendationDto.recommendationId,
+        recommendationDto.intakeAssessmentId,
         RecommendationModel(
             recommendationId: recommendationDto.recommendationId,
             recommendationTypeId: recommendationDto.recommendationTypeId,
@@ -74,7 +74,7 @@ class RecommendationRepository {
   Future<void> saveRecommendationFromEndpoint(
       RecommendationDto recommendationDto, int recommendationId) async {
     await _recommendationsBox.put(
-        recommendationId,
+        recommendationDto.intakeAssessmentId,
         RecommendationModel(
             recommendationId: recommendationId,
             recommendationTypeId: recommendationDto.recommendationTypeId,
@@ -112,6 +112,10 @@ class RecommendationRepository {
         .toList();
 
     return recommandationDtoItems.map(recommendationFromDb).toList();
+  }
+
+  Future<void> deleteRecommendationByAssessmentId(int id) async {
+    await _recommendationsBox.delete(id);
   }
 
 /*

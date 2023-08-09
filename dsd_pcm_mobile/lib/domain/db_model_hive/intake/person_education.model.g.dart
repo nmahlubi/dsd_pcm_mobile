@@ -8,7 +8,7 @@ part of 'person_education.model.dart';
 
 class PersonEducationModelAdapter extends TypeAdapter<PersonEducationModel> {
   @override
-  final int typeId = 42;
+  final int typeId = 45;
 
   @override
   PersonEducationModel read(BinaryReader reader) {
@@ -33,13 +33,14 @@ class PersonEducationModelAdapter extends TypeAdapter<PersonEducationModel> {
       personModel: fields[13] as PersonModel?,
       schoolModel: fields[14] as SchoolModel?,
       gradeModel: fields[15] as GradeModel?,
+      schoolName: fields[16] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, PersonEducationModel obj) {
     writer
-      ..writeByte(16)
+      ..writeByte(17)
       ..writeByte(0)
       ..write(obj.personEducationId)
       ..writeByte(1)
@@ -71,7 +72,9 @@ class PersonEducationModelAdapter extends TypeAdapter<PersonEducationModel> {
       ..writeByte(14)
       ..write(obj.schoolModel)
       ..writeByte(15)
-      ..write(obj.gradeModel);
+      ..write(obj.gradeModel)
+      ..writeByte(16)
+      ..write(obj.schoolName);
   }
 
   @override

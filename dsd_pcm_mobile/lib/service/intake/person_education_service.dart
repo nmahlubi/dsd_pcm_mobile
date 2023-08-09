@@ -84,4 +84,25 @@ class PersonEducationService {
     return await _httpClientService.httpClientPost(
         "${AppUrl.intakeURL}/Person/Educations/AddUpdate", personEducationDto);
   }
+
+  Future<ApiResponse> addUdatePersonEducation(
+      PersonEducationDto personEducationDto) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse = await addUdatePersonEducationOnline(personEducationDto);
+      if (apiResponse.ApiError == null) {
+        ApiResults apiResults = (apiResponse.Data as ApiResults);
+        PersonEducationDto personEducationDtoResponse =
+            PersonEducationDto.fromJson(apiResults.data);
+        apiResponse.Data = personEducationDtoResponse;
+        _personEducationRepository.savePersonEducationNewDbRecord(
+            personEducationDto, personEducationDtoResponse.personEducationId);
+      }
+    } on SocketException {
+      _personEducationRepository.savePersonEducation(personEducationDto);
+      apiResponse.Data = _personEducationRepository
+          .getAllPersonEducationByPersonId(personEducationDto.personId!);
+    }
+    return apiResponse;
+  }
 }

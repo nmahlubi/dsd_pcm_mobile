@@ -39,17 +39,16 @@ dependencies:
   shared_preferences: ^2.0.16
   http: ^0.13.5
   http_interceptor: ^1.0.2
-  firebase_auth: ^4.2.5
   expandable: ^5.0.1
   dropdown_plus: ^0.0.9
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   hive_generator: ^2.0.0
   build_runner: ^2.3.3
-  intl: ^0.17.0
+  intl: ^0.18.1
   workmanager: ^0.5.1
   flutter_bug_logger: ^1.0.0
-  logger: ^1.3.0
+  logger: ^2.0.1
   flutter_launcher_icons: ^0.12.0
 
 flutter_icons:

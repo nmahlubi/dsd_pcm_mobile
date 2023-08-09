@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../background_job/background_job_offline_lookup.dart';
-import '../../../background_job/background_job_offline_school.dart';
 import '../../../util/shared/loading_overlay.dart';
 import '../../../widgets/alert_dialog_messege_widget.dart';
 
@@ -25,7 +24,6 @@ class _LookupSyncOfflineManualPageState
   }
 
   final _backgroundJobOfflineLookUp = BackgroundJobOfflineLookUp();
-  final _backgroundJobOfflineSchool = BackgroundJobOfflineSchool();
 
   @override
   void initState() {
@@ -49,21 +47,6 @@ class _LookupSyncOfflineManualPageState
     } on SocketException {
       overlay.hide();
       showDialogMessage('Unable to sync lookup(offline) data.');
-    }
-  }
-
-  syncOfflineManualSchool() async {
-    final overlay = LoadingOverlay.of(context);
-    overlay.show();
-    try {
-      await _backgroundJobOfflineSchool.startRunningBackgroundSyncSchool();
-      overlay.hide();
-      if (!mounted) return;
-      alertDialogMessageWidget(
-          context, "Successfull", "School Synced Completed.");
-    } on SocketException {
-      overlay.hide();
-      showDialogMessage('Unable to sync offline data.');
     }
   }
 
@@ -127,28 +110,6 @@ class _LookupSyncOfflineManualPageState
                             fontWeight: FontWeight.w200,
                             fontSize: 21),
                       ),
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                              height: 70,
-                              padding: const EdgeInsets.all(10),
-                              child: OutlinedButton(
-                                style: OutlinedButton.styleFrom(
-                                  backgroundColor:
-                                      const Color.fromARGB(255, 23, 22, 22),
-                                  shape: const StadiumBorder(),
-                                  side: const BorderSide(
-                                      width: 2, color: Colors.blue),
-                                ),
-                                onPressed: () {
-                                  syncOfflineManualSchool();
-                                },
-                                child: const Text('Syncing Schools'),
-                              )),
-                        ),
-                      ],
                     ),
                   ],
                 )))));

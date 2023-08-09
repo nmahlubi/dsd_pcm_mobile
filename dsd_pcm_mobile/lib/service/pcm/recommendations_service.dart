@@ -17,16 +17,15 @@ class RecommendationsService {
   final _httpClientService = HttpClientService();
   final _recommendationRepository = RecommendationRepository();
 
-  Future<ApiResponse> getRecommendationsByIntakeAssessmentIdOnline(
+  Future<ApiResponse> getRecommendationByIntakeAssessmentIdOnline(
       int? intakeAssessmentId) async {
     ApiResponse apiResponse = ApiResponse();
-    final response = await client.get(Uri.parse(
-        "${AppUrl.pcmURL}/Recommendations/GetAll/$intakeAssessmentId"));
+    final response = await client.get(
+        Uri.parse("${AppUrl.pcmURL}/Recommendations/Get/$intakeAssessmentId"));
     switch (response.statusCode) {
       case 200:
-        apiResponse.Data = (json.decode(response.body) as List)
-            .map((data) => RecommendationDto.fromJson(data))
-            .toList();
+        apiResponse.Data =
+            RecommendationDto.fromJson(json.decode(response.body));
         break;
       default:
         apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
@@ -35,22 +34,21 @@ class RecommendationsService {
     return apiResponse;
   }
 
-  Future<ApiResponse> getRecommendationsByIntakeAssessmentId(
+  Future<ApiResponse> getRecommendationByIntakeAssessmentId(
       int? intakeAssessmentId) async {
     ApiResponse apiResponse = ApiResponse();
     try {
-      apiResponse = await getRecommendationsByIntakeAssessmentIdOnline(
-          intakeAssessmentId);
+      apiResponse =
+          await getRecommendationByIntakeAssessmentIdOnline(intakeAssessmentId);
       if (apiResponse.ApiError == null) {
-        List<RecommendationDto> recommendationDtoResponse =
-            apiResponse.Data as List<RecommendationDto>;
+        RecommendationDto recommendationDtoResponse =
+            apiResponse.Data as RecommendationDto;
         apiResponse.Data = recommendationDtoResponse;
-        _recommendationRepository
-            .saveRecommendationItems(recommendationDtoResponse);
+        _recommendationRepository.saveRecommendation(recommendationDtoResponse);
       }
     } on SocketException {
-      apiResponse.Data = _recommendationRepository
-          .getRecommendationByIntakeAssessment(intakeAssessmentId!);
+      apiResponse.Data =
+          _recommendationRepository.getRecommendationById(intakeAssessmentId!);
     }
     return apiResponse;
   }

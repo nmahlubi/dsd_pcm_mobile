@@ -10,23 +10,20 @@ class GeneralDetailSync {
   final _generalDetailRepository = GeneralDetailRepository();
   final _generalDetailServiceClient = GeneralDetailService();
   late ApiResponse apiResponse = ApiResponse();
-  late List<GeneralDetailDto> generalDetailsDto = [];
 
   Future<void> syncGeneralDetail(int? assessmentId) async {
-    var offlineGeneralDetailDto = _generalDetailRepository
-        .getAllGeneralDetailsByAssessmentId(assessmentId!);
-    if (offlineGeneralDetailDto.isNotEmpty) {
-      for (var generalDetail in offlineGeneralDetailDto) {
-        try {
-          apiResponse = await _generalDetailServiceClient
-              .addUpdateGeneralDetailOnline(generalDetail);
-          _generalDetailRepository
-              .deleteGeneralDetail(generalDetail.generalDetailsId!);
-        } on SocketException catch (_) {
-          if (kDebugMode) {
-            print(
-                'Unable to access _generalDetailServiceClient.syncGeneralDetail endpoint');
-          }
+    var offlineGeneralDetailDto =
+        _generalDetailRepository.getGeneralDetailByAssessmentId(assessmentId!);
+    if (offlineGeneralDetailDto != null) {
+      try {
+        apiResponse = await _generalDetailServiceClient
+            .addUpdateGeneralDetailOnline(offlineGeneralDetailDto);
+        _generalDetailRepository
+            .deleteGeneralDetailByAssessmentId(assessmentId);
+      } on SocketException catch (_) {
+        if (kDebugMode) {
+          print(
+              'Unable to access _generalDetailServiceClient.syncGeneralDetail endpoint');
         }
       }
     }
@@ -39,11 +36,10 @@ class GeneralDetailSync {
       apiResponse = await _generalDetailServiceClient
           .getGeneralDetailByIntakeAssessmentIdOnline(assessmentId);
       if ((apiResponse.ApiError) == null) {
-        generalDetailsDto = (apiResponse.Data as List<GeneralDetailDto>);
-        if (generalDetailsDto.isNotEmpty) {
-          await _generalDetailRepository
-              .saveGeneralDetailItems(generalDetailsDto);
-        }
+        GeneralDetailDto generalDetailDtoResponse =
+            apiResponse.Data as GeneralDetailDto;
+        await _generalDetailRepository
+            .saveGeneralDetail(generalDetailDtoResponse);
       }
     } on SocketException catch (_) {
       if (kDebugMode) {

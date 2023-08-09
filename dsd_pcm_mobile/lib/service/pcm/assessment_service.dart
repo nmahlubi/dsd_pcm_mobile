@@ -18,7 +18,45 @@ class AssessmentService {
       InterceptedClient.build(interceptors: [AuthorizationInterceptor()]);
   final _assesmentRegisterRepository = AssesmentRegisterRepository();
 
-  Future<ApiResponse> getAssessmentCountByIntakeAssessmentId(
+  Future<ApiResponse> getAssessmentStatusOnline(
+      int? intakeAssessmentId, int? personId) async {
+    ApiResponse apiResponse = ApiResponse();
+    final response = await client.get(Uri.parse(
+        "${AppUrl.pcmURL}/Assessment/Count/$intakeAssessmentId/$personId"));
+    switch (response.statusCode) {
+      case 200:
+        apiResponse.Data =
+            AssessmentCountQueryDto.fromJson(json.decode(response.body));
+        break;
+      default:
+        apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+        break;
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> getAssessmentStatus(
+      int? intakeAssessmentId, int? personId) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse =
+          await getAssessmentStatusOnline(intakeAssessmentId, personId);
+      if (apiResponse.ApiError == null) {
+        AssessmentCountQueryDto assessmentCountQueryDtoResponse =
+            apiResponse.Data as AssessmentCountQueryDto;
+        apiResponse.Data = assessmentCountQueryDtoResponse;
+        //_recommendationRepository.saveRecommendation(recommendationDtoResponse);
+      }
+    } on SocketException {
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+      //apiResponse.Data =
+      //_recommendationRepository.getRecommendationById(intakeAssessmentId!);
+    }
+    return apiResponse;
+  }
+  //to be deleted
+
+  Future<ApiResponse> getAssessmentCountById(
       int? intakeAssessmentId, int? personId) async {
     ApiResponse apiResponse = ApiResponse();
     try {
