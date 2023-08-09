@@ -153,7 +153,7 @@ class WorklistService {
        int? probationOfficerId) async {
     ApiResponse apiResponse = ApiResponse();
     final response = await client.get(Uri.parse(
-        "${AppUrl.pcmURL}/Worklist/HBSDiversion/All/$probationOfficerId"));
+        "${AppUrl.pcmURL}/HomeBasedDivesion/GetAll/$probationOfficerId"));
     switch (response.statusCode) {
       case 200:
         apiResponse.Data = (json.decode(response.body) as List)

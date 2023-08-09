@@ -2,6 +2,7 @@ class HomebasedDiversionQueryDto {
   HomebasedDiversionQueryDto({
     int? preliminaryId,
     int? homeBasedSupervisionId,
+    int? diversionId,
     int? probationOfficerId,
     int? assessmentRegisterId,
     int? caseId,
@@ -14,8 +15,9 @@ class HomebasedDiversionQueryDto {
     int? clientId,
   }) {
     _preliminaryId = preliminaryId;
-    _homeBasedSupervisionId=homeBasedSupervisionId;
     _probationOfficerId = probationOfficerId;
+    _homeBasedSupervisionId = homeBasedSupervisionId;
+    _diversionId = diversionId;
     _assessmentRegisterId = assessmentRegisterId;
     _caseId = caseId;
     _worklistId = worklistId;
@@ -29,8 +31,9 @@ class HomebasedDiversionQueryDto {
 
   HomebasedDiversionQueryDto.fromJson(dynamic json) {
     _preliminaryId = json['preliminaryId'];
-    _homeBasedSupervisionId = json['homeBasedSupervisionId'];
     _probationOfficerId = json['probationOfficerId'];
+    _homeBasedSupervisionId = json['homeBasedSupervisionId'];
+     _diversionId = json['diversionId'];
     _assessmentRegisterId = json['assessmentRegisterId'];
     _caseId = json['caseId'];
     _worklistId = json['worklistId'];
@@ -43,8 +46,9 @@ class HomebasedDiversionQueryDto {
   }
 
   int? _preliminaryId;
-  int? _homeBasedSupervisionId;
   int? _probationOfficerId;
+  int? _homeBasedSupervisionId;
+  int? _diversionId;
   int? _assessmentRegisterId;
   int? _caseId;
   int? _worklistId;
@@ -56,8 +60,9 @@ class HomebasedDiversionQueryDto {
   int? _clientId;
 
   int? get preliminaryId => _preliminaryId;
-  int? get homeBasedSupervisionId => _homeBasedSupervisionId;
   int? get probationOfficerId => _probationOfficerId;
+  int? get homeBasedSupervisionId => _homeBasedSupervisionId;
+   int? get diversionId => _diversionId;
   int? get assessmentRegisterId => _assessmentRegisterId;
   int? get caseId => _caseId;
   int? get worklistId => _worklistId;
@@ -71,8 +76,9 @@ class HomebasedDiversionQueryDto {
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['preliminaryId'] = _preliminaryId;
-    map['homeBasedSupervisionId'] =_homeBasedSupervisionId;
     map['probationOfficerId'] = _probationOfficerId;
+    map['homeBasedSupervisionId'] = _homeBasedSupervisionId;
+    map['diversionId'] = _diversionId;
     map['assessmentRegisterId'] = _assessmentRegisterId;
     map['caseId'] = _caseId;
     map['worklistId'] = _worklistId;
@@ -85,3 +91,4 @@ class HomebasedDiversionQueryDto {
     return map;
   }
 }
+
