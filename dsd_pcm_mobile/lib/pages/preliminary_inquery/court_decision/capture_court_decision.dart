@@ -122,7 +122,7 @@ class _CapturePreliminaryCourtDecisionPageState
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: preliminaryDateController,
-                              enableInteractiveSelection: false,
+
                               maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
@@ -159,7 +159,6 @@ class _CapturePreliminaryCourtDecisionPageState
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: OutcomeReasonController,
-                              enableInteractiveSelection: false,
                               maxLines: 3,
                               readOnly: false,
                               decoration: const InputDecoration(

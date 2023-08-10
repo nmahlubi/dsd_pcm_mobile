@@ -277,8 +277,6 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       consultedSourcesController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -308,8 +306,6 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       traceEffortsController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -338,8 +334,6 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       additionalInfoController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 3,
                                                   decoration:
                                                       const InputDecoration(

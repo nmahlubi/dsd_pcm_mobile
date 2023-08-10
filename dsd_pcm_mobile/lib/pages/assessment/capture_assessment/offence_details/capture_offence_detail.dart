@@ -195,7 +195,6 @@ class CaptureOffenceDetailPage extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: offenceCircumstanceController,
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
@@ -213,7 +212,6 @@ class CaptureOffenceDetailPage extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: valueOfGoodsController,
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
@@ -227,7 +225,6 @@ class CaptureOffenceDetailPage extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: valueRecoveredController,
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
@@ -276,7 +273,6 @@ class CaptureOffenceDetailPage extends StatelessWidget {
                           padding: const EdgeInsets.all(10),
                           child: TextFormField(
                             controller: responsibilityDetailsController,
-                            enableInteractiveSelection: false,
                             maxLines: 1,
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),

@@ -69,7 +69,7 @@ class CaptureProgramEnrolmentSessionOutcomePage extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: sessionDateController,
-                              enableInteractiveSelection: false,
+
                               maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
@@ -105,7 +105,6 @@ class CaptureProgramEnrolmentSessionOutcomePage extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: sessionOutcomeOutcomeController,
-                              enableInteractiveSelection: false,
                               maxLines: 4,
                               readOnly: false,
                               decoration: const InputDecoration(

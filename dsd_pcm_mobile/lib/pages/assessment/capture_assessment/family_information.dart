@@ -328,8 +328,6 @@ class _FamilyInformationPageState extends State<FamilyInformationPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       familyBackgroundController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 4,
                                                   decoration:
                                                       const InputDecoration(

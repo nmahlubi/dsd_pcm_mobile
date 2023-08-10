@@ -415,8 +415,6 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller: nameController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -440,8 +438,6 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller: surnameController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -470,8 +466,7 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       dateOfBirthController,
-                                                  enableInteractiveSelection:
-                                                      false,
+
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -535,8 +530,6 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller: ageController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   keyboardType:
                                                       TextInputType.number,
                                                   maxLines: 1,
@@ -612,8 +605,6 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       victimOccupationController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -635,8 +626,6 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       isVictimIndividualController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -659,8 +648,6 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       victimCareGiverNamesController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -693,8 +680,6 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       addressLine1Controller,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -716,8 +701,6 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       addressLine2Controller,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -745,8 +728,6 @@ class _VictimDetailPageState extends State<VictimDetailPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       postalCodeController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(

@@ -21,7 +21,6 @@ class AllocatedProbationOfficerPanel extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             child: TextFormField(
-              enableInteractiveSelection: false,
               maxLines: 1,
               controller: TextEditingController(
                   text: allocatedCaseSupervisorDto!.allocateTo),
@@ -34,7 +33,6 @@ class AllocatedProbationOfficerPanel extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             child: TextFormField(
-              enableInteractiveSelection: false,
               maxLines: 1,
               controller: TextEditingController(
                   text: allocatedCaseSupervisorDto!.dateAllocated),

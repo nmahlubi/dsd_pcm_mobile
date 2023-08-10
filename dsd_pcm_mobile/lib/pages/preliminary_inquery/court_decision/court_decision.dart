@@ -385,8 +385,7 @@ class _CourtDecisionPageState extends State<CourtDecisionPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       preliminaryDateController,
-                                                  enableInteractiveSelection:
-                                                      false,
+
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -433,8 +432,6 @@ class _CourtDecisionPageState extends State<CourtDecisionPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       outcomeReasonController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 4,
                                                   decoration:
                                                       const InputDecoration(

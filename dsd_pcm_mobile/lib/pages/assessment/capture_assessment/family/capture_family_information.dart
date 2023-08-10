@@ -58,7 +58,6 @@ class CaptureFamilyInformationPage extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: familyBackgroundController,
-                              enableInteractiveSelection: false,
                               maxLines: 4,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),

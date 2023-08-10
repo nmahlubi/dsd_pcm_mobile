@@ -50,7 +50,6 @@ class PersonInfoPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: personDto!.firstName),
@@ -65,7 +64,6 @@ class PersonInfoPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: personDto!.lastName.toString()),
@@ -84,7 +82,6 @@ class PersonInfoPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: personDto!.dateOfBirth),
@@ -99,7 +96,6 @@ class PersonInfoPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: languageDto?.description),
@@ -115,7 +111,6 @@ class PersonInfoPanel extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       child: TextFormField(
-                        enableInteractiveSelection: false,
                         maxLines: 1,
                         controller: TextEditingController(
                             text: personDto!.identificationNumber),
@@ -131,7 +126,6 @@ class PersonInfoPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: personDto!.dateOfBirth),
@@ -146,7 +140,6 @@ class PersonInfoPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: nationalityDto!.description),
@@ -162,7 +155,6 @@ class PersonInfoPanel extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       child: TextFormField(
-                        enableInteractiveSelection: false,
                         maxLines: 1,
                         controller: TextEditingController(
                             text: personDto!.emailAddress),
@@ -175,7 +167,6 @@ class PersonInfoPanel extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       child: TextFormField(
-                        enableInteractiveSelection: false,
                         maxLines: 1,
                         controller: TextEditingController(
                             text: personDto!.emailAddress),
@@ -191,7 +182,6 @@ class PersonInfoPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: personDto!.lastName.toString()),
@@ -206,7 +196,6 @@ class PersonInfoPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: personDto!.lastName.toString()),
@@ -225,7 +214,7 @@ class PersonInfoPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              enableInteractiveSelection: false,
+                              
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: childInformationDto!.personDateOfBirth),
@@ -240,7 +229,7 @@ class PersonInfoPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              enableInteractiveSelection: false,
+                              
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: childInformationDto!.personAge
@@ -257,7 +246,7 @@ class PersonInfoPanel extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       child: TextFormField(
-                        enableInteractiveSelection: false,
+                        
                         maxLines: 1,
                         controller: TextEditingController(
                             text: childInformationDto!.personIDNumber),
@@ -270,7 +259,7 @@ class PersonInfoPanel extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       child: TextFormField(
-                        enableInteractiveSelection: false,
+                        
                         maxLines: 1,
                         controller: TextEditingController(
                             text: countryDto!.countryName),
@@ -286,7 +275,7 @@ class PersonInfoPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              enableInteractiveSelection: false,
+                              
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: genderDto!.personGender),
@@ -301,7 +290,7 @@ class PersonInfoPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              enableInteractiveSelection: false,
+                              
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: raceDto!.raceType),
@@ -316,7 +305,7 @@ class PersonInfoPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              enableInteractiveSelection: false,
+                              
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: languageDto!.personLanguage),

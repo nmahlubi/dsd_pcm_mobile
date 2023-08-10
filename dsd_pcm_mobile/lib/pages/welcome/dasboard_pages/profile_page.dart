@@ -91,7 +91,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   child: TextFormField(
-                    enableInteractiveSelection: false,
                     maxLines: 1,
                     controller: firstNameController,
                     decoration: const InputDecoration(
@@ -104,7 +103,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   child: TextFormField(
-                    enableInteractiveSelection: false,
                     maxLines: 1,
                     controller: lastNameController,
                     decoration: const InputDecoration(
@@ -117,7 +115,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   child: TextFormField(
-                    enableInteractiveSelection: false,
                     controller: initialsController,
                     maxLines: 1,
                     decoration: const InputDecoration(

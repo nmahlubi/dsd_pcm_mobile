@@ -274,8 +274,6 @@ class _AssessmentDetailPageState extends State<AssessmentDetailPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       assessmentTimeController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -362,8 +360,6 @@ class _AssessmentDetailPageState extends State<AssessmentDetailPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       assessmentDateController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(

@@ -317,8 +317,6 @@ class _SocioEconomicPageState extends State<SocioEconomicPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       familyBackgroundCommentController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 2,
                                                   decoration:
                                                       const InputDecoration(
@@ -348,8 +346,6 @@ class _SocioEconomicPageState extends State<SocioEconomicPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       financeWorkRecordController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 2,
                                                   decoration:
                                                       const InputDecoration(
@@ -378,8 +374,6 @@ class _SocioEconomicPageState extends State<SocioEconomicPage> {
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller: housingController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 2,
                                                   decoration:
                                                       const InputDecoration(
@@ -408,8 +402,6 @@ class _SocioEconomicPageState extends State<SocioEconomicPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       socialCircumsancesController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 2,
                                                   decoration:
                                                       const InputDecoration(
@@ -439,8 +431,6 @@ class _SocioEconomicPageState extends State<SocioEconomicPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       previousInterventionController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 2,
                                                   decoration:
                                                       const InputDecoration(
@@ -470,8 +460,6 @@ class _SocioEconomicPageState extends State<SocioEconomicPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       interPersonalRelationshipController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 2,
                                                   decoration:
                                                       const InputDecoration(
@@ -501,8 +489,6 @@ class _SocioEconomicPageState extends State<SocioEconomicPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       peerPresureController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 2,
                                                   decoration:
                                                       const InputDecoration(
@@ -531,8 +517,6 @@ class _SocioEconomicPageState extends State<SocioEconomicPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       substanceAbuseController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 2,
                                                   decoration:
                                                       const InputDecoration(
@@ -562,8 +546,6 @@ class _SocioEconomicPageState extends State<SocioEconomicPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       religiousInvolveController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 2,
                                                   decoration:
                                                       const InputDecoration(
@@ -593,8 +575,6 @@ class _SocioEconomicPageState extends State<SocioEconomicPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       childBehaviorController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 2,
                                                   decoration:
                                                       const InputDecoration(
@@ -622,8 +602,6 @@ class _SocioEconomicPageState extends State<SocioEconomicPage> {
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller: otherController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 2,
                                                   decoration:
                                                       const InputDecoration(

@@ -95,7 +95,7 @@ class _OverdueCasesPageState extends State<OverdueCasesPage> {
                       padding: const EdgeInsets.all(10),
                       child: TextFormField(
                         controller: overdueStartDateController,
-                        enableInteractiveSelection: false,
+
                         maxLines: 1,
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
@@ -132,7 +132,7 @@ class _OverdueCasesPageState extends State<OverdueCasesPage> {
                       padding: const EdgeInsets.all(10),
                       child: TextFormField(
                         controller: overdueEndDateController,
-                        enableInteractiveSelection: false,
+
                         maxLines: 1,
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),

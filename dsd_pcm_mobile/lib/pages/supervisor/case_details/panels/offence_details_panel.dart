@@ -42,7 +42,6 @@ class OffenceDetailsPanel extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       child: TextFormField(
-                        enableInteractiveSelection: false,
                         maxLines: 1,
                         controller: TextEditingController(
                             text: offenseTypeDto!.offenseCode),
@@ -55,7 +54,6 @@ class OffenceDetailsPanel extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       child: TextFormField(
-                        enableInteractiveSelection: false,
                         maxLines: 4,
                         controller: TextEditingController(
                             text: offenseTypeDto!.offenseDescription),

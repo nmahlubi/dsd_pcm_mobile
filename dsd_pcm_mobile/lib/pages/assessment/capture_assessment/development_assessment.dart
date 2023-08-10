@@ -283,8 +283,6 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       belongingController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -312,8 +310,6 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller: masteryController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -342,8 +338,6 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       independenceController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -372,8 +366,6 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       generosityController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -402,8 +394,6 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       evaluationController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
