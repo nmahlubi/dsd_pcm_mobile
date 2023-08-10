@@ -46,7 +46,7 @@ class _ChildrenCaseListPageState extends State<ChildrenCaseListPage> {
     overlay.show();
 
     apiResponse =
-        await worklistServiceClient.getCompleteTaskAllocatedToProbationOfficer(
+        await worklistServiceClient.getCompletedTaskAllocatedToProbationOfficer(
             preferences!.getInt('userId')!);
 
     if ((apiResponse.ApiError) == null) {
