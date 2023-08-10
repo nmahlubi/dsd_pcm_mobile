@@ -77,7 +77,6 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
                                 controller: familyBackgroundCommentController,
-                                enableInteractiveSelection: false,
                                 maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
@@ -101,7 +100,6 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
                                 controller: financeWorkRecordController,
-                                enableInteractiveSelection: false,
                                 maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
@@ -125,7 +123,6 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
                                 controller: housingController,
-                                enableInteractiveSelection: false,
                                 maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
@@ -149,7 +146,6 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
                                 controller: socialCircumsancesController,
-                                enableInteractiveSelection: false,
                                 maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
@@ -173,7 +169,6 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
                                 controller: previousInterventionController,
-                                enableInteractiveSelection: false,
                                 maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
@@ -197,7 +192,6 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
                                 controller: interPersonalRelationshipController,
-                                enableInteractiveSelection: false,
                                 maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
@@ -221,7 +215,6 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
                                 controller: peerPresureController,
-                                enableInteractiveSelection: false,
                                 maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
@@ -245,7 +238,6 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
                                 controller: substanceAbuseController,
-                                enableInteractiveSelection: false,
                                 maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
@@ -269,7 +261,6 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
                                 controller: religiousInvolveController,
-                                enableInteractiveSelection: false,
                                 maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
@@ -293,7 +284,6 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
                                 controller: childBehaviorController,
-                                enableInteractiveSelection: false,
                                 maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
@@ -317,7 +307,6 @@ class CaptureSocioEconomicPage extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
                                 controller: otherController,
-                                enableInteractiveSelection: false,
                                 maxLines: 2,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),

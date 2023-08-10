@@ -400,8 +400,6 @@ class _FamilyMemberPageState extends State<FamilyMemberPage> {
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller: nameController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -425,8 +423,6 @@ class _FamilyMemberPageState extends State<FamilyMemberPage> {
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller: surnameController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -455,8 +451,7 @@ class _FamilyMemberPageState extends State<FamilyMemberPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       dateOfBirthController,
-                                                  enableInteractiveSelection:
-                                                      false,
+
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -520,8 +515,6 @@ class _FamilyMemberPageState extends State<FamilyMemberPage> {
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller: ageController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   keyboardType:
                                                       TextInputType.number,
                                                   maxLines: 1,

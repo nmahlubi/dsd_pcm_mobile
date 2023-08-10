@@ -1,31 +1,32 @@
+import 'package:dsd_pcm_mobile/model/pcm/hbs_conditions_dto.dart';
+import 'package:dsd_pcm_mobile/navigation_drawer/go_to_home_based_diversion_drawer.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../../model/intake/health_status_dto.dart';
-import '../../../model/pcm/accepted_worklist_dto.dart';
-import '../../../model/pcm/medical_health_detail_dto.dart';
-import '../../../navigation_drawer/go_to_assessment_drawer.dart';
-import '../../../service/pcm/medical_health_details_service.dart';
+import '../../../model/intake/compliance_dto.dart';
+import '../../../model/pcm/home_based_supervision_dto.dart';
+import '../../../model/pcm/query/homebased_diversion_query_dto.dart';
+import '../../../model/pcm/visitation_outcome_dto.dart';
+import '../../../service/pcm/home_based_supervision_service.dart';
 import '../../../transform_dynamic/transform_lookup.dart';
 import '../../../util/shared/apierror.dart';
 import '../../../util/shared/apiresponse.dart';
 import '../../../util/shared/apiresults.dart';
 import '../../../util/shared/loading_overlay.dart';
 import '../../../util/shared/randon_generator.dart';
-import '../../probation_officer/accepted_worklist.dart';
-import 'assessment_detail.dart';
-import 'education.dart';
+import '../home_based_diversion.dart';
 
-class HealthDetailPage extends StatefulWidget {
-  const HealthDetailPage({Key? key}) : super(key: key);
+class HomeBasedSupervisionDetailPage extends StatefulWidget {
+  const HomeBasedSupervisionDetailPage({Key? key}) : super(key: key);
 
   @override
-  State<HealthDetailPage> createState() => _HealthDetailPageState();
+  State<HomeBasedSupervisionDetailPage> createState() =>
+      _HomeBasedSupervisionDetailPageState();
 }
 
-class _HealthDetailPageState extends State<HealthDetailPage> {
+class _HomeBasedSupervisionDetailPageState
+    extends State<HomeBasedSupervisionDetailPage> {
   SharedPreferences? preferences;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final _loginFormKey = GlobalKey<FormState>();
@@ -34,68 +35,74 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
     preferences = await SharedPreferences.getInstance();
   }
 
-  late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
+  late HomebasedDiversionQueryDto homebasedDiversionQueryDto = HomebasedDiversionQueryDto();
   final _lookupTransform = LookupTransform();
   final _randomGenerator = RandomGenerator();
-  final _medicalHealthDetailsServiceClient = MedicalHealthDetailsService();
+  final _homeBasedSupervisionServiceClient = HomeBasedSupervisionService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
-  late MedicalHealthDetailDto captureMedicalHealthDetailDto =
-      MedicalHealthDetailDto();
-  late List<HealthStatusDto> healthStatusesDto = [];
-  late List<MedicalHealthDetailDto> medicalHealthDetailsDto = [];
+  late List<HomeBasedSupervionDto> homeBasedSupervionDto = [];
+  late List<HBSConditionsDto> hBSConditionsDto = [];
+  ExpandableController viewHomeBasedSupervisionPanelController =ExpandableController();
+  ExpandableController viewHBSConditionPanelController = ExpandableController();
 
-  ExpandableController captureMedicalInfoPanelController =
+  late VisitationOutcomeDto captureVisitationOutcomeDto =VisitationOutcomeDto();
+  late List<ComplianceDto> complianceDto = [];
+  late List<VisitationOutcomeDto> visitationOutcomeDto = [];
+
+  ExpandableController captureVisitationOutcomePanelController =
       ExpandableController();
-  ExpandableController viewMedicalInfoPanelController = ExpandableController();
-  final TextEditingController injuriesController = TextEditingController();
-  final TextEditingController medicationController = TextEditingController();
-  final TextEditingController allergiesController = TextEditingController();
-  final TextEditingController medicalAppointmentsController =
-      TextEditingController();
-  int? medicalHealthId;
-  int? healthStatusDropdownButtonFormField;
+  ExpandableController viewVisitationOutcomePanelController =
+      ExpandableController();
+  final TextEditingController processNotesController = TextEditingController();
+  final TextEditingController contactController = TextEditingController();
+  final TextEditingController dateCapturedController = TextEditingController();
+  int? visitationId;
+  int? complianceStatusDropdownButtonFormField;
   String? labelButtonAddUpdate = '';
 
   @override
   void initState() {
     super.initState();
-    captureMedicalInfoPanelController =
-        ExpandableController(initialExpanded: false);
-    viewMedicalInfoPanelController =
-        ExpandableController(initialExpanded: true);
-    labelButtonAddUpdate = 'Add Medical';
-    medicalHealthId = null;
+    viewHomeBasedSupervisionPanelController =ExpandableController(initialExpanded: true);
+    viewHBSConditionPanelController = ExpandableController(initialExpanded: true);
+    captureVisitationOutcomePanelController =ExpandableController(initialExpanded: false);
+    viewVisitationOutcomePanelController = ExpandableController(initialExpanded: true);
+    labelButtonAddUpdate = 'Add Visitation Outcome';
+    visitationId = null;
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
         setState(() {
-          acceptedWorklistDto =
-              ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
+          homebasedDiversionQueryDto =
+              ModalRoute.of(context)!.settings.arguments as HomebasedDiversionQueryDto;
           loadLookUpTransformer();
-          loadMedicalHealthDetailsByIntakeAssessmentId(
-              acceptedWorklistDto.intakeAssessmentId);
+          loadHomeBasedSupervisionDetailsByAssessmentId(
+              homebasedDiversionQueryDto.intakeAssessmentId);
+          //loadHBSConditionsDetailsByAssessmentId(
+            //  homebasedDiversionQueryDto.intakeAssessmentId);
+          loadVisitationOutcomeByIntakeAssessmentId(
+              homebasedDiversionQueryDto.intakeAssessmentId);
         });
       });
     });
   }
-
-  loadLookUpTransformer() async {
+ loadLookUpTransformer() async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    healthStatusesDto = await _lookupTransform.transformHealthStatusesDto();
+    complianceDto = await _lookupTransform.transformComplianceDto();
     overlay.hide();
   }
 
-  loadMedicalHealthDetailsByIntakeAssessmentId(int? intakeAssessmentId) async {
+  loadVisitationOutcomeByIntakeAssessmentId(int? intakeAssessmentId) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await _medicalHealthDetailsServiceClient
-        .getMedicalHealthDetailsByAssessmentId(intakeAssessmentId);
+    apiResponse = await _homeBasedSupervisionServiceClient
+        .getVisitationOutcomeByAssessmentId(intakeAssessmentId);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        medicalHealthDetailsDto =
-            (apiResponse.Data as List<MedicalHealthDetailDto>);
+        visitationOutcomeDto = (apiResponse.Data as List<VisitationOutcomeDto>);
       });
     } else {
       overlay.hide();
@@ -103,33 +110,67 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
     }
   }
 
-  addUpdateMedicalHealth() async {
+
+  loadHomeBasedSupervisionDetailsByAssessmentId(int? intakeAssessmentId) async {
+    final overlay = LoadingOverlay.of(context);
+    overlay.show();
+    apiResponse = await _homeBasedSupervisionServiceClient
+        .getHomeBasedSupervisionDetailsByAssessmentId(intakeAssessmentId);
+    if ((apiResponse.ApiError) == null) {
+      overlay.hide();
+      setState(() {
+        homeBasedSupervionDto =
+            (apiResponse.Data as List<HomeBasedSupervionDto>);
+      });
+    } else {
+      overlay.hide();
+      showDialogMessage((apiResponse.ApiError as ApiError));
+    }
+  }
+
+  loadHBSConditionsDetailsByAssessmentId(int? intakeAssessmentId) async {
+    final overlay = LoadingOverlay.of(context);
+    overlay.show();
+    apiResponse = await _homeBasedSupervisionServiceClient
+        .getHomeBasedSupervisionConditionsByAssessmentId(intakeAssessmentId);
+    if ((apiResponse.ApiError) == null) {
+      overlay.hide();
+      setState(() {
+        hBSConditionsDto = (apiResponse.Data as List<HBSConditionsDto>);
+      });
+    } else {
+      overlay.hide();
+      showDialogMessage((apiResponse.ApiError as ApiError));
+    }
+  }
+
+addUpdateVisitationOutcome() async {
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
     overlay.show();
-    MedicalHealthDetailDto requestAddmedicalHealthDetailDto =
-        MedicalHealthDetailDto(
-            healthDetailsId:
-                medicalHealthId ?? _randomGenerator.getRandomGeneratedNumber(),
-            healthStatusId: healthStatusDropdownButtonFormField,
-            healthStatusDto: healthStatusDropdownButtonFormField != null
-                ? healthStatusesDto
-                    .where((h) =>
-                        h.healthStatusId == healthStatusDropdownButtonFormField)
-                    .single
-                : null,
-            injuries: injuriesController.text,
-            medication: medicationController.text,
-            allergies: allergiesController.text,
-            dateCreated: _randomGenerator.getCurrentDateGenerated(),
-            medicalAppointments: medicalAppointmentsController.text == ""
-                ? null
-                : medicalAppointmentsController.text,
-            intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
-            createdBy: preferences!.getInt('userId'));
+    VisitationOutcomeDto requestAddVisitationOutcomeDto = VisitationOutcomeDto(
+        hBVisitaionOutcomeId:
+            visitationId ?? _randomGenerator.getRandomGeneratedNumber(),
+        homeBasedSupervisionId: homebasedDiversionQueryDto.homeBasedSupervisionId,
+        intakeAssessmentId: homebasedDiversionQueryDto.intakeAssessmentId,
+        conatactNumber: contactController.text,
+        processNotes: processNotesController.text,
+        createdBy: preferences!.getInt('userId')!,
+        modifiedBy: preferences!.getInt('userId')!,
+        dateModified: _randomGenerator.getCurrentDateGenerated(),
+        complianceId: complianceStatusDropdownButtonFormField,
+        complianceDto: complianceStatusDropdownButtonFormField != null
+            ? complianceDto
+                .where((h) =>
+                    h.complianceId == complianceStatusDropdownButtonFormField)
+                .single
+            : null,
+        dateCreated: dateCapturedController.text == ""
+            ? null
+            : dateCapturedController.text);
 
-    apiResponse = await _medicalHealthDetailsServiceClient
-        .addUpdateMedicalHealthDetail(requestAddmedicalHealthDetailDto);
+    apiResponse = await _homeBasedSupervisionServiceClient
+        .addUpdateVisitationOutcome(requestAddVisitationOutcomeDto);
 
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
@@ -137,9 +178,9 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
       showSuccessMessage('Successfully $labelButtonAddUpdate');
       navigator.push(
         MaterialPageRoute(
-            builder: (context) => const HealthDetailPage(),
+            builder: (context) => const HomeBasedSupervisionDetailPage(),
             settings: RouteSettings(
-              arguments: acceptedWorklistDto,
+              arguments: homebasedDiversionQueryDto,
             )),
       );
     } else {
@@ -148,35 +189,33 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
     }
   }
 
-  newMedicalDetail() {
+ newVisitationOutcome() {
     setState(() {
-      labelButtonAddUpdate = 'Add Medical';
-      injuriesController.clear();
-      medicationController.clear();
-      allergiesController.clear();
-      medicalAppointmentsController.clear();
-      healthStatusDropdownButtonFormField = null;
-      medicalHealthId = null;
+      labelButtonAddUpdate = 'Add Visitation Outcome';
+      processNotesController.clear();
+      contactController.clear();
+      dateCapturedController.clear();
+      complianceStatusDropdownButtonFormField = null;
+      visitationId = null;
     });
   }
 
-  populateHealthDetailForm(MedicalHealthDetailDto medicalHealthDetailsDto) {
+  populateVisitationOuctomeForm(VisitationOutcomeDto visitationOutcomeDto) {
     setState(() {
-      medicalHealthId = medicalHealthDetailsDto.healthDetailsId;
-      captureMedicalInfoPanelController =
+      visitationId = visitationOutcomeDto.hBVisitaionOutcomeId;
+      captureVisitationOutcomePanelController =
           ExpandableController(initialExpanded: true);
-      viewMedicalInfoPanelController =
+      viewVisitationOutcomePanelController =
           ExpandableController(initialExpanded: false);
-      labelButtonAddUpdate = 'Update Medical';
-      injuriesController.text = medicalHealthDetailsDto.injuries!;
-      medicationController.text = medicalHealthDetailsDto.medication!;
-      allergiesController.text = medicalHealthDetailsDto.allergies!;
-      medicalAppointmentsController.text =
-          medicalHealthDetailsDto.medicalAppointments!;
-      healthStatusDropdownButtonFormField =
-          medicalHealthDetailsDto.healthStatusId;
+      labelButtonAddUpdate = 'Updated Visitation Outcome';
+      processNotesController.text = visitationOutcomeDto.processNotes!;
+      contactController.text = visitationOutcomeDto.conatactNumber!;
+      dateCapturedController.text = visitationOutcomeDto.dateCreated!;
+      complianceStatusDropdownButtonFormField =
+          visitationOutcomeDto.complianceId;
     });
   }
+
 
   showDialogMessage(ApiError apiError) {
     final messageDialog = ScaffoldMessenger.of(context);
@@ -192,12 +231,11 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
     );
   }
 
-  @override
+@override
   void dispose() {
-    injuriesController.dispose();
-    medicationController.dispose();
-    allergiesController.dispose();
-    medicalAppointmentsController.dispose();
+    processNotesController.dispose();
+    contactController.dispose();
+    dateCapturedController.dispose();
     super.dispose();
   }
 
@@ -210,7 +248,7 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
         child: Scaffold(
             key: scaffoldKey,
             appBar: AppBar(
-              title: const Text("Medical Information"),
+              title: const Text("Homebased Supervision Details"),
               leading: IconButton(
                 icon: const Icon(Icons.offline_pin_rounded),
                 onPressed: () {
@@ -226,58 +264,18 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
               actions: [
                 IconButton(
                   icon: const Icon(Icons.home),
-                  tooltip: 'Accepted Worklist',
+                  tooltip: 'Home Based Diversion',
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const AcceptedWorklistPage()),
+                          builder: (context) => const HomeBasedDiversionPage()),
                     );
                   },
                 ),
               ],
             ),
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerFloat,
-            floatingActionButton: Container(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  FloatingActionButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const AssessmentDetailPage(),
-                            settings: RouteSettings(
-                              arguments: acceptedWorklistDto,
-                            ),
-                          ),
-                        );
-                      },
-                      heroTag: null,
-                      child: const Icon(Icons.arrow_back)),
-                  FloatingActionButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const EducationPage(),
-                            settings: RouteSettings(
-                              arguments: acceptedWorklistDto,
-                            ),
-                          ),
-                        );
-                      },
-                      heroTag: null,
-                      child: const Icon(Icons.arrow_forward)),
-                ],
-              ),
-            ),
-            drawer: GoToAssessmentDrawer(
-                acceptedWorklistDto: acceptedWorklistDto, isCompleted: true),
+            drawer:GoToHomeBasedDiversionDrawer(homebasedDiversionQueryDto: homebasedDiversionQueryDto),
             body: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 70),
                 child: Form(
@@ -298,7 +296,7 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                                   scrollOnCollapse: false,
                                   child: ExpandablePanel(
                                     controller:
-                                        captureMedicalInfoPanelController,
+                                        captureVisitationOutcomePanelController,
                                     theme: const ExpandableThemeData(
                                       headerAlignment:
                                           ExpandablePanelHeaderAlignment.center,
@@ -307,7 +305,7 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                                     header: Padding(
                                         padding: const EdgeInsets.all(10),
                                         child: Text(
-                                          "Capture Medical Information",
+                                          "Capture Visitation Outcome",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
@@ -355,7 +353,7 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                                                             color: Colors.blue),
                                                       ),
                                                       onPressed: () {
-                                                        newMedicalDetail();
+                                                        newVisitationOutcome();
                                                       },
                                                       child: const Text('New',
                                                           style: TextStyle(
@@ -371,19 +369,20 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                                                 padding:
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
-                                                  controller:
-                                                      allergiesController,
+                                                  controller: contactController,
+                                                  enableInteractiveSelection:
+                                                      false,
                                                   maxLines: 2,
                                                   decoration:
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
-                                                    labelText: 'Allergies',
+                                                    labelText: 'Contact Number',
                                                   ),
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Allergies Required';
+                                                      return 'Contact Number Required';
                                                     }
                                                     return null;
                                                   },
@@ -400,18 +399,20 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller:
-                                                      medicationController,
-                                                  maxLines: 2,
+                                                      processNotesController,
+                                                  enableInteractiveSelection:
+                                                      false,
+                                                  maxLines: 4,
                                                   decoration:
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
-                                                    labelText: 'Medication',
+                                                    labelText: 'Process Notes',
                                                   ),
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Medication Required';
+                                                      return 'Process Notes Required';
                                                     }
                                                     return null;
                                                   },
@@ -428,43 +429,15 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller:
-                                                      injuriesController,
-                                                  maxLines: 2,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                    labelText: 'Injuries',
-                                                  ),
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Injuries Required';
-                                                    }
-                                                    return null;
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                child: TextFormField(
-                                                  controller:
-                                                      medicalAppointmentsController,
-
+                                                      dateCapturedController,
+                                                  enableInteractiveSelection:
+                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
-                                                    labelText:
-                                                        'Medical Appointment',
+                                                    labelText: 'Date captured',
                                                   ),
                                                   readOnly:
                                                       true, // when true user cannot edit text
@@ -485,10 +458,9 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                                                                   'yyyy-MM-dd')
                                                               .format(
                                                                   pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
-                                                      medicalAppointmentsController
+                                                      dateCapturedController
                                                           .text = formattedDate;
                                                       //You can format date as per your need
-
                                                     }
                                                   },
                                                 ),
@@ -505,12 +477,11 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                                                   child:
                                                       DropdownButtonFormField(
                                                     value:
-                                                        healthStatusDropdownButtonFormField,
+                                                        complianceStatusDropdownButtonFormField,
                                                     decoration:
                                                         const InputDecoration(
-                                                      hintText: 'Health Status',
-                                                      labelText:
-                                                          'Health Status',
+                                                      hintText: 'Compliance',
+                                                      labelText: 'Compliance',
                                                       border:
                                                           OutlineInputBorder(
                                                         borderSide: BorderSide(
@@ -519,23 +490,22 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                                                                 Colors.green),
                                                       ),
                                                     ),
-                                                    items: healthStatusesDto
-                                                        .map((healthStatus) {
+                                                    items: complianceDto
+                                                        .map((compliance) {
                                                       return DropdownMenuItem(
-                                                          value: healthStatus
-                                                              .healthStatusId,
-                                                          child: Text(
-                                                              healthStatus
-                                                                  .description
-                                                                  .toString()));
+                                                          value: compliance
+                                                              .complianceId,
+                                                          child: Text(compliance
+                                                              .description
+                                                              .toString()));
                                                     }).toList(),
                                                     onChanged: (selectedValue) {
-                                                      healthStatusDropdownButtonFormField =
+                                                      complianceStatusDropdownButtonFormField =
                                                           selectedValue;
                                                     },
                                                     validator: (value) {
                                                       if (value == null) {
-                                                        return 'Health Status required';
+                                                        return 'Compliance required';
                                                       }
                                                       return null;
                                                     },
@@ -578,7 +548,7 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                                                         if (_loginFormKey
                                                             .currentState!
                                                             .validate()) {
-                                                          addUpdateMedicalHealth();
+                                                          addUpdateVisitationOutcome();
                                                         }
                                                       },
                                                       child: Text(
@@ -620,7 +590,8 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                                   scrollOnExpand: true,
                                   scrollOnCollapse: false,
                                   child: ExpandablePanel(
-                                    controller: viewMedicalInfoPanelController,
+                                    controller:
+                                        viewVisitationOutcomePanelController,
                                     theme: const ExpandableThemeData(
                                       headerAlignment:
                                           ExpandablePanelHeaderAlignment.center,
@@ -629,7 +600,7 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                                     header: Padding(
                                         padding: const EdgeInsets.all(10),
                                         child: Text(
-                                          "View Medical Health",
+                                          "View Visitation Outcome",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
@@ -644,26 +615,26 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        if (medicalHealthDetailsDto.isNotEmpty)
+                                        if (visitationOutcomeDto.isNotEmpty)
                                           Row(
                                             children: [
                                               Expanded(
                                                 child: ListView.separated(
                                                   shrinkWrap: true,
                                                   itemCount:
-                                                      medicalHealthDetailsDto
+                                                      visitationOutcomeDto
                                                           .length,
                                                   itemBuilder:
                                                       (context, int index) {
-                                                    if (medicalHealthDetailsDto
+                                                    if (visitationOutcomeDto
                                                         .isEmpty) {
                                                       return const Center(
                                                           child: Text(
-                                                              'No medical health Found.'));
+                                                              'No Visitation Outcome Found.'));
                                                     }
                                                     return ListTile(
                                                       title: Text(
-                                                          'Health Status : ${medicalHealthDetailsDto[index].healthStatusDto?.description}',
+                                                          'Process Notes : ${visitationOutcomeDto[index].processNotes}',
                                                           style: const TextStyle(
                                                               color:
                                                                   Colors.black,
@@ -671,9 +642,9 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                                                                   FontWeight
                                                                       .bold)),
                                                       subtitle: Text(
-                                                          'Allergy : ${medicalHealthDetailsDto[index].allergies}. '
-                                                          'Injuries : ${medicalHealthDetailsDto[index].injuries}. '
-                                                          'Medication : ${medicalHealthDetailsDto[index].medication}.',
+                                                          'Contact Number : ${visitationOutcomeDto[index].conatactNumber}. '
+                                                          'Date Visited : ${visitationOutcomeDto[index].dateCreated}. '
+                                                          'Compliance: ${visitationOutcomeDto[index].complianceDto?.description}.',
                                                           style:
                                                               const TextStyle(
                                                                   color: Colors
@@ -685,8 +656,8 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                                                           //IconButton(onPressed: () {}, icon: const Icon(Icons.favorite)),
                                                           IconButton(
                                                               onPressed: () {
-                                                                populateHealthDetailForm(
-                                                                    medicalHealthDetailsDto[
+                                                                populateVisitationOuctomeForm(
+                                                                    visitationOutcomeDto[
                                                                         index]);
                                                               },
                                                               icon: const Icon(
@@ -701,6 +672,205 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                                                                       .red)),*/
                                                         ],
                                                       ),
+                                                    );
+                                                  },
+                                                  separatorBuilder:
+                                                      (context, index) {
+                                                    return const Divider(
+                                                        thickness: 1);
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                      ],
+                                    ),
+                                    builder: (_, collapsed, expanded) {
+                                      return Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 10, right: 10, bottom: 10),
+                                        child: Expandable(
+                                          collapsed: collapsed,
+                                          expanded: expanded,
+                                          theme: const ExpandableThemeData(
+                                              crossFadePoint: 0),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ))),
+                      ]),
+                    
+                      Row(children: [
+                        Expanded(
+                            child: ExpandableNotifier(
+                                child: Padding(
+                          padding: const EdgeInsets.all(2),
+                          child: Card(
+                            clipBehavior: Clip.antiAlias,
+                            child: Column(
+                              children: <Widget>[
+                                ScrollOnExpand(
+                                  scrollOnExpand: true,
+                                  scrollOnCollapse: false,
+                                  child: ExpandablePanel(
+                                    controller:
+                                        viewHomeBasedSupervisionPanelController,
+                                    theme: const ExpandableThemeData(
+                                      headerAlignment:
+                                          ExpandablePanelHeaderAlignment.center,
+                                      tapBodyToCollapse: true,
+                                    ),
+                                    header: Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: Text(
+                                          "List Home Based Supervision",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyLarge,
+                                        )),
+                                    collapsed: const Text(
+                                      '',
+                                      softWrap: true,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    expanded: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        if (homeBasedSupervionDto.isNotEmpty)
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: ListView.separated(
+                                                  shrinkWrap: true,
+                                                  itemCount:
+                                                      homeBasedSupervionDto
+                                                          .length,
+                                                  itemBuilder:
+                                                      (context, int index) {
+                                                    if (homeBasedSupervionDto
+                                                        .isEmpty) {
+                                                      return const Center(
+                                                          child: Text(
+                                                              'No home based supervision Found.'));
+                                                    }
+                                                    return ListTile(
+                                                      title: Text(
+                                                          'Court Type : ${homeBasedSupervionDto[index].courtTypeDto?.description}',
+                                                          style: const TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold)),
+                                                      subtitle: Text(
+                                                          'Placement Date : ${homeBasedSupervionDto[index].placementDate}. '
+                                                          'Number of Visits : ${homeBasedSupervionDto[index].numberOfVisits}. ',
+                                                          style:
+                                                              const TextStyle(
+                                                                  color: Colors
+                                                                      .black)),
+                                                    
+                                                    );
+                                                  },
+                                                  separatorBuilder:
+                                                      (context, index) {
+                                                    return const Divider(
+                                                        thickness: 1);
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                      ],
+                                    ),
+                                    builder: (_, collapsed, expanded) {
+                                      return Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 10, right: 10, bottom: 10),
+                                        child: Expandable(
+                                          collapsed: collapsed,
+                                          expanded: expanded,
+                                          theme: const ExpandableThemeData(
+                                              crossFadePoint: 0),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ))),
+                      ]),
+                      Row(children: [
+                        Expanded(
+                            child: ExpandableNotifier(
+                                child: Padding(
+                          padding: const EdgeInsets.all(2),
+                          child: Card(
+                            clipBehavior: Clip.antiAlias,
+                            child: Column(
+                              children: <Widget>[
+                                ScrollOnExpand(
+                                  scrollOnExpand: true,
+                                  scrollOnCollapse: false,
+                                  child: ExpandablePanel(
+                                    controller: viewHBSConditionPanelController,
+                                    theme: const ExpandableThemeData(
+                                      headerAlignment:
+                                          ExpandablePanelHeaderAlignment.center,
+                                      tapBodyToCollapse: true,
+                                    ),
+                                    header: Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: Text(
+                                          "List HBS Conditions",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyLarge,
+                                        )),
+                                    collapsed: const Text(
+                                      '',
+                                      softWrap: true,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    expanded: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        if (homeBasedSupervionDto.isNotEmpty)
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: ListView.separated(
+                                                  shrinkWrap: true,
+                                                  itemCount:
+                                                      hBSConditionsDto.length,
+                                                  itemBuilder:
+                                                      (context, int index) {
+                                                    if (hBSConditionsDto
+                                                        .isEmpty) {
+                                                      return const Center(
+                                                          child: Text(
+                                                              'No hbs conditions Found.'));
+                                                    }
+                                                    return ListTile(
+                                                      title: Text(
+                                                          'Condition : ${hBSConditionsDto[index].conditionsDto?.conditions}',
+                                                          style: const TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold)),
                                                     );
                                                   },
                                                   separatorBuilder:

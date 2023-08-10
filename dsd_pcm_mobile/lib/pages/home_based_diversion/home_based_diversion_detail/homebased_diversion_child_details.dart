@@ -13,8 +13,6 @@ import '../../../../model/intake/nationality_dto.dart';
 import '../../../../model/intake/person_address_dto.dart';
 import '../../../../model/intake/person_dto.dart';
 import '../../../../model/intake/preferred_contact_type_dto.dart';
-import '../../../../model/pcm/accepted_worklist_dto.dart';
-import '../../../../navigation_drawer/go_to_assessment_drawer.dart';
 import '../../../../service/intake/address_service.dart';
 import '../../../../service/intake/person_service.dart';
 import '../../../../transform_dynamic/tranform_address.dart';
@@ -24,10 +22,9 @@ import '../../../../util/shared/apiresponse.dart';
 import '../../../../util/shared/apiresults.dart';
 import '../../../../util/shared/loading_overlay.dart';
 import '../../../../util/shared/randon_generator.dart';
-import '../../../../widgets/alert_dialog_messege_widget.dart';
 import '../../../navigation_drawer/go_to_home_based_diversion_drawer.dart';
 import '../home_based_diversion.dart';
-import 'home_based_diversion_detail.dart';
+import 'home_based_supervision_detail.dart';
 
 class DiversionHbsChildDetails extends StatefulWidget {
   const DiversionHbsChildDetails({super.key});
@@ -249,7 +246,7 @@ SharedPreferences? preferences;
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const HomeBasedDiversionDetailPage(),
+                            builder: (context) => const HomeBasedSupervisionDetailPage(),
                             settings: RouteSettings(
                               arguments: homebasedDiversionQueryDto,
                             ),

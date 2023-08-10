@@ -14,6 +14,7 @@ import '../../domain/repository/lookup/placement_type_repository.dart';
 import '../../domain/repository/lookup/preferred_contact_type_repository.dart';
 import '../../domain/repository/lookup/recommendation_type_repository.dart';
 import '../../domain/repository/lookup/relationship_type_repository.dart';
+import '../../model/intake/compliance_dto.dart';
 import '../../model/intake/disability_type_dto.dart';
 import '../../model/intake/form_of_notification_dto.dart';
 import '../../model/intake/gender_dto.dart';
@@ -27,6 +28,7 @@ import '../../model/intake/recommendation_type_dto.dart';
 import '../../model/intake/relationship_type_dto.dart';
 import '../../model/intake/placement_type_dto.dart';
 import '../../model/pcm/preliminaryStatus_dto.dart';
+import '../../model/pcm/programmes_dto.dart';
 import '../../util/app_url.dart';
 import '../../util/auth_intercept/authorization_interceptor.dart';
 import '../../util/shared/apierror.dart';
@@ -532,4 +534,49 @@ class LookUpService {
     }
     return apiResponse;
   }
+
+
+  Future<ApiResponse> getCompliance() async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      final response = await client
+          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/Compliance"));
+
+      switch (response.statusCode) {
+        case 200:
+          apiResponse.Data = (json.decode(response.body) as List)
+              .map((data) => ComplianceDto.fromJson(data))
+              .toList();
+          break;
+        default:
+          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+          break;
+      }
+    } on SocketException {
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
+  }
+
+    Future<ApiResponse> getProgrammes() async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      final response = await client
+          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/Programmes"));
+
+      switch (response.statusCode) {
+        case 200:
+          apiResponse.Data = (json.decode(response.body) as List)
+              .map((data) => ProgrammesDto.fromJson(data))
+              .toList();
+          break;
+        default:
+          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+          break;
+      }
+    } on SocketException {
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
+    }
 }

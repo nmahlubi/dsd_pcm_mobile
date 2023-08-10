@@ -577,8 +577,6 @@ class _OffenceDetailPageState extends State<OffenceDetailPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       offenceCircumstanceController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -608,8 +606,6 @@ class _OffenceDetailPageState extends State<OffenceDetailPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       valueOfGoodsController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -638,8 +634,6 @@ class _OffenceDetailPageState extends State<OffenceDetailPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       valueRecoveredController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -710,8 +704,6 @@ class _OffenceDetailPageState extends State<OffenceDetailPage> {
                                               child: TextFormField(
                                                 controller:
                                                     responsibilityDetailsController,
-                                                enableInteractiveSelection:
-                                                    false,
                                                 maxLines: 1,
                                                 decoration:
                                                     const InputDecoration(

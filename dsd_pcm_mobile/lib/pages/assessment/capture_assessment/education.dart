@@ -427,8 +427,6 @@ class _EducationPagePageState extends State<EducationPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       schoolNameController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -501,8 +499,7 @@ class _EducationPagePageState extends State<EducationPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       yearCompletedController,
-                                                  enableInteractiveSelection:
-                                                      false,
+
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -554,8 +551,7 @@ class _EducationPagePageState extends State<EducationPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       dateLastAttendedController,
-                                                  enableInteractiveSelection:
-                                                      false,
+
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -610,8 +606,6 @@ class _EducationPagePageState extends State<EducationPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       additionalInformationController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 4,
                                                   decoration:
                                                       const InputDecoration(

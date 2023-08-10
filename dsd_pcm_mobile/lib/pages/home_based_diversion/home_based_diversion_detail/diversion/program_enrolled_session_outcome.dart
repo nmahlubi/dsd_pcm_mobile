@@ -1,29 +1,25 @@
-import 'package:dsd_pcm_mobile/model/pcm/home_based_supervision_dto.dart';
-import 'package:expandable/expandable.dart';
+import 'package:dsd_pcm_mobile/model/pcm/program_enrolment_session_outcome_dto.dart';
+import 'package:dsd_pcm_mobile/model/pcm/programme_module_dto.dart';
+import 'package:dsd_pcm_mobile/navigation_drawer/navigation_drawer_menu.dart';
+import 'package:dsd_pcm_mobile/service/pcm/program_enrolment_session_outcome_service.dart';
+import 'package:dsd_pcm_mobile/service/pcm/programme_module_service.dart';
+import 'package:dsd_pcm_mobile/transform_dynamic/transform_lookup.dart';
+import 'package:dsd_pcm_mobile/util/shared/apierror.dart';
+import 'package:dsd_pcm_mobile/util/shared/apiresponse.dart';
+import 'package:dsd_pcm_mobile/util/shared/loading_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../model/pcm/accepted_worklist_dto.dart';
-import '../../../util/shared/apierror.dart';
-import '../../../util/shared/apiresponse.dart';
-import '../../../util/shared/loading_overlay.dart';
-import '../../model/pcm/query/homebased_diversion_query_dto.dart';
-import '../../model/pcm/query/homebased_diversion_query_dto.dart';
-import '../../navigation_drawer/navigation_drawer_menu.dart';
-import '../../service/pcm/worklist_service.dart';
-import 'home_based_diversion_detail/home_based_diversion_detail.dart';
-import 'home_based_diversion_detail/homebased_diversion_child_details.dart';
-import 'home_based_diversion_detail/home_based_supervision_detail.dart';
-import 'home_based_diversion_detail/homebased_diversion_child_details.dart';
-
-class HomeBasedDiversionPage extends StatefulWidget {
-  const HomeBasedDiversionPage({Key? key}) : super(key: key);
+class ProgramEnrolledSessionOutcomePage extends StatefulWidget {
+  const ProgramEnrolledSessionOutcomePage({Key? key}) : super(key: key);
 
   @override
-  State<HomeBasedDiversionPage> createState() => _HomeBasedDiversionPageState();
+  State<ProgramEnrolledSessionOutcomePage> createState() =>
+      _ProgramEnrolledSessionOutcomePageState();
 }
 
-class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
+class _ProgramEnrolledSessionOutcomePageState
+    extends State<ProgramEnrolledSessionOutcomePage> {
   SharedPreferences? preferences;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final _loginFormKey = GlobalKey<FormState>();
@@ -32,42 +28,54 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
     preferences = await SharedPreferences.getInstance();
   }
 
-  final _worklistServiceClient = WorklistService();
+  final ProgramEnrollmentSessionOutcomeService
+      programEnrollmentSessionOutcomeService =
+      ProgramEnrollmentSessionOutcomeService();
+  final ProgramModuleService programModuleService = ProgramModuleService();
   late ApiResponse apiResponse = ApiResponse();
-  late List<HomebasedDiversionQueryDto> homebasedDiversionQueryDto = [];
+  final _lookupTransform = LookupTransform();
+  late List<ProgramEnrolmentSessionOutcomeDto>
+      programEnrolmentSessionOutcomeDto = [];
+  late List<ProgrammeModuleDto> programmeModuleDto = [];
 
   String searchString = "";
-  ExpandableController viewMedicalInfoPanelController = ExpandableController();
 
   @override
   void initState() {
     super.initState();
-    viewMedicalInfoPanelController =
-        ExpandableController(initialExpanded: true);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
         setState(() {
-          loadHBSDiversionyProbationOfficer();
+          loadCompletedTaskAllocatedToProbationOfficer();
+          loadLookUpTransformer();
         });
       });
     });
   }
-  loadHBSDiversionyProbationOfficer() async {
+
+  loadCompletedTaskAllocatedToProbationOfficer() async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await _worklistServiceClient
-        .getHomebasedDiversionListByProbationOfficer(
-            preferences!.getInt('userId')!);
+
+    apiResponse = await programEnrollmentSessionOutcomeService
+        .getProgramEnrollmentSessionOutcome(preferences!.getInt('userId')!);
+
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        homebasedDiversionQueryDto = (apiResponse.Data as List<HomebasedDiversionQueryDto>);
-    
+        programEnrolmentSessionOutcomeDto =
+            (apiResponse.Data as List<ProgramEnrolmentSessionOutcomeDto>);
       });
     } else {
-      overlay.hide();
       showDialogMessage((apiResponse.ApiError as ApiError));
+      overlay.hide();
     }
+  }
+
+  loadLookUpTransformer() async {
+    final overlay = LoadingOverlay.of(context);
+    overlay.show();
+    overlay.hide();
   }
 
   showDialogMessage(ApiError apiError) {
@@ -91,9 +99,8 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
           return false;
         },
         child: Scaffold(
-          key: scaffoldKey,
           appBar: AppBar(
-            title: const Text("Diversion & HBS"),
+            title: const Text('Sessions Enrolled'),
           ),
           drawer: const NavigationDrawerMenu(),
           body: Column(
@@ -115,24 +122,25 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
               Expanded(
                 child: ListView.separated(
                   shrinkWrap: true,
-                  itemCount: homebasedDiversionQueryDto.length,
+                  itemCount: programEnrolmentSessionOutcomeDto.length,
                   itemBuilder: (context, int index) {
-                    if (homebasedDiversionQueryDto.isEmpty) {
+                    if (programEnrolmentSessionOutcomeDto.isEmpty) {
                       return const Center(
-                          child: Text('No HBS and  Diversionlist Found.'));
+                          child: Text('No Session Enrolled Found.'));
                     }
-                    return homebasedDiversionQueryDto[index]
-                            .childName!
+                    return programEnrolmentSessionOutcomeDto[index]
+                            .sessionOutCome!
                             .toLowerCase()
                             .contains(searchString)
                         ? ListTile(
-                            title: Text(homebasedDiversionQueryDto[index]
-                                .childName
+                            title: Text(programEnrolmentSessionOutcomeDto[index]
+                                .programModuleId
                                 .toString()),
                             subtitle: Text(
-                                homebasedDiversionQueryDto[index]
-                                    .dateAccepted
-                                    .toString(),
+                                'Module Name : ${programEnrolmentSessionOutcomeDto![index].programModuleId}.  \n'
+                                'Session: ${programEnrolmentSessionOutcomeDto![index].sessionId}  \n'
+                                'Session date : ${programEnrolmentSessionOutcomeDto![index].sessionDate}  \n'
+                                'Session outcomes : ${programEnrolmentSessionOutcomeDto![index].sessionOutCome}',
                                 style: const TextStyle(color: Colors.grey)),
                             trailing: const Icon(Icons.play_circle_fill_rounded,
                                 color: Colors.green),
@@ -141,24 +149,26 @@ class _HomeBasedDiversionPageState extends State<HomeBasedDiversionPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      const DiversionHbsChildDetails(),
+                                      const ProgramEnrolledSessionOutcomePage(), //////////////////////////////////////will be update
                                   settings: RouteSettings(
-                                    arguments: homebasedDiversionQueryDto[index],
+                                    arguments:
+                                        programEnrolmentSessionOutcomeDto[
+                                            index],
                                   ),
                                 ),
                               );
                             })
                         : Container();
-                },
+                  },
                   separatorBuilder: (context, index) {
-                    return homebasedDiversionQueryDto[index]
-                            .childName!
+                    return programEnrolmentSessionOutcomeDto[index]
+                            .sessionOutCome!
                             .toLowerCase()
                             .contains(searchString)
                         ? const Divider(thickness: 1)
                         : Container();
-                  }
-  ),
+                  },
+                ),
               ),
             ],
           ),

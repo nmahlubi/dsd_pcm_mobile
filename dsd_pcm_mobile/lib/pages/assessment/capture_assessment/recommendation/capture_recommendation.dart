@@ -143,7 +143,6 @@ class CaptureRecommendationPage extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: commentsForRecommendationController,
-                              enableInteractiveSelection: false,
                               maxLines: 4,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),

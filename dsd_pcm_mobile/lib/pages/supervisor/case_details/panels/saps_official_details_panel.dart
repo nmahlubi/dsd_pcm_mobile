@@ -42,7 +42,6 @@ class SapsOfficialDetailsPanel extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       child: TextFormField(
-                        enableInteractiveSelection: false,
                         maxLines: 1,
                         controller: TextEditingController(
                             text: sapsInfoDto!.policeFullName),
@@ -55,7 +54,6 @@ class SapsOfficialDetailsPanel extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       child: TextFormField(
-                        enableInteractiveSelection: false,
                         maxLines: 1,
                         controller: TextEditingController(
                             text: sapsInfoDto!.contactDetailsText),
@@ -68,7 +66,6 @@ class SapsOfficialDetailsPanel extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       child: TextFormField(
-                        enableInteractiveSelection: false,
                         maxLines: 1,
                         controller: TextEditingController(
                             text: sapsInfoDto!.policeUnitName),
@@ -84,7 +81,6 @@ class SapsOfficialDetailsPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: sapsInfoDto!.componentCode),

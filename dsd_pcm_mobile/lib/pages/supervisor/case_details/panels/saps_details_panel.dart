@@ -45,7 +45,6 @@ class SapsDetailsPanel extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       child: TextFormField(
-                        enableInteractiveSelection: false,
                         maxLines: 1,
                         controller: TextEditingController(
                             text: caseInformationDto!.casNumber),
@@ -61,7 +60,6 @@ class SapsDetailsPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
                                   text:
@@ -77,7 +75,6 @@ class SapsDetailsPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: policeStationDto!.policeStationName),
@@ -96,7 +93,6 @@ class SapsDetailsPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: caseInformationDto!.arrestDateFormat),
@@ -111,7 +107,6 @@ class SapsDetailsPanel extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: caseInformationDto!.arrestTime),

@@ -1,7 +1,9 @@
 import 'package:dsd_pcm_mobile/model/pcm/preliminaryStatus_dto.dart';
 import 'package:dsd_pcm_mobile/model/pcm/preliminary_detail_dto.dart';
+import 'package:dsd_pcm_mobile/model/pcm/programme_module_dto.dart';
 
 import '../model/intake/address_type_dto.dart';
+import '../model/intake/compliance_dto.dart';
 import '../model/intake/disability_type_dto.dart';
 import '../model/intake/form_of_notification_dto.dart';
 import '../model/intake/gender_dto.dart';
@@ -16,6 +18,7 @@ import '../model/intake/placement_type_dto.dart';
 import '../model/intake/preferred_contact_type_dto.dart';
 import '../model/intake/recommendation_type_dto.dart';
 import '../model/intake/relationship_type_dto.dart';
+import '../model/pcm/programmes_dto.dart';
 import '../service/intake/look_up_service.dart';
 import '../util/shared/apiresponse.dart';
 
@@ -38,6 +41,8 @@ class LookupTransform {
   late List<GradeDto> gradesDto = [];
   late List<FormOfNotificationDto> formOfNotificationsDto = [];
   late List<PreliminaryStatusDto> preliminayStatusDto = [];
+    late List<ComplianceDto> complianceDto=[];
+   late List<ProgrammesDto> programmesDto=[]; 
 
   Future<List<IdentificationTypeDto>> transformIdentificationTypeDto() async {
     apiResponse = await _lookUpServiceClient.getIdentificationTypes();
@@ -147,4 +152,21 @@ class LookupTransform {
     }
     return preliminayStatusDto;
   }
+
+   Future<List<ComplianceDto>> transformComplianceDto() async {
+    apiResponse = await _lookUpServiceClient.getCompliance();
+    if ((apiResponse.ApiError) == null) {
+      complianceDto = (apiResponse.Data as List<ComplianceDto>);
+    }
+    return complianceDto;
+  }
+
+ Future<List<ProgrammesDto>> transformProgrammesDto() async {
+    apiResponse = await _lookUpServiceClient.getProgrammes();
+    if ((apiResponse.ApiError) == null) {
+      programmesDto = (apiResponse.Data as List<ProgrammesDto>);
+    }
+    return programmesDto;
+  }
+
 }

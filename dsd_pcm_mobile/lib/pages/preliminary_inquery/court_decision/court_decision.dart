@@ -37,6 +37,9 @@ class _CourtDecisionPageState extends State<CourtDecisionPage> {
     preferences = await SharedPreferences.getInstance();
   }
 
+  final _randomGenerator = RandomGenerator();
+  final _lookupTransform = LookupTransform();
+
   late PreliminaryDetailQueryDto preliminaryDetailQueryDto =
       PreliminaryDetailQueryDto();
   late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
@@ -45,9 +48,6 @@ class _CourtDecisionPageState extends State<CourtDecisionPage> {
   final DiversionService diversionService = DiversionService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
-
-  final _randomGenerator = RandomGenerator();
-  final _lookupTransform = LookupTransform();
 
   late List<PreliminaryDetailDto> preliminaryDetailsDto = [];
 
@@ -111,7 +111,7 @@ class _CourtDecisionPageState extends State<CourtDecisionPage> {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
     apiResponse = await _preliminaryDetailService
-        .getPreliminaryDetailByPreliminaryIdOnline(preliminaryId);
+        .getPreliminaryByPreliminaryId(preliminaryId);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
@@ -385,8 +385,7 @@ class _CourtDecisionPageState extends State<CourtDecisionPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       preliminaryDateController,
-                                                  enableInteractiveSelection:
-                                                      false,
+
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -433,8 +432,6 @@ class _CourtDecisionPageState extends State<CourtDecisionPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       outcomeReasonController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 4,
                                                   decoration:
                                                       const InputDecoration(

@@ -58,7 +58,6 @@ class ChildDetailsPanel extends StatelessWidget {
                       child: TextFormField(
                         readOnly: true,
                         enabled: true,
-                        enableInteractiveSelection: false,
                         maxLines: 1,
                         controller: TextEditingController(
                             text: childInformationDto!
@@ -77,7 +76,6 @@ class ChildDetailsPanel extends StatelessWidget {
                             child: TextFormField(
                               readOnly: true,
                               enabled: true,
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: childInformationDto!.personDateOfBirth),
@@ -94,7 +92,6 @@ class ChildDetailsPanel extends StatelessWidget {
                             child: TextFormField(
                               readOnly: true,
                               enabled: true,
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: childInformationDto!.personAge
@@ -113,7 +110,6 @@ class ChildDetailsPanel extends StatelessWidget {
                       child: TextFormField(
                         readOnly: true,
                         enabled: true,
-                        enableInteractiveSelection: false,
                         maxLines: 1,
                         controller: TextEditingController(
                             text: childInformationDto!.personIDNumber),
@@ -128,7 +124,6 @@ class ChildDetailsPanel extends StatelessWidget {
                       child: TextFormField(
                         readOnly: true,
                         enabled: true,
-                        enableInteractiveSelection: false,
                         maxLines: 1,
                         controller: TextEditingController(
                             text: countryDto!.countryName),
@@ -146,7 +141,6 @@ class ChildDetailsPanel extends StatelessWidget {
                             child: TextFormField(
                               readOnly: true,
                               enabled: true,
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: genderDto!.personGender),
@@ -163,7 +157,6 @@ class ChildDetailsPanel extends StatelessWidget {
                             child: TextFormField(
                               readOnly: true,
                               enabled: true,
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: raceDto!.raceType),
@@ -184,7 +177,6 @@ class ChildDetailsPanel extends StatelessWidget {
                             child: TextFormField(
                               readOnly: true,
                               enabled: true,
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               controller: TextEditingController(
                                   text: languageDto!.personLanguage),

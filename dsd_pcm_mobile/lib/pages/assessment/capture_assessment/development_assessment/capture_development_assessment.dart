@@ -64,7 +64,6 @@ class CaptureDevelopmentAssessmentPage extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
                                 controller: belongingController,
-                                enableInteractiveSelection: false,
                                 maxLines: 1,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
@@ -88,7 +87,6 @@ class CaptureDevelopmentAssessmentPage extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
                                 controller: masteryController,
-                                enableInteractiveSelection: false,
                                 maxLines: 1,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
@@ -112,7 +110,6 @@ class CaptureDevelopmentAssessmentPage extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
                                 controller: independenceController,
-                                enableInteractiveSelection: false,
                                 maxLines: 1,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
@@ -136,7 +133,6 @@ class CaptureDevelopmentAssessmentPage extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
                                 controller: generosityController,
-                                enableInteractiveSelection: false,
                                 maxLines: 1,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
@@ -160,7 +156,6 @@ class CaptureDevelopmentAssessmentPage extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
                                 controller: evaluationController,
-                                enableInteractiveSelection: false,
                                 maxLines: 1,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),

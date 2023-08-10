@@ -75,7 +75,6 @@ class CaptureMedicalHealthPage extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: allergiesController,
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
@@ -93,7 +92,6 @@ class CaptureMedicalHealthPage extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: medicationController,
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
@@ -111,7 +109,6 @@ class CaptureMedicalHealthPage extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: injuriesController,
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
@@ -129,7 +126,7 @@ class CaptureMedicalHealthPage extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: medicalAppointmentsController,
-                              enableInteractiveSelection: false,
+
                               maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),

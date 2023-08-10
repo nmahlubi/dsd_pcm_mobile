@@ -437,7 +437,6 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
                                 padding: const EdgeInsets.all(10),
                                 child: TextFormField(
                                   controller: firstNameController,
-                                  enableInteractiveSelection: false,
                                   maxLines: 1,
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
@@ -457,7 +456,6 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
                                 padding: const EdgeInsets.all(10),
                                 child: TextFormField(
                                   controller: lastNameController,
-                                  enableInteractiveSelection: false,
                                   maxLines: 1,
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
@@ -519,8 +517,8 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
                               child: Container(
                                 padding: const EdgeInsets.all(10),
                                 child: TextFormField(
+                                  autofocus: true,
                                   controller: identityNumberController,
-                                  enableInteractiveSelection: false,
                                   maxLines: 1,
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
@@ -562,7 +560,6 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
                                 padding: const EdgeInsets.all(10),
                                 child: TextFormField(
                                   controller: dateOfBirthController,
-                                  enableInteractiveSelection: false,
                                   readOnly: true,
                                   maxLines: 1,
                                   decoration: const InputDecoration(
@@ -584,7 +581,6 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
                                 child: TextFormField(
                                   controller: ageController,
                                   keyboardType: TextInputType.number,
-                                  enableInteractiveSelection: false,
                                   maxLines: 1,
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
@@ -816,7 +812,6 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
                                 padding: const EdgeInsets.all(10),
                                 child: TextFormField(
                                   controller: phoneNumberController,
-                                  enableInteractiveSelection: false,
                                   maxLines: 1,
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
@@ -830,7 +825,6 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
                                 padding: const EdgeInsets.all(10),
                                 child: TextFormField(
                                   controller: mobileNumberController,
-                                  enableInteractiveSelection: false,
                                   maxLines: 1,
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
@@ -848,7 +842,6 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
                                 padding: const EdgeInsets.all(10),
                                 child: TextFormField(
                                   controller: emailAddressController,
-                                  enableInteractiveSelection: false,
                                   maxLines: 1,
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
@@ -937,7 +930,6 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
                                 padding: const EdgeInsets.all(10),
                                 child: TextFormField(
                                   controller: addressLine1Controller,
-                                  enableInteractiveSelection: false,
                                   maxLines: 1,
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
@@ -955,7 +947,6 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
                                 padding: const EdgeInsets.all(10),
                                 child: TextFormField(
                                   controller: addressLine2Controller,
-                                  enableInteractiveSelection: false,
                                   maxLines: 1,
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
@@ -973,7 +964,6 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
                                 padding: const EdgeInsets.all(10),
                                 child: TextFormField(
                                   controller: postalCodeController,
-                                  enableInteractiveSelection: false,
                                   maxLines: 1,
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
