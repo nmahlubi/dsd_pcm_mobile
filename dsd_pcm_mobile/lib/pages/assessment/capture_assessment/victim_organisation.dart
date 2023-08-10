@@ -389,7 +389,6 @@ class _VictimOrganisationPageState extends State<VictimOrganisationPage> {
                                           child: TextFormField(
                                             controller:
                                                 organisationNameController,
-                                            enableInteractiveSelection: false,
                                             maxLines: 1,
                                             decoration: const InputDecoration(
                                               border: OutlineInputBorder(),
@@ -423,8 +422,6 @@ class _VictimOrganisationPageState extends State<VictimOrganisationPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       contactPersonFirstNameController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -449,8 +446,6 @@ class _VictimOrganisationPageState extends State<VictimOrganisationPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       contactPersonLastNameController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -479,8 +474,6 @@ class _VictimOrganisationPageState extends State<VictimOrganisationPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       contactPersonOccupationController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -502,8 +495,6 @@ class _VictimOrganisationPageState extends State<VictimOrganisationPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       telephoneController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -524,8 +515,6 @@ class _VictimOrganisationPageState extends State<VictimOrganisationPage> {
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller: cellNoController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -554,8 +543,6 @@ class _VictimOrganisationPageState extends State<VictimOrganisationPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       otherContactsController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -577,8 +564,6 @@ class _VictimOrganisationPageState extends State<VictimOrganisationPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       addressLine1Controller,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -600,8 +585,6 @@ class _VictimOrganisationPageState extends State<VictimOrganisationPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       addressLine2Controller,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -629,8 +612,6 @@ class _VictimOrganisationPageState extends State<VictimOrganisationPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       postalCodeController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(

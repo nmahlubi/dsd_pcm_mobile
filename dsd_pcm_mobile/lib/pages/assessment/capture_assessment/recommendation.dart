@@ -440,8 +440,6 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       commentsForRecommendationController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 4,
                                                   decoration:
                                                       const InputDecoration(

@@ -373,8 +373,6 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       allergiesController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 2,
                                                   decoration:
                                                       const InputDecoration(
@@ -403,8 +401,6 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       medicationController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 2,
                                                   decoration:
                                                       const InputDecoration(
@@ -433,8 +429,6 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       injuriesController,
-                                                  enableInteractiveSelection:
-                                                      false,
                                                   maxLines: 2,
                                                   decoration:
                                                       const InputDecoration(
@@ -463,8 +457,7 @@ class _HealthDetailPageState extends State<HealthDetailPage> {
                                                 child: TextFormField(
                                                   controller:
                                                       medicalAppointmentsController,
-                                                  enableInteractiveSelection:
-                                                      false,
+
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(

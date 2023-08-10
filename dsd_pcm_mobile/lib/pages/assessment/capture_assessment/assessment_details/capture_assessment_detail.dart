@@ -65,7 +65,6 @@ class CaptureGeneralDetailPage extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
                                 controller: consultedSourcesController,
-                                enableInteractiveSelection: false,
                                 maxLines: 1,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
@@ -85,7 +84,6 @@ class CaptureGeneralDetailPage extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
                                 controller: traceEffortsController,
-                                enableInteractiveSelection: false,
                                 maxLines: 1,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
@@ -109,7 +107,6 @@ class CaptureGeneralDetailPage extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
                                 controller: commentsBySupervisorController,
-                                enableInteractiveSelection: false,
                                 maxLines: 3,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
@@ -127,7 +124,6 @@ class CaptureGeneralDetailPage extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               child: TextFormField(
                                 controller: additionalInfoController,
-                                enableInteractiveSelection: false,
                                 maxLines: 3,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),

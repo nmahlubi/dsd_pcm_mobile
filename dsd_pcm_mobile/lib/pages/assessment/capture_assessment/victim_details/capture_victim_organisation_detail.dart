@@ -60,7 +60,6 @@ class CaptureVictimOrganisationDetailPage extends StatelessWidget {
                       padding: const EdgeInsets.all(10),
                       child: TextFormField(
                         controller: organisationNameController,
-                        enableInteractiveSelection: false,
                         maxLines: 1,
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
@@ -85,7 +84,6 @@ class CaptureVictimOrganisationDetailPage extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: contactPersonFirstNameController,
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
@@ -99,7 +97,6 @@ class CaptureVictimOrganisationDetailPage extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: contactPersonLastNameController,
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
@@ -117,7 +114,6 @@ class CaptureVictimOrganisationDetailPage extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: contactPersonOccupationController,
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
@@ -135,7 +131,6 @@ class CaptureVictimOrganisationDetailPage extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: telephoneController,
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
@@ -149,7 +144,6 @@ class CaptureVictimOrganisationDetailPage extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: cellNoController,
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
@@ -167,7 +161,6 @@ class CaptureVictimOrganisationDetailPage extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: otherContactsController,
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
@@ -190,7 +183,6 @@ class CaptureVictimOrganisationDetailPage extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: addressLine1Controller,
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
@@ -208,7 +200,6 @@ class CaptureVictimOrganisationDetailPage extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: addressLine2Controller,
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
@@ -231,7 +222,6 @@ class CaptureVictimOrganisationDetailPage extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             child: TextFormField(
                               controller: postalCodeController,
-                              enableInteractiveSelection: false,
                               maxLines: 1,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
