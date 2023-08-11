@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:dsd_pcm_mobile/pages/probation_officer/accepted_children_caselist.dart';
 import 'package:dsd_pcm_mobile/sessions/session.dart';
 import 'package:dsd_pcm_mobile/sessions/session_manager.dart';
 import 'package:flutter/material.dart';
@@ -278,7 +277,7 @@ class MyApp extends StatelessWidget {
           '/re-assigned-cases': (context) => const ReAssignedCasesPage(),
           '/overdue-cases': (context) => const OverdueCasesPage(),
           '/sync-manual-offline': (context) => const SyncingOfflineManualPage(),
-          '/childrenCaseListPage': (context) => const ChildrenCaseListPage(),
+          '/preliminary': (context) => const PreliminaryPage(),
           '/home-based': (context) => const HomeBasedDiversionPage()
         },
       ),

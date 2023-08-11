@@ -5,6 +5,7 @@ import 'package:http_interceptor/http/intercepted_client.dart';
 
 import '../../domain/repository/worklist/accepted_worklist_repository.dart';
 import '../../model/pcm/accepted_worklist_dto.dart';
+import '../../model/pcm/query/homebased_diversion_query_dto.dart';
 import '../../model/pcm/request/create_worklist.dart';
 import '../../model/pcm/request/request_complete_assessment.dart';
 import '../../util/app_url.dart';
@@ -148,27 +149,20 @@ class WorklistService {
     return apiResponse;
   }
 
-//for preliminary details
-  Future<ApiResponse> getCompleteTaskAllocatedToProbationOfficer(
-      int? probationOfficerId) async {
+   Future<ApiResponse> getHomebasedDiversionListByProbationOfficer(
+       int? probationOfficerId) async {
     ApiResponse apiResponse = ApiResponse();
-    try {
-      final response = await client.get(Uri.parse(
-          "${AppUrl.pcmURL}/Worklist/CompletedAssessment/All/$probationOfficerId"));
-      switch (response.statusCode) {
-        case 200:
-          List<AcceptedWorklistDto> acceptedWorklistDtoResponse =
-              (json.decode(response.body) as List)
-                  .map((data) => AcceptedWorklistDto.fromJson(data))
-                  .toList();
-          apiResponse.Data = acceptedWorklistDtoResponse;
-          break;
-        default:
-          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
-          break;
-      }
-    } on SocketException {
-      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    final response = await client.get(Uri.parse(
+        "${AppUrl.pcmURL}/HomeBasedDivesion/GetAll/$probationOfficerId"));
+    switch (response.statusCode) {
+      case 200:
+        apiResponse.Data = (json.decode(response.body) as List)
+            .map((data) => HomebasedDiversionQueryDto.fromJson(data))
+            .toList();
+        break;
+      default:
+        apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+        break;
     }
     return apiResponse;
   }
