@@ -137,10 +137,10 @@ class _ProgramEnrolledSessionOutcomePageState
                                 .programModuleId
                                 .toString()),
                             subtitle: Text(
-                                'Module Name : ${programEnrolmentSessionOutcomeDto![index].programModuleId}.  \n'
-                                'Session: ${programEnrolmentSessionOutcomeDto![index].sessionId}  \n'
-                                'Session date : ${programEnrolmentSessionOutcomeDto![index].sessionDate}  \n'
-                                'Session outcomes : ${programEnrolmentSessionOutcomeDto![index].sessionOutCome}',
+                                'Module Name : ${programEnrolmentSessionOutcomeDto[index].programModuleId}.  \n'
+                                'Session: ${programEnrolmentSessionOutcomeDto[index].sessionId}  \n'
+                                'Session date : ${programEnrolmentSessionOutcomeDto[index].sessionDate}  \n'
+                                'Session outcomes : ${programEnrolmentSessionOutcomeDto[index].sessionOutCome}',
                                 style: const TextStyle(color: Colors.grey)),
                             trailing: const Icon(Icons.play_circle_fill_rounded,
                                 color: Colors.green),
