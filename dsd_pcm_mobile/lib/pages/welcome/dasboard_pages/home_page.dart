@@ -248,41 +248,41 @@ class _HomePageState extends State<HomePage> {
                 Container(
                   padding: const EdgeInsets.all(10),
                 ),
-                //if (preferences?.getBool('supervisor') == false)
-                _buildTile(
-                  onTap: () => Navigator.pushReplacementNamed(
-                      context, '/accepted-worklist'),
-                  Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              const Text('My WorkList',
-                                  style: TextStyle(color: Colors.blueAccent)),
-                              Text(mobileDashboardDto.newWorklist.toString(),
-                                  style: const TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 34.0))
-                            ],
-                          ),
-                          Material(
-                              color: Colors.blue,
-                              borderRadius: BorderRadius.circular(24.0),
-                              child: const Center(
-                                  child: Padding(
-                                padding: EdgeInsets.all(16.0),
-                                child: Icon(Icons.timeline,
-                                    color: Colors.white, size: 30.0),
-                              )))
-                        ]),
+                if (preferences?.getBool('supervisor') == false)
+                  _buildTile(
+                    onTap: () => Navigator.pushReplacementNamed(
+                        context, '/accepted-worklist'),
+                    Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                const Text('My WorkList',
+                                    style: TextStyle(color: Colors.blueAccent)),
+                                Text(mobileDashboardDto.newWorklist.toString(),
+                                    style: const TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 34.0))
+                              ],
+                            ),
+                            Material(
+                                color: Colors.blue,
+                                borderRadius: BorderRadius.circular(24.0),
+                                child: const Center(
+                                    child: Padding(
+                                  padding: EdgeInsets.all(16.0),
+                                  child: Icon(Icons.timeline,
+                                      color: Colors.white, size: 30.0),
+                                )))
+                          ]),
+                    ),
                   ),
-                ),
                 Container(
                   padding: const EdgeInsets.all(10),
                 ),

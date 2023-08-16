@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.dsd_pcm_mobile">
+    <uses-permission android:name="android.permission.INTERNET" />
    <application
         android:label="Dsd PCM"
         android:name="${applicationName}"
