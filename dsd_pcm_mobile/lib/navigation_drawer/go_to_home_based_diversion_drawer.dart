@@ -3,6 +3,7 @@ import 'package:dsd_pcm_mobile/navigation_drawer/create_drawer_body_item.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../pages/home_based_diversion/home_based_diversion_detail/diversion/diversion_programs_enrolled.dart';
 import '../pages/home_based_diversion/home_based_diversion_detail/home_based_supervision_detail.dart';
 
 // ignore: use_key_in_widget_constructors
@@ -52,7 +53,15 @@ class _GoToHomeBasedDiversionDrawerPageWidgetState
             icon: Icons.inbox,
             text: 'Diversion',
             onTap: () =>
-                Navigator.pushReplacementNamed(context, '/preliminary'),
+                 Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProgrammesEnrolledDetailsPage(),
+                    settings: RouteSettings(
+                      arguments: widget.homebasedDiversionQueryDto,
+                    ),
+                  ),
+                ),
           ),
       
           createDrawerBodyItem(
