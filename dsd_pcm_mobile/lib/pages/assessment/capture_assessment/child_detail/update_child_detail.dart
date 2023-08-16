@@ -517,7 +517,6 @@ class _UpdateChildDetailPageState extends State<UpdateChildDetailPage> {
                               child: Container(
                                 padding: const EdgeInsets.all(10),
                                 child: TextFormField(
-                                  autofocus: true,
                                   controller: identityNumberController,
                                   maxLines: 1,
                                   decoration: const InputDecoration(
