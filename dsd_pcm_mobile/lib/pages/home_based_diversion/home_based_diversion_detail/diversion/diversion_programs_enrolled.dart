@@ -248,12 +248,7 @@ class _ProgrammesEnrolledDetailsPageState
                                                             color:
                                                                 Colors.green),
                                                         onTap: () {
-                                                          /*Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  const ProgramEnrolledSessionOutcomePage(),
-                                                         Navigator.push(
+                                                          Navigator.push(
                                                             context,
                                                             MaterialPageRoute(
                                                               builder: (context) =>
@@ -265,7 +260,7 @@ class _ProgrammesEnrolledDetailsPageState
                                                                         index],
                                                               ),
                                                             ),
-                                                          );*/
+                                                          );
                                                         });
                                                   },
                                                   separatorBuilder:
