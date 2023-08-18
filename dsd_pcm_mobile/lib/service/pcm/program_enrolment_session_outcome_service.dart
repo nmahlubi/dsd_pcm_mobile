@@ -19,7 +19,7 @@ class ProgramEnrollmentSessionOutcomeService {
     ApiResponse apiResponse = ApiResponse();
     try {
       final response = await client.post(
-          Uri.parse("${AppUrl.pcmURL}/ProgramEnrolmentSessionOutcome/Add"),
+          Uri.parse("${AppUrl.pcmURL}/Diversion/Session/Add"),
           body: json.encode(programEnrollmentSessionOutcomeDto),
           headers: {'Content-Type': 'application/json'});
 
@@ -39,12 +39,12 @@ class ProgramEnrollmentSessionOutcomeService {
     return apiResponse;
   }
 
-  Future<ApiResponse> getProgramEnrollmentSessionOutcome(int? sessionId) async {
+  Future<ApiResponse> getProgramEnrollmentSessionOutcome(
+      int? enrollmentId) async {
     ApiResponse apiResponse = ApiResponse();
     try {
-      final response = await client.get(Uri.parse(
-          //$sessionId
-          "${AppUrl.pcmURL}/ProgramEnrolmentSessionOutcome/$sessionId"));
+      final response = await client.get(
+          Uri.parse("${AppUrl.pcmURL}/Diversion/Session/GetAll/$enrollmentId"));
 
       switch (response.statusCode) {
         case 200:

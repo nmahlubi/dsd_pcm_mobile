@@ -1,7 +1,11 @@
 import 'package:dsd_pcm_mobile/model/pcm/program_enrolment_session_outcome_dto.dart';
+import 'package:dsd_pcm_mobile/model/pcm/programme_module_dto.dart';
+import 'package:dsd_pcm_mobile/model/pcm/programmes_dto.dart';
 import 'package:dsd_pcm_mobile/model/pcm/programs_enrolled_dto.dart';
-import 'package:dsd_pcm_mobile/navigation_drawer/navigation_drawer_menu.dart';
+import 'package:dsd_pcm_mobile/model/pcm/query/homebased_diversion_query_dto.dart';
+import 'package:dsd_pcm_mobile/navigation_drawer/go_to_home_based_diversion_drawer.dart';
 import 'package:dsd_pcm_mobile/service/pcm/program_enrolment_session_outcome_service.dart';
+import 'package:dsd_pcm_mobile/transform_dynamic/transform_lookup.dart';
 import 'package:dsd_pcm_mobile/util/shared/apierror.dart';
 import 'package:dsd_pcm_mobile/util/shared/apiresponse.dart';
 import 'package:dsd_pcm_mobile/util/shared/loading_overlay.dart';
@@ -28,6 +32,7 @@ class _ProgramEnrolledSessionOutcomePageState
     preferences = await SharedPreferences.getInstance();
   }
 
+  final _lookupTransform = LookupTransform();
   final ProgramEnrollmentSessionOutcomeService
       programEnrollmentSessionOutcomeService =
       ProgramEnrollmentSessionOutcomeService();
@@ -37,8 +42,13 @@ class _ProgramEnrolledSessionOutcomePageState
   late List<ProgramEnrolmentSessionOutcomeDto> programsEnrolledDto = [];
   late ProgramsEnrolledDto programsEnrolled = ProgramsEnrolledDto();
 
+  late HomebasedDiversionQueryDto homebasedDiversionQueryDto =
+      HomebasedDiversionQueryDto();
+
   final ProgramEnrolmentSessionOutcomeDto programEnrolled =
       ProgramEnrolmentSessionOutcomeDto();
+  late List<ProgrammesDto> programmesDto = [];
+  late List<ProgrammeModuleDto> programmeModule = [];
 
   String searchString = "";
 
@@ -50,12 +60,20 @@ class _ProgramEnrolledSessionOutcomePageState
         setState(() {
           programsEnrolled =
               ModalRoute.of(context)!.settings.arguments as ProgramsEnrolledDto;
+          loadLookUpTransformer();
           //programEnrolled.enrolmentID
           loadProgrammEnrolledSessionOutcome(1);
-          loadLookUpTransformer();
         });
       });
     });
+  }
+
+  loadLookUpTransformer() async {
+    final overlay = LoadingOverlay.of(context);
+    overlay.show();
+    programmesDto = await _lookupTransform.transformProgrammesDto();
+    // programmeModule = await _lookupTransform.transformProgrammeModuleDto();
+    overlay.hide();
   }
 
   loadProgrammEnrolledSessionOutcome(int? $sessionId) async {
@@ -75,12 +93,6 @@ class _ProgramEnrolledSessionOutcomePageState
       showDialogMessage((apiResponse.ApiError as ApiError));
       overlay.hide();
     }
-  }
-
-  loadLookUpTransformer() async {
-    final overlay = LoadingOverlay.of(context);
-    overlay.show();
-    overlay.hide();
   }
 
   showDialogMessage(ApiError apiError) {
@@ -107,7 +119,8 @@ class _ProgramEnrolledSessionOutcomePageState
           appBar: AppBar(
             title: const Text('Sessions Enrolled'),
           ),
-          drawer: const NavigationDrawerMenu(),
+          drawer: GoToHomeBasedDiversionDrawer(
+              homebasedDiversionQueryDto: homebasedDiversionQueryDto),
           body: Column(
             children: <Widget>[
               Padding(
@@ -143,8 +156,10 @@ class _ProgramEnrolledSessionOutcomePageState
                                 .toString()),
                             subtitle: Text(
                                 'Session: ${programsEnrolledDto![index].sessionOutCome}  \n'
+                                'Program Module : ${programsEnrolledDto![index].programModuleId}  \n'
+                                'Programme Name: ${programsEnrolledDto[index].programModuleSessionsId} \n'
                                 'Session date : ${programsEnrolledDto![index].sessionDate}  \n'
-                                'Session Id : ${programsEnrolledDto![index].sessionId}',
+                                'Session Id : ${programsEnrolledDto![index].programModuleId}',
                                 style: const TextStyle(color: Colors.grey)),
                             trailing: const Icon(Icons.play_circle_fill_rounded,
                                 color: Colors.green),
