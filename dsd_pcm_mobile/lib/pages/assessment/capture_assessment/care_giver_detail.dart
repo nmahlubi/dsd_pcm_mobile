@@ -629,15 +629,17 @@ class _CareGiverDetailPageState extends State<CareGiverDetailPage> {
                                                           DateFormat('yyyy')
                                                               .format(
                                                                   pickedDate);
-                                                      ageController
-                                                          .text = (DateTime
-                                                                      .now()
-                                                                  .year -
-                                                              int.parse(
-                                                                  formattedYear))
-                                                          .toString();
-                                                      //You can format date as per your need
+                                                      DateTime now =
+                                                          DateTime.now();
+                                                      Duration age =
+                                                          now.difference(
+                                                              pickedDate);
+                                                      int years =
+                                                          age.inDays ~/ 365;
+                                                      ageController.text =
+                                                          (years).toString();
 
+                                                      //You can format date as per your need
                                                     }
                                                   },
                                                   validator: (value) {
