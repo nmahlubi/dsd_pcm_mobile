@@ -118,6 +118,31 @@ class _ProgramEnrolledSessionOutcomePageState
         child: Scaffold(
           appBar: AppBar(
             title: const Text('Module Program Sessions'),
+            leading: IconButton(
+              icon: const Icon(Icons.offline_pin_rounded),
+              onPressed: () {
+                if (scaffoldKey.currentState!.isDrawerOpen) {
+                  scaffoldKey.currentState!.closeDrawer();
+                  //close drawer, if drawer is open
+                } else {
+                  scaffoldKey.currentState!.openDrawer();
+                  //open drawer, if drawer is closed
+                }
+              },
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.home),
+                tooltip: 'Home Based Diversion',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const HomeBasedDiversionPage()),
+                  );
+                },
+              ),
+            ],
           ),
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerFloat,
@@ -132,6 +157,9 @@ class _ProgramEnrolledSessionOutcomePageState
                         context,
                         MaterialPageRoute(
                           builder: (context) => const HomeBasedDiversionPage(),
+                          settings: RouteSettings(
+                            arguments: homebasedDiversionQueryDto,
+                          ),
                         ),
                       );
                     },
@@ -140,8 +168,8 @@ class _ProgramEnrolledSessionOutcomePageState
               ],
             ),
           ),
-
-          //drawer: GoToHomeBasedDiversionDrawer(homebasedDiversionQueryDto: homebasedDiversionQueryDto),
+          drawer: GoToHomeBasedDiversionDrawer(
+              homebasedDiversionQueryDto: homebasedDiversionQueryDto),
           body: Column(
             children: <Widget>[
               Padding(
@@ -173,10 +201,10 @@ class _ProgramEnrolledSessionOutcomePageState
                             .contains(searchString)
                         ? ListTile(
                             title: Text(
-                                'Session Outcome: ${programEnrolmentSessionOutcomeDto[index].sessionOutCome}'),
+                                'Module Name: ${programEnrolmentSessionOutcomeDto[index].programModuleDto?.moduleName}'),
                             subtitle: Text(
                                 'Session Name : ${programEnrolmentSessionOutcomeDto[index].programModuleSessionDto?.sessionName}  \n'
-                                'Module Name: ${programEnrolmentSessionOutcomeDto[index].programModuleDto?.moduleName} \n'
+                                'Session Outcome: ${programEnrolmentSessionOutcomeDto[index].sessionOutCome} \n'
                                 'Session date : ${programEnrolmentSessionOutcomeDto[index].sessionDate}',
                                 style: const TextStyle(color: Colors.grey)),
                             trailing: const Icon(Icons.play_circle_fill_rounded,

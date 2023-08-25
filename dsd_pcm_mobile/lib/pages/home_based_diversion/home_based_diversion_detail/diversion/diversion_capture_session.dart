@@ -75,8 +75,8 @@ class _DiversionProgrammeSessionState extends State<DiversionProgrammeSession> {
               .settings
               .arguments as ProgramEnrolmentSessionOutcomeDto;
 
-          //programsEnrolled.enrolmentID
-          loadProgrammEnrollement(1);
+          loadProgrammEnrollement(
+              programEnrolmentSessionOutcomeDto.enrolmentID);
         });
       });
     });
