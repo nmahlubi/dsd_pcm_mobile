@@ -87,8 +87,8 @@ class _HomeBasedSupervisionDetailPageState
           loadLookUpTransformer();
           loadHomeBasedSupervisionDetailsByAssessmentId(
               homebasedDiversionQueryDto.intakeAssessmentId);
-          //loadHBSConditionsDetailsByAssessmentId(
-          //  homebasedDiversionQueryDto.intakeAssessmentId);
+          loadHBSConditionsDetailsByAssessmentId(
+              homebasedDiversionQueryDto.intakeAssessmentId);
           loadVisitationOutcomeByIntakeAssessmentId(
               homebasedDiversionQueryDto.intakeAssessmentId);
         });
@@ -891,7 +891,7 @@ class _HomeBasedSupervisionDetailPageState
                                                     }
                                                     return ListTile(
                                                       title: Text(
-                                                          'Condition : ${hBSConditionsDto[index].conditionsDto?.conditions}',
+                                                          'Condition : ${hBSConditionsDto[index].conditionsDto?.description}',
                                                           style: const TextStyle(
                                                               color:
                                                                   Colors.black,

@@ -1,5 +1,3 @@
-
-
 import 'package:expandable/expandable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -41,12 +39,14 @@ class _DiversionProgrammeSessionState extends State<DiversionProgrammeSession> {
       ProgramEnrollmentSessionOutcomeService();
   late HomebasedDiversionQueryDto homebasedDiversionQueryDto =
       HomebasedDiversionQueryDto();
+  late ProgramEnrolmentSessionOutcomeDto programEnrolmentSessionOutcomeDto =
+      ProgramEnrolmentSessionOutcomeDto();
   final _randomGenerator = RandomGenerator();
   final _diversionServiceClient = DiversionService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
   late List<ProgramEnrolmentSessionOutcomeDto> programsEnrolledDto = [];
-  late ProgramsEnrolledDto programsEnrolled = ProgramsEnrolledDto();
+  //late ProgramsEnrolledDto programsEnrolled = ProgramsEnrolledDto();
 
   ExpandableController captureProgrammeEnrolledSessionController =
       ExpandableController();
@@ -71,8 +71,10 @@ class _DiversionProgrammeSessionState extends State<DiversionProgrammeSession> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
         setState(() {
-          programsEnrolledDto = ModalRoute.of(context)!.settings.arguments
-              as List<ProgramEnrolmentSessionOutcomeDto>;
+          programEnrolmentSessionOutcomeDto = ModalRoute.of(context)!
+              .settings
+              .arguments as ProgramEnrolmentSessionOutcomeDto;
+
           //programsEnrolled.enrolmentID
           loadProgrammEnrollement(1);
         });
@@ -100,27 +102,25 @@ class _DiversionProgrammeSessionState extends State<DiversionProgrammeSession> {
   }
 
   addUpdateProgrammeSession() async {
-    ProgramEnrolmentSessionOutcomeDto programEnrolmentSessionOutcomeDto =
+    ProgramEnrolmentSessionOutcomeDto captureProgramEnrolmentSessionOutcomeDto =
         ProgramEnrolmentSessionOutcomeDto(
-            sessionId: 1,
-            //programEnrolmentSessionOutcomeDto.enrolmentID
-            enrolmentID: 1,
-            //programEnrolmentSessionOutcomeDto.programModuleId
-            programModuleId: 1,
-            sessionOutCome: sessionOutcomeController.text,
-            sessionDate: dateCapturedSessionController.text,
-
-            //programEnrolmentSessionOutcomeDto.sessionId
-            programModuleSessionsId: 12,
-            dateCreated: _randomGenerator.getCurrentDateGenerated(),
-            createdBy: preferences!.getInt('userId')!,
-            modifiedBy: preferences!.getInt('userId')!);
+      sessionId: programEnrolmentSessionOutcomeDto.sessionId,
+      enrolmentID: programEnrolmentSessionOutcomeDto.enrolmentID,
+      programModuleId: programEnrolmentSessionOutcomeDto.programModuleId,
+      sessionOutCome: sessionOutcomeController.text,
+      sessionDate: dateCapturedSessionController.text,
+      createdBy: preferences!.getInt('userId')!,
+      modifiedBy: preferences!.getInt('userId')!,
+      programModuleSessionsId:
+          programEnrolmentSessionOutcomeDto.programModuleSessionsId,
+      dateCreated: _randomGenerator.getCurrentDateGenerated(),
+    );
 
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
     overlay.show();
     apiResponse = await _diversionServiceClient
-        .addSessionOutcome(programEnrolmentSessionOutcomeDto);
+        .addSessionOutcome(captureProgramEnrolmentSessionOutcomeDto);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       if (!mounted) return;
@@ -216,7 +216,7 @@ class _DiversionProgrammeSessionState extends State<DiversionProgrammeSession> {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                const DiversionProgrammeSession(),
+                                const HomeBasedDiversionPage(),
                             settings: RouteSettings(
                               arguments: homebasedDiversionQueryDto,
                             ),
@@ -456,10 +456,8 @@ class _DiversionProgrammeSessionState extends State<DiversionProgrammeSession> {
                           ),
                         )))
                       ]),
-
                     ],
                   ),
                 ))));
   }
 }
-
