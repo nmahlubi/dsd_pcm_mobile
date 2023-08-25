@@ -46,7 +46,6 @@ class _DiversionProgrammeSessionState extends State<DiversionProgrammeSession> {
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
   late List<ProgramEnrolmentSessionOutcomeDto> programsEnrolledDto = [];
-  //late ProgramsEnrolledDto programsEnrolled = ProgramsEnrolledDto();
 
   ExpandableController captureProgrammeEnrolledSessionController =
       ExpandableController();
@@ -152,7 +151,7 @@ class _DiversionProgrammeSessionState extends State<DiversionProgrammeSession> {
     );
   }
 
-  newFamilyInformation() {
+  newSession() {
     setState(() {
       labelButtonAddUpdate = 'Add Session';
       sessionOutcomeController.clear();
@@ -176,60 +175,11 @@ class _DiversionProgrammeSessionState extends State<DiversionProgrammeSession> {
             key: scaffoldKey,
             appBar: AppBar(
               title: const Text("Programme Session"),
-              leading: IconButton(
-                icon: const Icon(Icons.offline_pin_rounded),
-                onPressed: () {
-                  if (scaffoldKey.currentState!.isDrawerOpen) {
-                    scaffoldKey.currentState!.closeDrawer();
-                    //close drawer, if drawer is open
-                  } else {
-                    scaffoldKey.currentState!.openDrawer();
-                    //open drawer, if drawer is closed
-                  }
-                },
-              ),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.home),
-                  tooltip: 'Home Based Diversion',
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const HomeBasedDiversionPage()),
-                    );
-                  },
-                ),
-              ],
-            ),
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerFloat,
-            floatingActionButton: Container(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  FloatingActionButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                const HomeBasedDiversionPage(),
-                            settings: RouteSettings(
-                              arguments: homebasedDiversionQueryDto,
-                            ),
-                          ),
-                        );
-                      },
-                      heroTag: null,
-                      child: const Icon(Icons.arrow_back)),
-                ],
+              leading: new IconButton(
+                icon: new Icon(Icons.offline_pin_rounded),
+                onPressed: () => Navigator.of(context).pop(),
               ),
             ),
-            drawer: GoToHomeBasedDiversionDrawer(
-                homebasedDiversionQueryDto: homebasedDiversionQueryDto),
             body: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 70),
                 child: Form(
@@ -307,7 +257,7 @@ class _DiversionProgrammeSessionState extends State<DiversionProgrammeSession> {
                                                             color: Colors.blue),
                                                       ),
                                                       onPressed: () {
-                                                        newFamilyInformation();
+                                                        newSession();
                                                       },
                                                       child: const Text('New',
                                                           style: TextStyle(

@@ -116,60 +116,14 @@ class _ProgramEnrolledSessionOutcomePageState
           return false;
         },
         child: Scaffold(
+          key: scaffoldKey,
           appBar: AppBar(
             title: const Text('Module Program Sessions'),
-            leading: IconButton(
-              icon: const Icon(Icons.offline_pin_rounded),
-              onPressed: () {
-                if (scaffoldKey.currentState!.isDrawerOpen) {
-                  scaffoldKey.currentState!.closeDrawer();
-                  //close drawer, if drawer is open
-                } else {
-                  scaffoldKey.currentState!.openDrawer();
-                  //open drawer, if drawer is closed
-                }
-              },
-            ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.home),
-                tooltip: 'Home Based Diversion',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const HomeBasedDiversionPage()),
-                  );
-                },
-              ),
-            ],
-          ),
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerFloat,
-          floatingActionButton: Container(
-            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                FloatingActionButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const HomeBasedDiversionPage(),
-                          settings: RouteSettings(
-                            arguments: homebasedDiversionQueryDto,
-                          ),
-                        ),
-                      );
-                    },
-                    heroTag: null,
-                    child: const Icon(Icons.arrow_back)),
-              ],
+            leading: new IconButton(
+              icon: new Icon(Icons.offline_pin_rounded),
+              onPressed: () => Navigator.of(context).pop(),
             ),
           ),
-          drawer: GoToHomeBasedDiversionDrawer(
-              homebasedDiversionQueryDto: homebasedDiversionQueryDto),
           body: Column(
             children: <Widget>[
               Padding(
