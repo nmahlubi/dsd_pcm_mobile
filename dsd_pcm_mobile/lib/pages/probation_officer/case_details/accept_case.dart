@@ -1,5 +1,7 @@
 import 'package:dsd_pcm_mobile/model/child_notification/language_dto.dart';
 import 'package:dsd_pcm_mobile/model/child_notification/race_dto.dart';
+import 'package:dsd_pcm_mobile/pages/probation_officer/accepted_worklist.dart';
+import 'package:dsd_pcm_mobile/pages/probation_officer/allocated_case.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_plus/dropdown_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -200,6 +202,23 @@ class _AcceptCasePageState extends State<AcceptCasePage> {
         child: Scaffold(
           appBar: AppBar(
             title: Text('Case For: ${childInformationDto.childName}'),
+            leading: new IconButton(
+              icon: new Icon(Icons.offline_pin_rounded),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.home),
+                tooltip: ' Accepted Work List  ',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AllocatedCasesPage()),
+                  );
+                },
+              ),
+            ],
           ),
           body: ListView(
             children: [
