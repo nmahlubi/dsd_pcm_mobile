@@ -123,6 +123,19 @@ class _ProgramEnrolledSessionOutcomePageState
               icon: new Icon(Icons.offline_pin_rounded),
               onPressed: () => Navigator.of(context).pop(),
             ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.home),
+                tooltip: 'Home Based Diversion',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const HomeBasedDiversionPage()),
+                  );
+                },
+              ),
+            ],
           ),
           body: Column(
             children: <Widget>[
