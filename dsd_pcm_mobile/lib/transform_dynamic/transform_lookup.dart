@@ -1,5 +1,7 @@
+import 'package:dsd_pcm_mobile/model/intake/program_module_sessions_dto.dart';
 import 'package:dsd_pcm_mobile/model/pcm/preliminaryStatus_dto.dart';
 import 'package:dsd_pcm_mobile/model/pcm/preliminary_detail_dto.dart';
+import 'package:dsd_pcm_mobile/model/intake/program_module_dto.dart';
 import 'package:dsd_pcm_mobile/model/pcm/programme_module_dto.dart';
 
 import '../model/intake/address_type_dto.dart';
@@ -41,8 +43,10 @@ class LookupTransform {
   late List<GradeDto> gradesDto = [];
   late List<FormOfNotificationDto> formOfNotificationsDto = [];
   late List<PreliminaryStatusDto> preliminayStatusDto = [];
-    late List<ComplianceDto> complianceDto=[];
-   late List<ProgrammesDto> programmesDto=[]; 
+  late List<ComplianceDto> complianceDto = [];
+  late List<ProgrammesDto> programmesDto = [];
+  late List<ProgramModuleDto> programModuleDto = [];
+  late List<ProgramModuleSessionDto> programModuleSessionDto = [];
 
   Future<List<IdentificationTypeDto>> transformIdentificationTypeDto() async {
     apiResponse = await _lookUpServiceClient.getIdentificationTypes();
@@ -153,7 +157,7 @@ class LookupTransform {
     return preliminayStatusDto;
   }
 
-   Future<List<ComplianceDto>> transformComplianceDto() async {
+  Future<List<ComplianceDto>> transformComplianceDto() async {
     apiResponse = await _lookUpServiceClient.getCompliance();
     if ((apiResponse.ApiError) == null) {
       complianceDto = (apiResponse.Data as List<ComplianceDto>);
@@ -161,7 +165,7 @@ class LookupTransform {
     return complianceDto;
   }
 
- Future<List<ProgrammesDto>> transformProgrammesDto() async {
+  Future<List<ProgrammesDto>> transformProgrammesDto() async {
     apiResponse = await _lookUpServiceClient.getProgrammes();
     if ((apiResponse.ApiError) == null) {
       programmesDto = (apiResponse.Data as List<ProgrammesDto>);
@@ -169,4 +173,21 @@ class LookupTransform {
     return programmesDto;
   }
 
+  Future<List<ProgramModuleDto>> transformProgramModuleDto() async {
+    apiResponse = await _lookUpServiceClient.getProgramModules();
+    if ((apiResponse.ApiError) == null) {
+      programModuleDto = (apiResponse.Data as List<ProgramModuleDto>);
+    }
+    return programModuleDto;
+  }
+
+  Future<List<ProgramModuleSessionDto>>
+      transformProgrammeModuleSessionDto() async {
+    apiResponse = await _lookUpServiceClient.getProgrammeModuleSessions();
+    if ((apiResponse.ApiError) == null) {
+      programModuleSessionDto =
+          (apiResponse.Data as List<ProgramModuleSessionDto>);
+    }
+    return programModuleSessionDto;
+  }
 }

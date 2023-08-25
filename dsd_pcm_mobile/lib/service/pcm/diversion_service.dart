@@ -14,7 +14,7 @@ import '../../util/shared/apiresults.dart';
 class DiversionService {
   final client =
       InterceptedClient.build(interceptors: [AuthorizationInterceptor()]);
-final _httpClientService = HttpClientService();
+  final _httpClientService = HttpClientService();
 
   Future<ApiResponse> getDiversionByAssessmentId(
       int? intakeAssessmentId) async {
@@ -62,7 +62,8 @@ final _httpClientService = HttpClientService();
     }
     return apiResponse;
   }
-Future<ApiResponse> getProgramesEnrolledByAssessmentIdOnline(
+
+  Future<ApiResponse> getProgramesEnrolledByAssessmentIdOnline(
       int? intakeAssessmentId) async {
     ApiResponse apiResponse = ApiResponse();
     final response = await client.get(Uri.parse(
@@ -134,9 +135,9 @@ Future<ApiResponse> getProgramesEnrolledByAssessmentIdOnline(
           programEnrolmentSessionOutcomeDto);
       if (apiResponse.ApiError == null) {
         ApiResults apiResults = (apiResponse.Data as ApiResults);
-        ProgramEnrolmentSessionOutcomeDto familyInformationDtoResponse =
+        ProgramEnrolmentSessionOutcomeDto sessionOutcomeDtoResponse =
             ProgramEnrolmentSessionOutcomeDto.fromJson(apiResults.data);
-        apiResponse.Data = familyInformationDtoResponse;
+        apiResponse.Data = sessionOutcomeDtoResponse;
       }
     } on SocketException {
       apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");

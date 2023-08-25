@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dsd_pcm_mobile/model/intake/program_module_sessions_dto.dart';
+import 'package:dsd_pcm_mobile/model/intake/program_module_dto.dart';
 import 'package:http_interceptor/http/intercepted_client.dart';
 
 import '../../domain/repository/lookup/disability_type_repository.dart';
@@ -535,12 +537,11 @@ class LookUpService {
     return apiResponse;
   }
 
-
   Future<ApiResponse> getCompliance() async {
     ApiResponse apiResponse = ApiResponse();
     try {
-      final response = await client
-          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/Compliance"));
+      final response =
+          await client.get(Uri.parse("${AppUrl.intakeURL}/LookUp/Compliance"));
 
       switch (response.statusCode) {
         case 200:
@@ -558,11 +559,11 @@ class LookUpService {
     return apiResponse;
   }
 
-    Future<ApiResponse> getProgrammes() async {
+  Future<ApiResponse> getProgrammes() async {
     ApiResponse apiResponse = ApiResponse();
     try {
-      final response = await client
-          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/Programmes"));
+      final response =
+          await client.get(Uri.parse("${AppUrl.intakeURL}/LookUp/Programmes"));
 
       switch (response.statusCode) {
         case 200:
@@ -578,5 +579,49 @@ class LookUpService {
       apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
     }
     return apiResponse;
+  }
+
+  Future<ApiResponse> getProgramModules() async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      final response = await client
+          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/Programmemodule"));
+
+      switch (response.statusCode) {
+        case 200:
+          apiResponse.Data = (json.decode(response.body) as List)
+              .map((data) => ProgramModuleDto.fromJson(data))
+              .toList();
+          break;
+        default:
+          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+          break;
+      }
+    } on SocketException {
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
     }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> getProgrammeModuleSessions() async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      final response = await client
+          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/ProgrammemoduleSession"));
+
+      switch (response.statusCode) {
+        case 200:
+          apiResponse.Data = (json.decode(response.body) as List)
+              .map((data) => ProgramModuleSessionDto.fromJson(data))
+              .toList();
+          break;
+        default:
+          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+          break;
+      }
+    } on SocketException {
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
+  }
 }

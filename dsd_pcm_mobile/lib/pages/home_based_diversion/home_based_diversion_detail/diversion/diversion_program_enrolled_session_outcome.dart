@@ -1,17 +1,20 @@
+import 'package:dsd_pcm_mobile/model/intake/program_module_sessions_dto.dart';
 import 'package:dsd_pcm_mobile/model/pcm/program_enrolment_session_outcome_dto.dart';
-import 'package:dsd_pcm_mobile/model/pcm/programme_module_dto.dart';
-import 'package:dsd_pcm_mobile/model/pcm/programmes_dto.dart';
+import 'package:dsd_pcm_mobile/model/intake/program_module_dto.dart';
 import 'package:dsd_pcm_mobile/model/pcm/programs_enrolled_dto.dart';
 import 'package:dsd_pcm_mobile/model/pcm/query/homebased_diversion_query_dto.dart';
-import 'package:dsd_pcm_mobile/navigation_drawer/go_to_home_based_diversion_drawer.dart';
 import 'package:dsd_pcm_mobile/service/pcm/program_enrolment_session_outcome_service.dart';
 import 'package:dsd_pcm_mobile/transform_dynamic/transform_lookup.dart';
 import 'package:dsd_pcm_mobile/util/shared/apierror.dart';
 import 'package:dsd_pcm_mobile/util/shared/apiresponse.dart';
 import 'package:dsd_pcm_mobile/util/shared/loading_overlay.dart';
+import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../navigation_drawer/go_to_home_based_diversion_drawer.dart';
+import '../../../../util/shared/apiresults.dart';
+import '../../home_based_diversion.dart';
 import 'diversion_capture_session.dart';
 
 class ProgramEnrolledSessionOutcomePage extends StatefulWidget {
@@ -32,23 +35,20 @@ class _ProgramEnrolledSessionOutcomePageState
     preferences = await SharedPreferences.getInstance();
   }
 
-  final _lookupTransform = LookupTransform();
-  final ProgramEnrollmentSessionOutcomeService
-      programEnrollmentSessionOutcomeService =
-      ProgramEnrollmentSessionOutcomeService();
-  late ApiResponse apiResponse = ApiResponse();
-  late ProgramEnrolmentSessionOutcomeDto programEnrolmentSessionOutcomeDto =
-      ProgramEnrolmentSessionOutcomeDto();
-  late List<ProgramEnrolmentSessionOutcomeDto> programsEnrolledDto = [];
-  late ProgramsEnrolledDto programsEnrolled = ProgramsEnrolledDto();
-
+  late ProgramsEnrolledDto programsEnrolledDto = ProgramsEnrolledDto();
   late HomebasedDiversionQueryDto homebasedDiversionQueryDto =
       HomebasedDiversionQueryDto();
-
-  final ProgramEnrolmentSessionOutcomeDto programEnrolled =
-      ProgramEnrolmentSessionOutcomeDto();
-  late List<ProgrammesDto> programmesDto = [];
-  late List<ProgrammeModuleDto> programmeModule = [];
+  final _lookupTransform = LookupTransform();
+  final _programEnrollmentSessionOutcome =
+      ProgramEnrollmentSessionOutcomeService();
+  late ApiResponse apiResponse = ApiResponse();
+  late ApiResults apiResults = ApiResults();
+  late List<ProgramEnrolmentSessionOutcomeDto>
+      programEnrolmentSessionOutcomeDto = [];
+  late List<ProgramModuleDto> programModuleDto = [];
+  late List<ProgramModuleSessionDto> programModuleSessionDto = [];
+  ExpandableController viewProgrammesEnrolledPanelController =
+      ExpandableController();
 
   String searchString = "";
 
@@ -58,11 +58,10 @@ class _ProgramEnrolledSessionOutcomePageState
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
         setState(() {
-          programsEnrolled =
+          programsEnrolledDto =
               ModalRoute.of(context)!.settings.arguments as ProgramsEnrolledDto;
           loadLookUpTransformer();
-          //programEnrolled.enrolmentID
-          loadProgrammEnrolledSessionOutcome(1);
+          loadProgrammEnrolledSessionOutcome(programsEnrolledDto.enrolmentID);
         });
       });
     });
@@ -71,22 +70,23 @@ class _ProgramEnrolledSessionOutcomePageState
   loadLookUpTransformer() async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    programmesDto = await _lookupTransform.transformProgrammesDto();
-    // programmeModule = await _lookupTransform.transformProgrammeModuleDto();
+    programModuleDto = await _lookupTransform.transformProgramModuleDto();
+    programModuleSessionDto =
+        await _lookupTransform.transformProgrammeModuleSessionDto();
     overlay.hide();
   }
 
-  loadProgrammEnrolledSessionOutcome(int? $sessionId) async {
+  loadProgrammEnrolledSessionOutcome(int? $enrollmentId) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
 
-    apiResponse = await programEnrollmentSessionOutcomeService
-        .getProgramEnrollmentSessionOutcome($sessionId);
+    apiResponse = await _programEnrollmentSessionOutcome
+        .getProgramEnrollmentSessionOutcome($enrollmentId);
 
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        programsEnrolledDto =
+        programEnrolmentSessionOutcomeDto =
             (apiResponse.Data as List<ProgramEnrolmentSessionOutcomeDto>);
       });
     } else {
@@ -116,11 +116,27 @@ class _ProgramEnrolledSessionOutcomePageState
           return false;
         },
         child: Scaffold(
+          key: scaffoldKey,
           appBar: AppBar(
-            title: const Text('Sessions Enrolled'),
+            title: const Text('Module Program Sessions'),
+            leading: new IconButton(
+              icon: new Icon(Icons.offline_pin_rounded),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.home),
+                tooltip: 'Home Based Diversion',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const HomeBasedDiversionPage()),
+                  );
+                },
+              ),
+            ],
           ),
-          drawer: GoToHomeBasedDiversionDrawer(
-              homebasedDiversionQueryDto: homebasedDiversionQueryDto),
           body: Column(
             children: <Widget>[
               Padding(
@@ -140,26 +156,23 @@ class _ProgramEnrolledSessionOutcomePageState
               Expanded(
                 child: ListView.separated(
                   shrinkWrap: true,
-                  itemCount: programsEnrolledDto.length,
+                  itemCount: programEnrolmentSessionOutcomeDto.length,
                   itemBuilder: (context, int index) {
-                    if (programsEnrolledDto.isEmpty) {
+                    if (programEnrolmentSessionOutcomeDto.isEmpty) {
                       return const Center(
                           child: Text('No Session Enrolled Found.'));
                     }
-                    return programsEnrolledDto[index]
+                    return programEnrolmentSessionOutcomeDto[index]
                             .sessionOutCome!
                             .toLowerCase()
                             .contains(searchString)
                         ? ListTile(
-                            title: Text(programsEnrolledDto[index]
-                                .programModuleId
-                                .toString()),
+                            title: Text(
+                                'Module Name: ${programEnrolmentSessionOutcomeDto[index].programModuleDto?.moduleName}'),
                             subtitle: Text(
-                                'Session: ${programsEnrolledDto![index].sessionOutCome}  \n'
-                                'Program Module : ${programsEnrolledDto![index].programModuleId}  \n'
-                                'Programme Name: ${programsEnrolledDto[index].programModuleSessionsId} \n'
-                                'Session date : ${programsEnrolledDto![index].sessionDate}  \n'
-                                'Session Id : ${programsEnrolledDto![index].programModuleId}',
+                                'Session Name : ${programEnrolmentSessionOutcomeDto[index].programModuleSessionDto?.sessionName}  \n'
+                                'Session Outcome: ${programEnrolmentSessionOutcomeDto[index].sessionOutCome} \n'
+                                'Session date : ${programEnrolmentSessionOutcomeDto[index].sessionDate}',
                                 style: const TextStyle(color: Colors.grey)),
                             trailing: const Icon(Icons.play_circle_fill_rounded,
                                 color: Colors.green),
@@ -170,7 +183,9 @@ class _ProgramEnrolledSessionOutcomePageState
                                   builder: (context) =>
                                       const DiversionProgrammeSession(),
                                   settings: RouteSettings(
-                                    arguments: programsEnrolledDto,
+                                    arguments:
+                                        programEnrolmentSessionOutcomeDto[
+                                            index],
                                   ),
                                 ),
                               );
@@ -178,7 +193,7 @@ class _ProgramEnrolledSessionOutcomePageState
                         : Container();
                   },
                   separatorBuilder: (context, index) {
-                    return programsEnrolledDto[index]
+                    return programEnrolmentSessionOutcomeDto[index]
                             .sessionOutCome!
                             .toLowerCase()
                             .contains(searchString)

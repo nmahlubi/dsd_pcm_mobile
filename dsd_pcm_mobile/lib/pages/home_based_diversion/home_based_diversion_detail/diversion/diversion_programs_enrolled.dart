@@ -1,7 +1,5 @@
-import 'package:dsd_pcm_mobile/model/pcm/hbs_conditions_dto.dart';
 import 'package:dsd_pcm_mobile/model/pcm/programmes_dto.dart';
 import 'package:dsd_pcm_mobile/navigation_drawer/go_to_home_based_diversion_drawer.dart';
-import 'package:dsd_pcm_mobile/pages/home_based_diversion/home_based_diversion_detail/diversion/diversion_capture_session.dart';
 import 'package:dsd_pcm_mobile/pages/home_based_diversion/home_based_diversion_detail/diversion/diversion_program_enrolled_session_outcome.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +12,6 @@ import '../../../../util/shared/apierror.dart';
 import '../../../../util/shared/apiresponse.dart';
 import '../../../../util/shared/apiresults.dart';
 import '../../../../util/shared/loading_overlay.dart';
-import '../../../assessment/capture_assessment/program_enrolled/capture_program_enrolment_session_outcome.dart';
 import '../../home_based_diversion.dart';
 
 class ProgrammesEnrolledDetailsPage extends StatefulWidget {
@@ -57,8 +54,9 @@ class _ProgrammesEnrolledDetailsPageState
               .settings
               .arguments as HomebasedDiversionQueryDto;
           loadLookUpTransformer();
-          //homebasedDiversionQueryDto.intakeAssessmentId
-          loadProgrammesEnrolledByAssessmentId(18225);
+
+          loadProgrammesEnrolledByAssessmentId(
+              homebasedDiversionQueryDto.intakeAssessmentId);
         });
       });
     });

@@ -302,7 +302,7 @@ class _AssessmentDetailPageState extends State<AssessmentDetailPage> {
                                                     if (pickedTime != null) {
                                                       assessmentTimeController
                                                               .text =
-                                                          "${pickedTime.hour}:${pickedTime.minute}";
+                                                          "${pickedTime.hour.toString().padLeft(2, '0')}:${pickedTime.minute.toString().padLeft(2, '0')}:00.0000000";
                                                       /*DateTime parsedTime =
                                                           DateFormat.jm().parse(
                                                               pickedTime
@@ -320,7 +320,6 @@ class _AssessmentDetailPageState extends State<AssessmentDetailPage> {
                                                               .text =
                                                           parsedTime.toString();*/
                                                       //You can format date as per your need
-
                                                     }
 
                                                     /*DateTime? pickedDate =
@@ -397,7 +396,6 @@ class _AssessmentDetailPageState extends State<AssessmentDetailPage> {
                                                       assessmentDateController
                                                           .text = formattedDate;
                                                       //You can format date as per your need
-
                                                     }
                                                   },
                                                 ),
