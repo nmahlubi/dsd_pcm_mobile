@@ -1,5 +1,6 @@
 import 'dart:async';
-
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dsd_pcm_mobile/connectivity_check/network_controller.dart';
 import 'package:dsd_pcm_mobile/sessions/session.dart';
 import 'package:dsd_pcm_mobile/sessions/session_manager.dart';
 import 'package:flutter/material.dart';
@@ -265,6 +266,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'PCM',
         navigatorKey: globalNavigatorKey,
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(primarySwatch: Palette.kToDark),
         routes: {
           '/': (context) =>

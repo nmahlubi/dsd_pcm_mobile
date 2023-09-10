@@ -10,12 +10,14 @@ class DashboardPage extends StatefulWidget {
   Session session;
   DashboardPage({Key? key, required this.session, required String title})
       : super(key: key);
+
   @override
   State<DashboardPage> createState() => _DashboardPageWidgetState();
 }
 
 class _DashboardPageWidgetState extends State<DashboardPage> {
   int _selectedIndex = 0;
+  bool hasInternet = false;
   final List<Widget> _widgetOptions = [
     const HomePage(),
     const ProfilePage(),
@@ -32,6 +34,17 @@ class _DashboardPageWidgetState extends State<DashboardPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard'),
+        actions: [
+          Icon(
+            Icons.error,
+            color: hasInternet ? Colors.green : Colors.red,
+            size: 40,
+          ),
+          const SizedBox(
+            width: 20,
+          ),
+          // Text(hasInternet ? 'Internet avaliable' : 'No internet'),
+        ],
       ),
       drawer: const NavigationDrawerMenu(),
       body: Center(

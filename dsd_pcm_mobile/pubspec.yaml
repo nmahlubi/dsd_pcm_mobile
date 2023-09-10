@@ -50,6 +50,9 @@ dependencies:
   flutter_bug_logger: ^1.0.0
   logger: ^2.0.1
   flutter_launcher_icons: ^0.12.0
+  connectivity_plus: 2.3.0
+  get: ^4.6.5
+  
 
 flutter_icons:
   image_path: "images/pcmicon.png"
