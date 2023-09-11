@@ -49,9 +49,11 @@ class _PreviousInvolvementDetailPageState
       ExpandableController();
   ExpandableController viewPreviousInvolvementDetailPanelPanelController =
       ExpandableController();
-
   final TextEditingController isArrestController = TextEditingController();
-  final TextEditingController PreviousArrestDateController =
+
+  final TextEditingController ispreviousInvolvedController =
+      TextEditingController();
+  final TextEditingController previousArrestDateController =
       TextEditingController();
   final TextEditingController sentenceOutcomesController =
       TextEditingController();
@@ -62,17 +64,14 @@ class _PreviousInvolvementDetailPageState
   final TextEditingController escapesDateController = TextEditingController();
   final TextEditingController escapeTimeController = TextEditingController();
   final TextEditingController placeOfEscapeController = TextEditingController();
-  final TextEditingController timeController = TextEditingController();
-
-  final TextEditingController dateCreatedController = TextEditingController();
 
   int? natureOfOffenceDropdownButtonFormField;
   int? involvementId;
   String? labelButtonAddUpdate = '';
   // radio button
   String previousInvolved = 'No';
-  String WasPreviousArrest = 'No';
-  String WasChildConvictedPreviously = 'No';
+  String wasPreviousArrest = 'No';
+  String wasChildConvictedPreviously = 'No';
   String anyPreviousEscape = 'No';
 
   @override
@@ -91,7 +90,7 @@ class _PreviousInvolvementDetailPageState
               ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
           loadLookUpTransformer();
           loadPreviousInvolvementDetailByIntakeAssessmentId(
-              14565); /////////////////////////////////////////////////////////
+              acceptedWorklistDto.intakeAssessmentId);
         });
       });
     });
@@ -125,34 +124,38 @@ class _PreviousInvolvementDetailPageState
   addPreviousInvolvementDetailClient() async {
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
+    overlay.show();
     PreviousInvolvementDetailDto requestPreviousInvolvementDetailDto =
         PreviousInvolvementDetailDto(
-            involvementId:
-                involvementId ?? _randomGenerator.getRandomGeneratedNumber(),
-            intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
-            previousInvolved: previousInvolved,
-            isArrest: isArrestController.text,
-            offenceCategoryId: natureOfOffenceDropdownButtonFormField,
-            sentenceOutcomes: sentenceOutcomesController.text,
-            isConvicted: isConvictedController.text,
-            convictionDate: convictionDateController.text,
-            isEscape: isEscapeController.text,
-            escapesDate: escapesDateController.text,
-            escapeTime: escapeTimeController.text,
-            whenEscapedId: 0,
-            placeOfEscape: placeOfEscapeController.text,
-            dateCreated: dateCreatedController.text,
-            modifiedBy: preferences!.getInt('userId')!,
-            dateModified: _randomGenerator.getCurrentDateGenerated(),
-            offenceCategoryDto: natureOfOffenceDropdownButtonFormField != null
-                ? offenceCategoryDto
-                    .where((i) =>
-                        i.offenceCategoryId ==
-                        natureOfOffenceDropdownButtonFormField)
-                    .single
-                : null,
-            createdBy: preferences!.getInt('userId')!);
+      involvementId:
+          involvementId ?? _randomGenerator.getRandomGeneratedNumber(),
+      intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
+      previousInvolved: previousInvolved,
+      isArrest: wasPreviousArrest,
+      arrestDate: previousArrestDateController.text,
+      offenceCategoryId: natureOfOffenceDropdownButtonFormField,
+      sentenceOutcomes: sentenceOutcomesController.text,
+      isConvicted: wasChildConvictedPreviously,
+      convictionDate: convictionDateController.text,
+      isEscape: anyPreviousEscape,
+      escapesDate: escapesDateController.text,
+      escapeTime: escapeTimeController.text, //????
+      whenEscapedId: 0,
+      placeOfEscape: placeOfEscapeController.text,
+      createdBy: preferences!.getInt('userId'),
+      dateCreated: _randomGenerator.getCurrentDateGenerated(),
+      modifiedBy: preferences!.getInt('userId'),
+      dateModified: _randomGenerator.getCurrentDateGenerated(),
+      offenceCategoryDto: natureOfOffenceDropdownButtonFormField != null
+          ? offenceCategoryDto
+              .where((i) =>
+                  i.offenceCategoryId == natureOfOffenceDropdownButtonFormField)
+              .single
+          : null,
+    );
     overlay.show();
+
+    print("tIME TAKEN" + escapeTimeController.text);
     apiResponse = await _previousInvolvementDetailClient
         .addPreviousInvolvementDetail(requestPreviousInvolvementDetailDto);
     if ((apiResponse.ApiError) == null) {
@@ -194,11 +197,11 @@ class _PreviousInvolvementDetailPageState
             convictionDate: convictionDateController.text,
             isEscape: isEscapeController.text,
             escapesDate: escapesDateController.text,
-            escapeTime: escapeTimeController.text,
+            //  escapeTime: escapeTimeController.text,
             whenEscapedId: 0,
             placeOfEscape: placeOfEscapeController.text,
-            dateCreated: dateCreatedController.text,
-            modifiedBy: preferences!.getInt('userId')!,
+            dateCreated: _randomGenerator.getCurrentDateGenerated(),
+            modifiedBy: preferences!.getInt('userId'),
             dateModified: _randomGenerator.getCurrentDateGenerated(),
             offenceCategoryDto: natureOfOffenceDropdownButtonFormField != null
                 ? offenceCategoryDto
@@ -231,6 +234,7 @@ class _PreviousInvolvementDetailPageState
   newPreviousInvolvementDetail() {
     setState(() {
       labelButtonAddUpdate = 'Add Previous Involvement Crime';
+      previousArrestDateController.clear();
       convictionDateController.clear();
       sentenceOutcomesController.clear();
       escapesDateController.clear();
@@ -250,14 +254,29 @@ class _PreviousInvolvementDetailPageState
       viewPreviousInvolvementDetailPanelPanelController =
           ExpandableController(initialExpanded: false);
       labelButtonAddUpdate = 'Update Previous Involvement';
+      ispreviousInvolvedController.text =
+          previousInvolvementDetailDto.previousInvolved.toString();
+      previousArrestDateController.text =
+          previousInvolvementDetailDto.arrestDate.toString();
+      isArrestController.text =
+          previousInvolvementDetailDto.isArrest.toString();
+      isConvictedController.text =
+          previousInvolvementDetailDto.isConvicted.toString();
+      isEscapeController.text =
+          previousInvolvementDetailDto.isEscape.toString();
+      convictionDateController.text =
+          previousInvolvementDetailDto.convictionDate.toString();
+      escapesDateController.text =
+          previousInvolvementDetailDto.escapesDate.toString();
+
       escapeTimeController.text =
           previousInvolvementDetailDto.escapeTime.toString();
       sentenceOutcomesController.text =
           previousInvolvementDetailDto.sentenceOutcomes.toString();
-      dateCreatedController.text =
-          previousInvolvementDetailDto.arrestDate.toString();
       natureOfOffenceDropdownButtonFormField =
           previousInvolvementDetailDto.offenceCategoryDto?.offenceCategoryId;
+      placeOfEscapeController.text =
+          previousInvolvementDetailDto.placeOfEscape.toString();
     });
   }
 
@@ -369,6 +388,7 @@ class _PreviousInvolvementDetailPageState
                   key: _loginFormKey,
                   child: ListView(
                     children: [
+                      //capture data
                       Row(children: [
                         Expanded(
                             child: ExpandableNotifier(
@@ -520,10 +540,10 @@ class _PreviousInvolvementDetailPageState
                                                         Radio(
                                                           value: 'Yes',
                                                           groupValue:
-                                                              WasPreviousArrest,
+                                                              wasPreviousArrest,
                                                           onChanged: (value) {
                                                             setState(() {
-                                                              WasPreviousArrest =
+                                                              wasPreviousArrest =
                                                                   'Yes';
                                                             });
                                                           },
@@ -532,10 +552,10 @@ class _PreviousInvolvementDetailPageState
                                                         Radio(
                                                           value: 'No',
                                                           groupValue:
-                                                              WasPreviousArrest,
+                                                              wasPreviousArrest,
                                                           onChanged: (value) {
                                                             setState(() {
-                                                              WasPreviousArrest =
+                                                              wasPreviousArrest =
                                                                   'No';
                                                             });
                                                           },
@@ -557,7 +577,7 @@ class _PreviousInvolvementDetailPageState
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller:
-                                                      PreviousArrestDateController,
+                                                      previousArrestDateController,
 
                                                   maxLines: 1,
                                                   decoration:
@@ -586,7 +606,7 @@ class _PreviousInvolvementDetailPageState
                                                                   'yyyy-MM-dd')
                                                               .format(
                                                                   pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
-                                                      PreviousArrestDateController
+                                                      previousArrestDateController
                                                           .text = formattedDate;
                                                       String formattedYear =
                                                           DateFormat('yyyy')
@@ -625,7 +645,7 @@ class _PreviousInvolvementDetailPageState
                                                         hintText:
                                                             'Select Offence Category ',
                                                         labelText:
-                                                            'Nature of offence',
+                                                            'Select Nature of offence',
                                                         border:
                                                             OutlineInputBorder(
                                                           borderSide:
@@ -683,10 +703,10 @@ class _PreviousInvolvementDetailPageState
                                                         Radio(
                                                           value: 'Yes',
                                                           groupValue:
-                                                              WasChildConvictedPreviously,
+                                                              wasChildConvictedPreviously,
                                                           onChanged: (value) {
                                                             setState(() {
-                                                              WasChildConvictedPreviously =
+                                                              wasChildConvictedPreviously =
                                                                   'Yes';
                                                             });
                                                           },
@@ -695,10 +715,10 @@ class _PreviousInvolvementDetailPageState
                                                         Radio(
                                                           value: 'No',
                                                           groupValue:
-                                                              WasChildConvictedPreviously,
+                                                              wasChildConvictedPreviously,
                                                           onChanged: (value) {
                                                             setState(() {
-                                                              WasChildConvictedPreviously =
+                                                              wasChildConvictedPreviously =
                                                                   'No';
                                                             });
                                                           },
@@ -911,35 +931,67 @@ class _PreviousInvolvementDetailPageState
                                                 padding:
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
-                                                  controller: timeController,
+                                                  controller:
+                                                      escapeTimeController, // Use a different controller for date and time
+
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
-                                                    labelText: 'Time',
+                                                    labelText:
+                                                        'Escape Time?', // Update the label
                                                   ),
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Time Required';
-                                                    }
-                                                    return null;
-                                                  },
                                                   readOnly:
                                                       true, // when true user cannot edit text
                                                   onTap: () async {
-                                                    TimeOfDay? pickedTime =
-                                                        await showTimePicker(
-                                                      initialTime:
-                                                          TimeOfDay.now(),
+                                                    DateTime? pickedDateTime =
+                                                        await showDatePicker(
                                                       context: context,
+                                                      initialDate: DateTime
+                                                          .now(), // get today's date
+                                                      firstDate: DateTime(
+                                                          1900), // DateTime.now() - not to allow to choose before today.
+                                                      lastDate: DateTime(3000),
                                                     );
 
-                                                    if (pickedTime != null) {
-                                                      timeController.text =
-                                                          "${pickedTime.hour.toString().padLeft(2, '0')}:${pickedTime.minute.toString().padLeft(2, '0')}:00.0000000";
+                                                    if (pickedDateTime !=
+                                                        null) {
+                                                      TimeOfDay? pickedTime =
+                                                          await showTimePicker(
+                                                        context: context,
+                                                        initialTime: TimeOfDay
+                                                            .now(), // get the current time
+                                                      );
+
+                                                      if (pickedTime != null) {
+                                                        pickedDateTime =
+                                                            DateTime(
+                                                          pickedDateTime.year,
+                                                          pickedDateTime.month,
+                                                          pickedDateTime.day,
+                                                          pickedTime.hour,
+                                                          pickedTime.minute,
+                                                        );
+
+                                                        String
+                                                            formattedDateTime =
+                                                            DateFormat(
+                                                                    'yyyy-MM-dd HH:mm:ss.SSS')
+                                                                .format(
+                                                                    pickedDateTime);
+                                                        escapeTimeController
+                                                                .text =
+                                                            formattedDateTime;
+                                                      }
                                                     }
+                                                  },
+                                                  validator: (value) {
+                                                    if (value == null ||
+                                                        value.isEmpty) {
+                                                      return 'Escape Date and Time? Required';
+                                                    }
+                                                    return null;
                                                   },
                                                 ),
                                               ),
@@ -1039,6 +1091,8 @@ class _PreviousInvolvementDetailPageState
                           ),
                         )))
                       ]),
+
+                      //view data
                       Row(children: [
                         Expanded(
                             child: ExpandableNotifier(
