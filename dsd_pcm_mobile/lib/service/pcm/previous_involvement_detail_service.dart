@@ -98,32 +98,26 @@ class PreviousInvolvementDetailService {
     return apiResponse;
   }
 
-  Future<ApiResponse> UpdatePreviousInvolvementDetailOnline(
+  Future<ApiResponse> addUpdatePreviousInvolvementDetailOnline(
       PreviousInvolvementDetailDto previousInvolvementDetailDto) async {
     return await _httpClientService.httpClientPost(
-        "${AppUrl.pcmURL}/PreviousInvolvementDetail/Update",
+        "${AppUrl.pcmURL}/PreviousInvolvementDetail/AddUpdate",
         previousInvolvementDetailDto);
   }
 
-  Future<ApiResponse> UpdatePreviousInvolvementDetail(
+  Future<ApiResponse> addUpdatePreviousInvolvementDetail(
       PreviousInvolvementDetailDto previousInvolvementDetailDto) async {
     ApiResponse apiResponse = ApiResponse();
     try {
-      apiResponse = await UpdatePreviousInvolvementDetailOnline(
+      apiResponse = await addUpdatePreviousInvolvementDetailOnline(
           previousInvolvementDetailDto);
       if (apiResponse.ApiError == null) {
         ApiResults apiResults = (apiResponse.Data as ApiResults);
         PreviousInvolvementDetailDto previousInvolvementDetailDtoResponse =
             PreviousInvolvementDetailDto.fromJson(apiResults.data);
         apiResponse.Data = previousInvolvementDetailDtoResponse;
-        // _previousInvolvementDetailRepository.savePreviousInvolvementDetailFromEndpoint(
-        //    previousInvolvementDetailDtoResponse,
-        //     previousInvolvementDetailDtoResponse.involvementId!);
       }
     } on SocketException {
-      // _previousInvolvementDetailRepository.savePreviousInvolvementDetail(previousInvolvementDetailDto);
-      // apiResponse.Data = _previousInvolvementDetailRepository
-      //     .getPreviousInvolvementDetailById(previousInvolvementDetailDto.involvementId!);
       apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
     }
     return apiResponse;

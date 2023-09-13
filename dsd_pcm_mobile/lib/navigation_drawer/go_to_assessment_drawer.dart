@@ -237,6 +237,21 @@ class _GoToAssessmentDrawerPageWidgetState extends State<GoToAssessmentDrawer> {
               status: widget.isCompleted),
           createDrawerBodyItemTrail(
               icon: Icons.arrow_right,
+              text: 'Previous Involvement detail',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PreviousInvolvementDetailPage(),
+                    settings: RouteSettings(
+                      arguments: widget.acceptedWorklistDto,
+                    ),
+                  ),
+                );
+              },
+              status: widget.isCompleted),
+          createDrawerBodyItemTrail(
+              icon: Icons.arrow_right,
               text: 'Development Assessment',
               onTap: () {
                 Navigator.push(
@@ -273,21 +288,6 @@ class _GoToAssessmentDrawerPageWidgetState extends State<GoToAssessmentDrawer> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const GeneralDetailPage(),
-                    settings: RouteSettings(
-                      arguments: widget.acceptedWorklistDto,
-                    ),
-                  ),
-                );
-              },
-              status: widget.isCompleted),
-          createDrawerBodyItemTrail(
-              icon: Icons.arrow_right,
-              text: 'Previous Involvement detail',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const PreviousInvolvementDetailPage(),
                     settings: RouteSettings(
                       arguments: widget.acceptedWorklistDto,
                     ),

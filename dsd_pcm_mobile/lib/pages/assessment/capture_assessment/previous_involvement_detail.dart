@@ -2,8 +2,10 @@ import 'package:dsd_pcm_mobile/model/intake/offence_category_dto.dart';
 import 'package:dsd_pcm_mobile/model/pcm/accepted_worklist_dto.dart';
 import 'package:dsd_pcm_mobile/model/pcm/previousInvolvement_detail_dto.dart';
 import 'package:dsd_pcm_mobile/navigation_drawer/go_to_assessment_drawer.dart';
+import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/development_assessment.dart';
 import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/family_member.dart';
 import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/health_detail.dart';
+import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/victim_organisation.dart';
 import 'package:dsd_pcm_mobile/pages/probation_officer/accepted_worklist.dart';
 import 'package:dsd_pcm_mobile/service/pcm/previous_involvement_detail_service.dart';
 import 'package:dsd_pcm_mobile/transform_dynamic/transform_offence.dart';
@@ -69,10 +71,10 @@ class _PreviousInvolvementDetailPageState
   int? involvementId;
   String? labelButtonAddUpdate = '';
   // radio button
-  String previousInvolved = 'No';
-  String wasPreviousArrest = 'No';
-  String wasChildConvictedPreviously = 'No';
-  String anyPreviousEscape = 'No';
+  String? previousInvolved = 'No';
+  String? wasPreviousArrest = 'No';
+  String? wasChildConvictedPreviously = 'No';
+  String? anyPreviousEscape = 'No';
 
   @override
   void initState() {
@@ -121,7 +123,7 @@ class _PreviousInvolvementDetailPageState
     }
   }
 
-  addPreviousInvolvementDetailClient() async {
+  addupdatePreviousInvolvementDetailClient() async {
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
     overlay.show();
@@ -139,7 +141,8 @@ class _PreviousInvolvementDetailPageState
       convictionDate: convictionDateController.text,
       isEscape: anyPreviousEscape,
       escapesDate: escapesDateController.text,
-      escapeTime: escapeTimeController.text, //????
+      escapeTime: escapeTimeController
+          .text, ///////////////////////////////////////////////////////////.????
       whenEscapedId: 0,
       placeOfEscape: placeOfEscapeController.text,
       createdBy: preferences!.getInt('userId'),
@@ -155,65 +158,10 @@ class _PreviousInvolvementDetailPageState
     );
     overlay.show();
 
-    print("tIME TAKEN" + escapeTimeController.text);
+    //print("tIME TAKEN" + escapeTimeController.text);
     apiResponse = await _previousInvolvementDetailClient
-        .addPreviousInvolvementDetail(requestPreviousInvolvementDetailDto);
-    if ((apiResponse.ApiError) == null) {
-      overlay.hide();
-      if (!mounted) return;
-      showSuccessMessage('Successfully $labelButtonAddUpdate.');
-      navigator.push(
-        MaterialPageRoute(
-            builder: (context) => const PreviousInvolvementDetailPage(),
-            settings: RouteSettings(
-              arguments: acceptedWorklistDto,
-            )),
-      );
-    } else {
-      showDialogMessage((apiResponse.ApiError as ApiError));
-      overlay.hide();
-    }
-  }
-
-  capturePreviousInvolvementDetail(
-      String? name,
-      String? surname,
-      String? dateOfBirth,
-      int? age,
-      int? genderId,
-      int? relationshipTypeId) async {
-    final overlay = LoadingOverlay.of(context);
-    final navigator = Navigator.of(context);
-    PreviousInvolvementDetailDto requestPreviousInvolvementDetailDto =
-        PreviousInvolvementDetailDto(
-            involvementId:
-                involvementId ?? _randomGenerator.getRandomGeneratedNumber(),
-            intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
-            previousInvolved: previousInvolved,
-            isArrest: isArrestController.text,
-            offenceCategoryId: natureOfOffenceDropdownButtonFormField,
-            sentenceOutcomes: sentenceOutcomesController.text,
-            isConvicted: isConvictedController.text,
-            convictionDate: convictionDateController.text,
-            isEscape: isEscapeController.text,
-            escapesDate: escapesDateController.text,
-            //  escapeTime: escapeTimeController.text,
-            whenEscapedId: 0,
-            placeOfEscape: placeOfEscapeController.text,
-            dateCreated: _randomGenerator.getCurrentDateGenerated(),
-            modifiedBy: preferences!.getInt('userId'),
-            dateModified: _randomGenerator.getCurrentDateGenerated(),
-            offenceCategoryDto: natureOfOffenceDropdownButtonFormField != null
-                ? offenceCategoryDto
-                    .where((i) =>
-                        i.offenceCategoryId ==
-                        natureOfOffenceDropdownButtonFormField)
-                    .single
-                : null,
-            createdBy: preferences!.getInt('userId')!);
-    overlay.show();
-    apiResponse = await _previousInvolvementDetailClient
-        .addPreviousInvolvementDetail(requestPreviousInvolvementDetailDto);
+        .addUpdatePreviousInvolvementDetail(
+            requestPreviousInvolvementDetailDto);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       if (!mounted) return;
@@ -354,7 +302,8 @@ class _PreviousInvolvementDetailPageState
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const HealthDetailPage(),
+                            builder: (context) =>
+                                const VictimOrganisationPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),
@@ -368,7 +317,8 @@ class _PreviousInvolvementDetailPageState
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const FamilyMemberPage(),
+                            builder: (context) =>
+                                const DevelopmentAssessmentPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),
@@ -620,7 +570,7 @@ class _PreviousInvolvementDetailPageState
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Previous Arrest Date? Required';
+                                                      return 'Escape Date? Required';
                                                     }
                                                     return null;
                                                   },
@@ -932,66 +882,54 @@ class _PreviousInvolvementDetailPageState
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller:
-                                                      escapeTimeController, // Use a different controller for date and time
-
+                                                      escapeTimeController,
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
-                                                    labelText:
-                                                        'Escape Time?', // Update the label
+                                                    labelText: 'Escape Time',
                                                   ),
-                                                  readOnly:
-                                                      true, // when true user cannot edit text
-                                                  onTap: () async {
-                                                    DateTime? pickedDateTime =
-                                                        await showDatePicker(
-                                                      context: context,
-                                                      initialDate: DateTime
-                                                          .now(), // get today's date
-                                                      firstDate: DateTime(
-                                                          1900), // DateTime.now() - not to allow to choose before today.
-                                                      lastDate: DateTime(3000),
-                                                    );
-
-                                                    if (pickedDateTime !=
-                                                        null) {
-                                                      TimeOfDay? pickedTime =
-                                                          await showTimePicker(
-                                                        context: context,
-                                                        initialTime: TimeOfDay
-                                                            .now(), // get the current time
-                                                      );
-
-                                                      if (pickedTime != null) {
-                                                        pickedDateTime =
-                                                            DateTime(
-                                                          pickedDateTime.year,
-                                                          pickedDateTime.month,
-                                                          pickedDateTime.day,
-                                                          pickedTime.hour,
-                                                          pickedTime.minute,
-                                                        );
-
-                                                        String
-                                                            formattedDateTime =
-                                                            DateFormat(
-                                                                    'yyyy-MM-dd HH:mm:ss.SSS')
-                                                                .format(
-                                                                    pickedDateTime);
-                                                        escapeTimeController
-                                                                .text =
-                                                            formattedDateTime;
-                                                      }
-                                                    }
-                                                  },
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Escape Date and Time? Required';
+                                                      return 'Escape Time Required';
                                                     }
                                                     return null;
+                                                  },
+                                                  readOnly: true,
+                                                  onTap: () async {
+                                                    TimeOfDay? pickedTime =
+                                                        await showTimePicker(
+                                                      initialTime:
+                                                          TimeOfDay.now(),
+                                                      context: context,
+                                                    );
+
+                                                    if (pickedTime != null) {
+                                                      // Create a DateTime object with the selected time
+                                                      DateTime
+                                                          selectedDateTime =
+                                                          DateTime(
+                                                        DateTime.now().year,
+                                                        DateTime.now().month,
+                                                        DateTime.now().day,
+                                                        pickedTime.hour,
+                                                        pickedTime.minute,
+                                                      );
+
+                                                      // Format the DateTime as needed
+                                                      String formattedTime =
+                                                          selectedDateTime
+                                                              .toUtc()
+                                                              .toIso8601String();
+
+                                                      setState(() {
+                                                        escapeTimeController
+                                                                .text =
+                                                            formattedTime;
+                                                      });
+                                                    }
                                                   },
                                                 ),
                                               ),
@@ -1062,7 +1000,7 @@ class _PreviousInvolvementDetailPageState
                                                         if (_loginFormKey
                                                             .currentState!
                                                             .validate()) {
-                                                          addPreviousInvolvementDetailClient();
+                                                          addupdatePreviousInvolvementDetailClient();
                                                         }
                                                       },
                                                       child: Text(
@@ -1151,7 +1089,7 @@ class _PreviousInvolvementDetailPageState
                                                     }
                                                     return ListTile(
                                                       title: Text(
-                                                          'Relationship : ${previousInvolvementDetailDto[index].createdBy ?? ''} ',
+                                                          'Previous Involved : ${previousInvolvementDetailDto[index].previousInvolved ?? ''} ',
                                                           style: const TextStyle(
                                                               color:
                                                                   Colors.black,
@@ -1159,8 +1097,13 @@ class _PreviousInvolvementDetailPageState
                                                                   FontWeight
                                                                       .bold)),
                                                       subtitle: Text(
-                                                          'Name : ${previousInvolvementDetailDto[index].arrestDate ?? ''} '
-                                                          ' ${previousInvolvementDetailDto[index].sentenceOutcomes ?? ''}',
+                                                          'Is Arrest:  ${previousInvolvementDetailDto[index].isArrest ?? ''} \n'
+                                                          'Offence Category : ${previousInvolvementDetailDto[index].offenceCategoryDto?.description ?? ''} \n'
+                                                          'Arrest Date : ${previousInvolvementDetailDto[index].arrestDate ?? ''} \n'
+                                                          'Is Convicted : ${previousInvolvementDetailDto[index].isConvicted ?? ''} \n'
+                                                          'Conviction Date : ${previousInvolvementDetailDto[index].convictionDate ?? ''} \n'
+                                                          'Is Escape : ${previousInvolvementDetailDto[index].isEscape ?? ''} \n'
+                                                          'Escapes Date : ${previousInvolvementDetailDto[index].escapesDate ?? ''} \n',
                                                           style:
                                                               const TextStyle(
                                                                   color: Colors
