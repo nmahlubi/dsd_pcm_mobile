@@ -1,3 +1,5 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dsd_pcm_mobile/connectivity_check/network_controller.dart';
 import 'package:flutter/material.dart';
 
 import '../../navigation_drawer/navigation_drawer_menu.dart';
@@ -21,7 +23,7 @@ class _DashboardPageWidgetState extends State<DashboardPage> {
   final List<Widget> _widgetOptions = [
     const HomePage(),
     const ProfilePage(),
-    const SettingPage()
+    const SettingPage(),
   ];
   void _onItemTapped(int index) {
     setState(() {
@@ -34,16 +36,18 @@ class _DashboardPageWidgetState extends State<DashboardPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard'),
+        //check the network status and update
         actions: [
-          Icon(
-            Icons.error,
-            color: hasInternet ? Colors.green : Colors.red,
-            size: 40,
+          StreamBuilder(
+            stream: Connectivity().onConnectivityChanged,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return NetworkStatus(snapshot.data as ConnectivityResult);
+              } else {
+                return SizedBox(); // Return an empty SizedBox if no data
+              }
+            },
           ),
-          const SizedBox(
-            width: 20,
-          ),
-          // Text(hasInternet ? 'Internet avaliable' : 'No internet'),
         ],
       ),
       drawer: const NavigationDrawerMenu(),

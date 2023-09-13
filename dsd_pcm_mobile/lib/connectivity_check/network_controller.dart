@@ -1,29 +1,42 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
-class NetworkStatusChecker {
-  final BuildContext context;
+class NetworkStatus extends StatelessWidget {
+  final ConnectivityResult connectivityResult;
 
-  NetworkStatusChecker(this.context);
+  NetworkStatus(this.connectivityResult);
 
-  Future<void> checkNetworkStatus() async {
-    var connectivityResult = await Connectivity().checkConnectivity();
+  Widget _buildConnectionIndicator() {
+    IconData icon;
+    Color color;
 
-    if (connectivityResult == ConnectivityResult.none) {
-      // Display a Snackbar indicating that the user is working offline.
-      showSnackbar("You are working offline");
-    } else {
-      // Display a Snackbar indicating that the user is connected to the network.
-      showSnackbar("You are connected to the network");
+    switch (connectivityResult) {
+      case ConnectivityResult.wifi:
+        icon = Icons.wifi;
+        color = Colors.green;
+        break;
+      case ConnectivityResult.mobile:
+        icon = Icons.error;
+        color = Colors.green;
+        break;
+      default:
+        icon = Icons.signal_wifi_off;
+        color = Colors.red;
+        break;
     }
-  }
 
-  void showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: Duration(seconds: 10),
+    return Padding(
+      padding: EdgeInsets.all(10.0),
+      child: Icon(
+        icon,
+        color: color,
+        size: 30.0,
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildConnectionIndicator();
   }
 }
