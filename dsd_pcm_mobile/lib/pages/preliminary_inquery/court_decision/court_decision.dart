@@ -567,7 +567,7 @@ class _CourtDecisionPageState extends State<CourtDecisionPage> {
                                                     height: 70,
                                                     padding: const EdgeInsets
                                                             .fromLTRB(
-                                                        10, 20, 10, 2),
+                                                        20, 20, 20, 3),
                                                     child: OutlinedButton(
                                                       style: OutlinedButton
                                                           .styleFrom(
