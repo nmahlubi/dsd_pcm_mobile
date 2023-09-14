@@ -203,7 +203,7 @@ class _AcceptCasePageState extends State<AcceptCasePage> {
           appBar: AppBar(
             title: Text('Case For: ${childInformationDto.childName}'),
             leading: new IconButton(
-              icon: new Icon(Icons.offline_pin_rounded),
+              icon: new Icon(Icons.backspace),
               onPressed: () => Navigator.of(context).pop(),
             ),
             actions: [

@@ -202,16 +202,12 @@ class _PreviousInvolvementDetailPageState
       viewPreviousInvolvementDetailPanelPanelController =
           ExpandableController(initialExpanded: false);
       labelButtonAddUpdate = 'Update Previous Involvement';
-      ispreviousInvolvedController.text =
-          previousInvolvementDetailDto.previousInvolved.toString();
+      previousInvolved = previousInvolvementDetailDto.previousInvolved;
+      wasPreviousArrest = previousInvolvementDetailDto.isArrest;
       previousArrestDateController.text =
           previousInvolvementDetailDto.arrestDate.toString();
-      isArrestController.text =
-          previousInvolvementDetailDto.isArrest.toString();
-      isConvictedController.text =
-          previousInvolvementDetailDto.isConvicted.toString();
-      isEscapeController.text =
-          previousInvolvementDetailDto.isEscape.toString();
+      wasChildConvictedPreviously = previousInvolvementDetailDto.isConvicted;
+      anyPreviousEscape = previousInvolvementDetailDto.isEscape;
       convictionDateController.text =
           previousInvolvementDetailDto.convictionDate.toString();
       escapesDateController.text =
@@ -528,7 +524,10 @@ class _PreviousInvolvementDetailPageState
                                                 child: TextFormField(
                                                   controller:
                                                       previousArrestDateController,
-
+                                                  enabled: previousInvolved ==
+                                                          "Yes" ||
+                                                      wasPreviousArrest ==
+                                                          "Yes",
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -606,6 +605,11 @@ class _PreviousInvolvementDetailPageState
                                                         ),
                                                       ),
                                                       items: offenceCategoryDto
+                                                          .where((offenceCategory) =>
+                                                              previousInvolved ==
+                                                                  "Yes" ||
+                                                              wasPreviousArrest ==
+                                                                  "Yes")
                                                           .map(
                                                               (offenceCategory) {
                                                         return DropdownMenuItem(
@@ -687,6 +691,12 @@ class _PreviousInvolvementDetailPageState
                                                 child: TextFormField(
                                                   controller:
                                                       convictionDateController,
+                                                  enabled: (previousInvolved ==
+                                                              "Yes" ||
+                                                          wasPreviousArrest ==
+                                                              "Yes") &&
+                                                      wasChildConvictedPreviously ==
+                                                          "Yes",
 
                                                   maxLines: 1,
                                                   decoration:
@@ -747,6 +757,10 @@ class _PreviousInvolvementDetailPageState
                                                 child: TextFormField(
                                                   controller:
                                                       sentenceOutcomesController,
+                                                  enabled: (previousInvolved ==
+                                                          "Yes" ||
+                                                      wasPreviousArrest ==
+                                                          "Yes"),
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -828,6 +842,12 @@ class _PreviousInvolvementDetailPageState
                                                 child: TextFormField(
                                                   controller:
                                                       escapesDateController,
+                                                  enabled: (previousInvolved ==
+                                                              "Yes" ||
+                                                          wasPreviousArrest ==
+                                                              "Yes") &&
+                                                      anyPreviousEscape ==
+                                                          "Yes",
 
                                                   maxLines: 1,
                                                   decoration:
@@ -883,6 +903,12 @@ class _PreviousInvolvementDetailPageState
                                                 child: TextFormField(
                                                   controller:
                                                       escapeTimeController,
+                                                  enabled: (previousInvolved ==
+                                                              "Yes" ||
+                                                          wasPreviousArrest ==
+                                                              "Yes") &&
+                                                      anyPreviousEscape ==
+                                                          "Yes",
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -945,6 +971,12 @@ class _PreviousInvolvementDetailPageState
                                                 child: TextFormField(
                                                   controller:
                                                       placeOfEscapeController,
+                                                  enabled: (previousInvolved ==
+                                                              "Yes" ||
+                                                          wasPreviousArrest ==
+                                                              "Yes") &&
+                                                      anyPreviousEscape ==
+                                                          "Yes",
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
