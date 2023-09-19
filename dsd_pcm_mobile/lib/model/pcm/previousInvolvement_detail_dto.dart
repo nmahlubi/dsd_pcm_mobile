@@ -38,7 +38,7 @@ class PreviousInvolvementDetailDto {
     _placeOfEscape = placeOfEscape;
     _createdBy = createdBy;
     _dateCreated = dateCreated;
-    _modifiedBy = _modifiedBy;
+    _modifiedBy = modifiedBy;
     _dateModified = dateModified;
     _offenceCategoryDto = offenceCategoryDto;
   }

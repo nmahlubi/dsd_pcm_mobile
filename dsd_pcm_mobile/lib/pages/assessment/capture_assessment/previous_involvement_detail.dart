@@ -134,17 +134,24 @@ class _PreviousInvolvementDetailPageState
       intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
       previousInvolved: previousInvolved,
       isArrest: wasPreviousArrest,
-      arrestDate: previousArrestDateController.text,
+      arrestDate: previousArrestDateController.text == ""
+          ? null
+          : previousArrestDateController.text,
       offenceCategoryId: natureOfOffenceDropdownButtonFormField,
       sentenceOutcomes: sentenceOutcomesController.text,
       isConvicted: wasChildConvictedPreviously,
-      convictionDate: convictionDateController.text,
+      convictionDate: convictionDateController.text == ""
+          ? null
+          : convictionDateController.text,
       isEscape: anyPreviousEscape,
-      escapesDate: escapesDateController.text,
-      escapeTime: escapeTimeController
-          .text, ///////////////////////////////////////////////////////////.????
+      escapesDate:
+          escapesDateController.text == "" ? null : escapesDateController.text,
+      escapeTime:
+          escapeTimeController.text == "" ? null : escapeTimeController.text,
       whenEscapedId: 0,
-      placeOfEscape: placeOfEscapeController.text,
+      placeOfEscape: placeOfEscapeController.text == ""
+          ? null
+          : placeOfEscapeController.text,
       createdBy: preferences!.getInt('userId'),
       dateCreated: _randomGenerator.getCurrentDateGenerated(),
       modifiedBy: preferences!.getInt('userId'),
@@ -158,7 +165,6 @@ class _PreviousInvolvementDetailPageState
     );
     overlay.show();
 
-    //print("tIME TAKEN" + escapeTimeController.text);
     apiResponse = await _previousInvolvementDetailClient
         .addUpdatePreviousInvolvementDetail(
             requestPreviousInvolvementDetailDto);
@@ -184,6 +190,10 @@ class _PreviousInvolvementDetailPageState
       labelButtonAddUpdate = 'Add Previous Involvement Crime';
       previousArrestDateController.clear();
       convictionDateController.clear();
+      previousInvolved = "No";
+      anyPreviousEscape = "No";
+      wasChildConvictedPreviously = "No";
+      wasPreviousArrest = "No";
       sentenceOutcomesController.clear();
       escapesDateController.clear();
       escapeTimeController.clear();
@@ -202,16 +212,12 @@ class _PreviousInvolvementDetailPageState
       viewPreviousInvolvementDetailPanelPanelController =
           ExpandableController(initialExpanded: false);
       labelButtonAddUpdate = 'Update Previous Involvement';
-      ispreviousInvolvedController.text =
-          previousInvolvementDetailDto.previousInvolved.toString();
+      previousInvolved = previousInvolvementDetailDto.previousInvolved;
+      wasPreviousArrest = previousInvolvementDetailDto.isArrest;
       previousArrestDateController.text =
           previousInvolvementDetailDto.arrestDate.toString();
-      isArrestController.text =
-          previousInvolvementDetailDto.isArrest.toString();
-      isConvictedController.text =
-          previousInvolvementDetailDto.isConvicted.toString();
-      isEscapeController.text =
-          previousInvolvementDetailDto.isEscape.toString();
+      wasChildConvictedPreviously = previousInvolvementDetailDto.isConvicted;
+      anyPreviousEscape = previousInvolvementDetailDto.isEscape;
       convictionDateController.text =
           previousInvolvementDetailDto.convictionDate.toString();
       escapesDateController.text =
@@ -469,6 +475,10 @@ class _PreviousInvolvementDetailPageState
                                                 ),
                                               ),
                                             ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
                                             Expanded(
                                               child: Container(
                                                 padding:
@@ -528,7 +538,8 @@ class _PreviousInvolvementDetailPageState
                                                 child: TextFormField(
                                                   controller:
                                                       previousArrestDateController,
-
+                                                  enabled: wasPreviousArrest ==
+                                                      "Yes",
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -567,13 +578,13 @@ class _PreviousInvolvementDetailPageState
                                                       //You can format date as per your need
                                                     }
                                                   },
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Escape Date? Required';
-                                                    }
-                                                    return null;
-                                                  },
+                                                  // validator: (value) {
+                                                  //   if (value == null ||
+                                                  //       value.isEmpty) {
+                                                  //     return 'Escape Date? Required';
+                                                  //   }
+                                                  //   return null;
+                                                  // },
                                                 ),
                                               ),
                                             ),
@@ -606,6 +617,11 @@ class _PreviousInvolvementDetailPageState
                                                         ),
                                                       ),
                                                       items: offenceCategoryDto
+                                                          .where((offenceCategory) =>
+                                                              previousInvolved ==
+                                                                  "Yes" ||
+                                                              wasPreviousArrest ==
+                                                                  "Yes")
                                                           .map(
                                                               (offenceCategory) {
                                                         return DropdownMenuItem(
@@ -630,56 +646,57 @@ class _PreviousInvolvementDetailPageState
                                                     ))),
                                           ],
                                         ),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    const Text(
-                                                      'Was child convicted Previously?',
-                                                      style: TextStyle(
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                    SizedBox(height: 10),
-                                                    Row(
-                                                      children: [
-                                                        Radio(
-                                                          value: 'Yes',
-                                                          groupValue:
-                                                              wasChildConvictedPreviously,
-                                                          onChanged: (value) {
-                                                            setState(() {
-                                                              wasChildConvictedPreviously =
-                                                                  'Yes';
-                                                            });
-                                                          },
-                                                        ),
-                                                        Text('Yes'),
-                                                        Radio(
-                                                          value: 'No',
-                                                          groupValue:
-                                                              wasChildConvictedPreviously,
-                                                          onChanged: (value) {
-                                                            setState(() {
-                                                              wasChildConvictedPreviously =
-                                                                  'No';
-                                                            });
-                                                          },
-                                                        ),
-                                                        Text('No'),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
+                                        Row(children: [
+                                          Expanded(
+                                            child: Container(
+                                              padding: const EdgeInsets.all(10),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  const Text(
+                                                    'Was child convicted Previously?',
+                                                    style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  SizedBox(height: 10),
+                                                  Row(
+                                                    children: [
+                                                      Radio(
+                                                        value: 'Yes',
+                                                        groupValue:
+                                                            wasChildConvictedPreviously,
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            wasChildConvictedPreviously =
+                                                                'Yes';
+                                                          });
+                                                        },
+                                                      ),
+                                                      Text('Yes'),
+                                                      Radio(
+                                                        value: 'No',
+                                                        groupValue:
+                                                            wasChildConvictedPreviously,
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            wasChildConvictedPreviously =
+                                                                'No';
+                                                          });
+                                                        },
+                                                      ),
+                                                      Text('No'),
+                                                    ],
+                                                  ),
+                                                ],
                                               ),
                                             ),
+                                          ),
+                                        ]),
+                                        Row(
+                                          children: [
                                             Expanded(
                                               child: Container(
                                                 padding:
@@ -687,6 +704,12 @@ class _PreviousInvolvementDetailPageState
                                                 child: TextFormField(
                                                   controller:
                                                       convictionDateController,
+                                                  enabled: (previousInvolved ==
+                                                              "Yes" ||
+                                                          wasPreviousArrest ==
+                                                              "Yes") &&
+                                                      wasChildConvictedPreviously ==
+                                                          "Yes",
 
                                                   maxLines: 1,
                                                   decoration:
@@ -726,13 +749,13 @@ class _PreviousInvolvementDetailPageState
                                                       //You can format date as per your need
                                                     }
                                                   },
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Conviction Date Required';
-                                                    }
-                                                    return null;
-                                                  },
+                                                  // validator: (value) {
+                                                  //   if (value == null ||
+                                                  //       value.isEmpty) {
+                                                  //     return 'Conviction Date Required';
+                                                  //   }
+                                                  //   return null;
+                                                  // },
                                                 ),
                                               ),
                                             ),
@@ -747,6 +770,10 @@ class _PreviousInvolvementDetailPageState
                                                 child: TextFormField(
                                                   controller:
                                                       sentenceOutcomesController,
+                                                  enabled: (previousInvolved ==
+                                                          "Yes" ||
+                                                      wasPreviousArrest ==
+                                                          "Yes"),
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -819,6 +846,64 @@ class _PreviousInvolvementDetailPageState
                                             ),
                                           ],
                                         ),
+                                        Row(children: [
+                                          Expanded(
+                                            child: Container(
+                                              padding: const EdgeInsets.all(10),
+                                              child: TextFormField(
+                                                controller:
+                                                    escapesDateController,
+                                                enabled: (previousInvolved ==
+                                                            "Yes" ||
+                                                        wasPreviousArrest ==
+                                                            "Yes") &&
+                                                    anyPreviousEscape == "Yes",
+
+                                                maxLines: 1,
+                                                decoration:
+                                                    const InputDecoration(
+                                                  border: OutlineInputBorder(),
+                                                  labelText: 'Escape Date?',
+                                                ),
+                                                readOnly:
+                                                    true, // when true user cannot edit text
+                                                onTap: () async {
+                                                  DateTime? pickedDate =
+                                                      await showDatePicker(
+                                                          context: context,
+                                                          initialDate: DateTime
+                                                              .now(), //get today's date
+                                                          firstDate: DateTime(
+                                                              1900), //DateTime.now() - not to allow to choose before today.
+                                                          lastDate:
+                                                              DateTime(3000));
+
+                                                  if (pickedDate != null) {
+                                                    String formattedDate =
+                                                        DateFormat('yyyy-MM-dd')
+                                                            .format(
+                                                                pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
+                                                    escapesDateController.text =
+                                                        formattedDate;
+                                                    String formattedYear =
+                                                        DateFormat('yyyy')
+                                                            .format(pickedDate);
+                                                    DateTime now =
+                                                        DateTime.now();
+                                                    //You can format date as per your need
+                                                  }
+                                                },
+                                                // validator: (value) {
+                                                //   if (value == null ||
+                                                //       value.isEmpty) {
+                                                //     return 'Escape Date? Required';
+                                                //   }
+                                                //   return null;
+                                                // },
+                                              ),
+                                            ),
+                                          ),
+                                        ]),
                                         Row(
                                           children: [
                                             Expanded(
@@ -827,62 +912,13 @@ class _PreviousInvolvementDetailPageState
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller:
-                                                      escapesDateController,
-
-                                                  maxLines: 1,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                    labelText: 'Escape Date?',
-                                                  ),
-                                                  readOnly:
-                                                      true, // when true user cannot edit text
-                                                  onTap: () async {
-                                                    DateTime? pickedDate =
-                                                        await showDatePicker(
-                                                            context: context,
-                                                            initialDate: DateTime
-                                                                .now(), //get today's date
-                                                            firstDate: DateTime(
-                                                                1900), //DateTime.now() - not to allow to choose before today.
-                                                            lastDate:
-                                                                DateTime(3000));
-
-                                                    if (pickedDate != null) {
-                                                      String formattedDate =
-                                                          DateFormat(
-                                                                  'yyyy-MM-dd')
-                                                              .format(
-                                                                  pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
-                                                      escapesDateController
-                                                          .text = formattedDate;
-                                                      String formattedYear =
-                                                          DateFormat('yyyy')
-                                                              .format(
-                                                                  pickedDate);
-                                                      DateTime now =
-                                                          DateTime.now();
-                                                      //You can format date as per your need
-                                                    }
-                                                  },
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Escape Date? Required';
-                                                    }
-                                                    return null;
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                child: TextFormField(
-                                                  controller:
                                                       escapeTimeController,
+                                                  enabled: (previousInvolved ==
+                                                              "Yes" ||
+                                                          wasPreviousArrest ==
+                                                              "Yes") &&
+                                                      anyPreviousEscape ==
+                                                          "Yes",
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -890,13 +926,13 @@ class _PreviousInvolvementDetailPageState
                                                         OutlineInputBorder(),
                                                     labelText: 'Escape Time',
                                                   ),
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Escape Time Required';
-                                                    }
-                                                    return null;
-                                                  },
+                                                  // validator: (value) {
+                                                  //   if (value == null ||
+                                                  //       value.isEmpty) {
+                                                  //     return 'Escape Time Required';
+                                                  //   }
+                                                  //   return null;
+                                                  // },
                                                   readOnly: true,
                                                   onTap: () async {
                                                     TimeOfDay? pickedTime =
@@ -945,6 +981,12 @@ class _PreviousInvolvementDetailPageState
                                                 child: TextFormField(
                                                   controller:
                                                       placeOfEscapeController,
+                                                  enabled: (previousInvolved ==
+                                                              "Yes" ||
+                                                          wasPreviousArrest ==
+                                                              "Yes") &&
+                                                      anyPreviousEscape ==
+                                                          "Yes",
                                                   maxLines: 1,
                                                   decoration:
                                                       const InputDecoration(
@@ -953,13 +995,13 @@ class _PreviousInvolvementDetailPageState
                                                     labelText:
                                                         'Place of escape',
                                                   ),
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return 'Place of escape Required';
-                                                    }
-                                                    return null;
-                                                  },
+                                                  // validator: (value) {
+                                                  //   if (value == null ||
+                                                  //       value.isEmpty) {
+                                                  //     return 'Place of escape Required';
+                                                  //   }
+                                                  //   return null;
+                                                  // },
                                                 ),
                                               ),
                                             ),

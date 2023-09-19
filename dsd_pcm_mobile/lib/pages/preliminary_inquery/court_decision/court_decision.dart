@@ -228,17 +228,9 @@ class _CourtDecisionPageState extends State<CourtDecisionPage> {
             key: scaffoldKey,
             appBar: AppBar(
               title: const Text("Preliminary Court Decision"),
-              leading: IconButton(
-                icon: const Icon(Icons.offline_pin_rounded),
-                onPressed: () {
-                  if (scaffoldKey.currentState!.isDrawerOpen) {
-                    scaffoldKey.currentState!.closeDrawer();
-                    //close drawer, if drawer is open
-                  } else {
-                    scaffoldKey.currentState!.openDrawer();
-                    //open drawer, if drawer is closed
-                  }
-                },
+              leading: new IconButton(
+                icon: new Icon(Icons.backspace),
+                onPressed: () => Navigator.of(context).pop(),
               ),
               actions: [
                 IconButton(
