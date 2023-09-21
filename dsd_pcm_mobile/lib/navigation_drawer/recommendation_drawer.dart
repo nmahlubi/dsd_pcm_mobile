@@ -54,7 +54,6 @@ class _GoToRecommendationDrawerPageWidgetState
             icon: Icons.inbox,
             text: 'Orders',
             onTap: () =>
-               // Navigator.pushReplacementNamed(context, '/home-based'),
                  Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -69,7 +68,6 @@ class _GoToRecommendationDrawerPageWidgetState
             icon: Icons.inbox,
             text: 'Service Provider',
             onTap: () =>
-               // Navigator.pushReplacementNamed(context, '/home-based'),
                  Navigator.push(
                   context,
                   MaterialPageRoute(

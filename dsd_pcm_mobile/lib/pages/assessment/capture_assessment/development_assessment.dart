@@ -1,6 +1,4 @@
-import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/general_detail.dart';
 import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/previous_involvement_detail.dart';
-import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/victim_organisation.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,7 +13,6 @@ import '../../../util/shared/loading_overlay.dart';
 import '../../../util/shared/randon_generator.dart';
 import '../../probation_officer/accepted_worklist.dart';
 import 'recommendation.dart';
-
 
 class DevelopmentAssessmentPage extends StatefulWidget {
   const DevelopmentAssessmentPage({Key? key}) : super(key: key);
@@ -428,18 +425,15 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                                                 child: Container(
                                                     height: 70,
                                                     padding: const EdgeInsets
-                                                            .fromLTRB(
+                                                        .fromLTRB(
                                                         10, 20, 10, 2),
                                                     child: OutlinedButton(
                                                       style: OutlinedButton
                                                           .styleFrom(
                                                         backgroundColor:
                                                             const Color
-                                                                    .fromARGB(
-                                                                255,
-                                                                23,
-                                                                22,
-                                                                22),
+                                                                .fromARGB(255,
+                                                                23, 22, 22),
                                                         shape:
                                                             const StadiumBorder(),
                                                         side: const BorderSide(

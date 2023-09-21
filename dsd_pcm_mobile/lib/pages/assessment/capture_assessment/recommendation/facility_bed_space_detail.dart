@@ -17,20 +17,16 @@ import '../../../../util/shared/apierror.dart';
 import '../../../../util/shared/apiresponse.dart';
 import '../../../../util/shared/apiresults.dart';
 import '../../../../util/shared/loading_overlay.dart';
-import '../../../../util/shared/randon_generator.dart';
 import '../../../probation_officer/accepted_worklist.dart';
-
 
 class FacilityBedSpacePage extends StatefulWidget {
   const FacilityBedSpacePage({Key? key}) : super(key: key);
 
   @override
-  State<FacilityBedSpacePage> createState() =>
-      _FacilityBedSpacePageState();
+  State<FacilityBedSpacePage> createState() => _FacilityBedSpacePageState();
 }
 
-class _FacilityBedSpacePageState
-    extends State<FacilityBedSpacePage> {
+class _FacilityBedSpacePageState extends State<FacilityBedSpacePage> {
   SharedPreferences? preferences;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final _loginFormKey = GlobalKey<FormState>();
@@ -39,18 +35,16 @@ class _FacilityBedSpacePageState
     preferences = await SharedPreferences.getInstance();
   }
 
-  late AcceptedWorklistDto acceptedWorklistDto =
-      AcceptedWorklistDto();
+  late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
   final _lookupTransform = LookupTransform();
-  final _randomGenerator = RandomGenerator();
   final _facilityBedSpaceServiceClient = FacilityBedSpaceService();
   final _provinceClient = ProvinceService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
-  late List<FacilityBedSpaceDto> facilityBedSpaceDto= [];
+  late List<FacilityBedSpaceDto> facilityBedSpaceDto = [];
   late List<CycaFacilityDto> cycaFacilityDto = [];
-  late List<AdmissionTypeDto> admissionTypeDto= [];
-  late List<ProvinceDto> provinceDto=[];
+  late List<AdmissionTypeDto> admissionTypeDto = [];
+  late List<ProvinceDto> provinceDto = [];
   ExpandableController viewHomeBasedSupervisionPanelController =
       ExpandableController();
   ExpandableController viewHBSConditionPanelController = ExpandableController();
@@ -59,7 +53,8 @@ class _FacilityBedSpacePageState
       ExpandableController();
   ExpandableController viewVisitationOutcomePanelController =
       ExpandableController();
-  final TextEditingController requestCommentsController = TextEditingController();
+  final TextEditingController requestCommentsController =
+      TextEditingController();
 
   int? requestId;
   int? provinceDropdownButtonFormField;
@@ -78,24 +73,21 @@ class _FacilityBedSpacePageState
     viewVisitationOutcomePanelController =
         ExpandableController(initialExpanded: true);
     labelButtonAddUpdate = 'Add Visitation Outcome';
-    
+
     requestId = null;
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
         setState(() {
-          acceptedWorklistDto = ModalRoute.of(context)!
-              .settings
-              .arguments as AcceptedWorklistDto;
-          //loadLookUpTransformer();
-          loadProvinces();
-        
+          acceptedWorklistDto =
+              ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
+              loadProvinces();
         });
       });
     });
   }
 
-loadLookUpTransformer() async {
+  loadLookUpTransformer() async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
     cycaFacilityDto = await _lookupTransform.transformCycaFacilityDto();
@@ -103,7 +95,8 @@ loadLookUpTransformer() async {
     provinceDto = await _lookupTransform.transformProvinceDto();
     overlay.hide();
   }
-loadProvinces() async {
+
+  loadProvinces() async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
     apiResponse = await _provinceClient.getProvinces();
@@ -118,7 +111,7 @@ loadProvinces() async {
     }
   }
 
-loadFacilityBedSpaceByProvinceId(int? provinceId) async {
+  loadFacilityBedSpaceByProvinceId(int? provinceId) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
     apiResponse = await _facilityBedSpaceServiceClient
@@ -160,7 +153,7 @@ loadFacilityBedSpaceByProvinceId(int? provinceId) async {
         onWillPop: () async {
           return false;
         },
-         child: Scaffold(
+        child: Scaffold(
             key: scaffoldKey,
             appBar: AppBar(
               title: const Text("FACILITY BED SPACE"),
@@ -229,8 +222,7 @@ loadFacilityBedSpaceByProvinceId(int? provinceId) async {
                 ],
               ),
             ),
-            
-             drawer: GoToAssessmentDrawer(
+            drawer: GoToAssessmentDrawer(
                 acceptedWorklistDto: acceptedWorklistDto, isCompleted: true),
             body: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 70),
@@ -238,7 +230,6 @@ loadFacilityBedSpaceByProvinceId(int? provinceId) async {
                   key: _loginFormKey,
                   child: ListView(
                     children: [
-        
                       Row(children: [
                         Expanded(
                             child: ExpandableNotifier(
@@ -277,7 +268,7 @@ loadFacilityBedSpaceByProvinceId(int? provinceId) async {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
-                                         Row(
+                                        Row(
                                           children: [
                                             Expanded(
                                                 child: Container(
@@ -290,10 +281,8 @@ loadFacilityBedSpaceByProvinceId(int? provinceId) async {
                                                           provinceDropdownButtonFormField,
                                                       decoration:
                                                           const InputDecoration(
-                                                        hintText:
-                                                            'Province',
-                                                        labelText:
-                                                            'Province',
+                                                        hintText: 'Province',
+                                                        labelText: 'Province',
                                                         border:
                                                             OutlineInputBorder(
                                                           borderSide:
@@ -308,31 +297,28 @@ loadFacilityBedSpaceByProvinceId(int? provinceId) async {
                                                         return DropdownMenuItem(
                                                             value: province
                                                                 .provinceId,
-                                                            child: Text(
-                                                                province
-                                                                    .description
-                                                                    .toString()));
+                                                            child: Text(province
+                                                                .description
+                                                                .toString()));
                                                       }).toList(),
                                                       onChanged:
                                                           (selectedValue) {
                                                         provinceDropdownButtonFormField =
                                                             selectedValue;
-                                                            loadFacilityBedSpaceByProvinceId(provinceDropdownButtonFormField);
+                                                        loadFacilityBedSpaceByProvinceId(
+                                                            provinceDropdownButtonFormField);
                                                       },
-                                                      
                                                     ))),
                                           ],
                                         ),
-                                        
-                                        if (facilityBedSpaceDto.isNotEmpty)                                       
+                                        if (facilityBedSpaceDto.isNotEmpty)
                                           Row(
                                             children: [
                                               Expanded(
                                                 child: ListView.separated(
                                                   shrinkWrap: true,
-                                                  itemCount:
-                                                      facilityBedSpaceDto
-                                                          .length,
+                                                  itemCount: facilityBedSpaceDto
+                                                      .length,
                                                   itemBuilder:
                                                       (context, int index) {
                                                     if (facilityBedSpaceDto
@@ -358,7 +344,7 @@ loadFacilityBedSpaceByProvinceId(int? provinceId) async {
                                                               const TextStyle(
                                                                   color: Colors
                                                                       .black)),
-                                                                      trailing: Row(
+                                                      trailing: Row(
                                                         mainAxisSize:
                                                             MainAxisSize.min,
                                                         children: [
@@ -370,7 +356,10 @@ loadFacilityBedSpaceByProvinceId(int? provinceId) async {
                                                                   MaterialPageRoute(
                                                                     builder:
                                                                         (context) =>
-                                                                             CaptureFacilityBedSpaceDetails(facilityBedSpaceDto: facilityBedSpaceDto,),
+                                                                            CaptureFacilityBedSpaceDetails(
+                                                                      facilityBedSpaceDto:
+                                                                          facilityBedSpaceDto,
+                                                                    ),
                                                                     settings:
                                                                         RouteSettings(
                                                                       arguments:
@@ -380,7 +369,8 @@ loadFacilityBedSpaceByProvinceId(int? provinceId) async {
                                                                 );
                                                               },
                                                               icon: const Icon(
-                                                                  Icons.play_circle_fill_rounded,
+                                                                  Icons
+                                                                      .play_circle_fill_rounded,
                                                                   color: Colors
                                                                       .green)),
                                                         ],
@@ -416,8 +406,7 @@ loadFacilityBedSpaceByProvinceId(int? provinceId) async {
                             ),
                           ),
                         ))),
-                      ]),                    
-                     
+                      ]),
                     ],
                   ),
                 ))));

@@ -45,7 +45,7 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
   final _provinceClient = ProvinceService();
-  final _recommendationsServiceClient =RecommendationsService();
+  final _recommendationsServiceClient = RecommendationsService();
   final _districtServiceClient = DistrictService();
   final _localMunicipalityServiceClient = LocalMunicipalityService();
   final _organizationTypeServiceClient = OrganizationTypeService();
@@ -59,8 +59,10 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
   late List<OrganizationDto> organizationDto = [];
   late List<DiversionRecommendationDto> diversionRecommendationDto = [];
   late List<ProgrammesDto> tempArray = [];
-  ExpandableController captureServiceProviderPanelController =ExpandableController();
-  ExpandableController viewOffenceDetailPanelController =ExpandableController();
+  ExpandableController captureServiceProviderPanelController =
+      ExpandableController();
+  ExpandableController viewOffenceDetailPanelController =
+      ExpandableController();
 
   int? provinceDropdownButtonFormField;
   int? districtDropdownButtonForm;
@@ -88,7 +90,8 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
               ModalRoute.of(context)!.settings.arguments as RecommendationDto;
           loadProvinces();
           loadOrganizationTypes();
-          loadDiversionRecommendationByRecommendationId(recommendationDto.recommendationId);
+          loadDiversionRecommendationByRecommendationId(
+              recommendationDto.recommendationId);
         });
       });
     });
@@ -208,57 +211,59 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        diversionRecommendationDto = (apiResponse.Data as List<DiversionRecommendationDto>);
+        diversionRecommendationDto =
+            (apiResponse.Data as List<DiversionRecommendationDto>);
       });
     } else {
       overlay.hide();
       showDialogMessage((apiResponse.ApiError as ApiError));
     }
   }
-  
-  deleteDiversionRecommendationByRecommendationForm(DiversionRecommendationDto diversionRecommendationDto) async{
+
+  deleteDiversionRecommendationByRecommendationForm(
+      DiversionRecommendationDto diversionRecommendationDto) async {
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
     apiResponse = await _recommendationsServiceClient
         .deleteDiversionRecommendation(diversionRecommendationDto);
-     
-     if ((apiResponse.ApiError) == null) {
+
+    if ((apiResponse.ApiError) == null) {
       overlay.hide();
       if (!mounted) return;
       showSuccessMessage('Successfully deleted');
       navigator.push(
         MaterialPageRoute(
-            builder: (context) => const ServiceProviderPage(),
-           ),
+          builder: (context) => const ServiceProviderPage(),
+        ),
       );
     } else {
       overlay.hide();
       showDialogMessage((apiResponse.ApiError as ApiError));
     }
-
   }
 
   addUpdateServiceProviderMember() async {
-  final overlay = LoadingOverlay.of(context);
+    final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
     overlay.show();
-    DiversionRecommendationDto requestAddDiversionRecommendationRequestDto = DiversionRecommendationDto(
-        pcmDiversionRecommId:
-            pcmDiversionRecommId ?? _randomGenerator.getRandomGeneratedNumber(), 
-        recommendationId: recommendationDto.recommendationId,
-         recommendationProgrammesId: programmesDropdownButtonFormField,
-         programmesDto: programmesDropdownButtonFormField != null
-                ? programmesDto
-                    .where((a) =>
-                        a.programmeId == programmesDropdownButtonFormField)
-                    .single
-                : null,
-        createdBy: preferences!.getInt('userId')!,
-        dateCreated: _randomGenerator.getCurrentDateGenerated(),
-        );
+    DiversionRecommendationDto requestAddDiversionRecommendationRequestDto =
+        DiversionRecommendationDto(
+      pcmDiversionRecommId:
+          pcmDiversionRecommId ?? _randomGenerator.getRandomGeneratedNumber(),
+      recommendationId: recommendationDto.recommendationId,
+      recommendationProgrammesId: programmesDropdownButtonFormField,
+      programmesDto: programmesDropdownButtonFormField != null
+          ? programmesDto
+              .where((a) => a.programmeId == programmesDropdownButtonFormField)
+              .single
+          : null,
+      createdBy: preferences!.getInt('userId')!,
+      dateCreated: _randomGenerator.getCurrentDateGenerated(),
+    );
 
-    apiResponse = await _recommendationsServiceClient
-        .addUpdateDiversionRecommendation(requestAddDiversionRecommendationRequestDto);
+    apiResponse =
+        await _recommendationsServiceClient.addUpdateDiversionRecommendation(
+            requestAddDiversionRecommendationRequestDto);
 
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
@@ -266,8 +271,8 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
       showSuccessMessage('Successfully $labelButtonAddUpdate');
       navigator.push(
         MaterialPageRoute(
-            builder: (context) => const ServiceProviderPage(),
-           ),
+          builder: (context) => const ServiceProviderPage(),
+        ),
       );
     } else {
       overlay.hide();
@@ -275,18 +280,16 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
     }
   }
 
-  newOffenceDetail() {
+  newServiceProvider() {
     setState(() {
       labelButtonAddUpdate = 'Add Service Provider';
-      // valueOfGoodsController.clear();
-      // valueRecoveredController.clear();
-      // responsibilityDetailsController.clear();
+
       districtDropdownButtonForm = null;
       provinceDropdownButtonFormField = null;
-
-      //localMunicipalityDropdownButtonFormField = null;
-      // organizationTypeDropdownButtonFormField = null;
-      // pcmDiversionRecommId = null;
+      localMunicipalityDropdownButtonFormField = null;
+      organizationTypeDropdownButtonFormField = null;
+      organizationTypeDropdownButtonFormField = null;
+      pcmDiversionRecommId = null;
     });
   }
 
@@ -297,7 +300,8 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
     // responsibilityDetailsController.dispose();
     super.dispose();
   }
- showDialogMessage(ApiError apiError) {
+
+  showDialogMessage(ApiError apiError) {
     final messageDialog = ScaffoldMessenger.of(context);
     messageDialog.showSnackBar(
       SnackBar(content: Text(apiError.error!), backgroundColor: Colors.red),
@@ -352,39 +356,6 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
             floatingActionButton: Container(
               padding:
                   const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  // FloatingActionButton(
-                  //     onPressed: () {
-                  //       Navigator.push(
-                  //         context,
-                  //         MaterialPageRoute(
-                  //           builder: (context) => const SocioEconomicPage(),
-                  //           settings: RouteSettings(
-                  //             arguments: acceptedWorklistDto,
-                  //           ),
-                  //         ),
-                  //       );
-                  //     },
-                  //     heroTag: null,
-                  //     child: const Icon(Icons.arrow_back)),
-                  // FloatingActionButton(
-                  //     onPressed: () {
-                  //       Navigator.push(
-                  //         context,
-                  //         MaterialPageRoute(
-                  //           builder: (context) => const VictimDetailPage(),
-                  //           settings: RouteSettings(
-                  //             arguments: acceptedWorklistDto,
-                  //           ),
-                  //         ),
-                  //       );
-                  //     },
-                  //     heroTag: null,
-                  //     child: const Icon(Icons.arrow_forward)),
-                ],
-              ),
             ),
             drawer:
                 GoToRecommendationDrawer(recommendationDto: recommendationDto),
@@ -462,7 +433,7 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
                                                             color: Colors.blue),
                                                       ),
                                                       onPressed: () {
-                                                        newOffenceDetail();
+                                                        newServiceProvider();
                                                       },
                                                       child: const Text('New',
                                                           style: TextStyle(
@@ -674,7 +645,8 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
                                                         loadOrganizationByOrganizationTypeId(
                                                             localMunicipalityDropdownButtonFormField,
                                                             selectedValue);
-                                                            print(localMunicipalityDropdownButtonFormField);
+                                                        print(
+                                                            localMunicipalityDropdownButtonFormField);
                                                       }
                                                     },
                                                     validator: (value) {
@@ -875,7 +847,7 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
                                         //     ),
                                         //   ],
                                         // ),
-                                        
+
                                         Row(
                                           children: [
                                             Expanded(
@@ -908,7 +880,7 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
                                                         if (_loginFormKey
                                                             .currentState!
                                                             .validate()) {
-                                                           addUpdateServiceProviderMember();
+                                                          addUpdateServiceProviderMember();
                                                         }
                                                       },
                                                       child: Text(
@@ -975,17 +947,20 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        if (diversionRecommendationDto.isNotEmpty)
+                                        if (diversionRecommendationDto
+                                            .isNotEmpty)
                                           Row(
                                             children: [
                                               Expanded(
                                                 child: ListView.separated(
                                                   shrinkWrap: true,
                                                   itemCount:
-                                                      diversionRecommendationDto.length,
+                                                      diversionRecommendationDto
+                                                          .length,
                                                   itemBuilder:
                                                       (context, int index) {
-                                                    if (diversionRecommendationDto.isEmpty) {
+                                                    if (diversionRecommendationDto
+                                                        .isEmpty) {
                                                       return const Center(
                                                           child: Text(
                                                               'No diversion programmes Found.'));
@@ -1010,10 +985,10 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
                                                             MainAxisSize.min,
                                                         children: [
                                                           //IconButton(onPressed: () {}, icon: const Icon(Icons.favorite)),
-                                                        
+
                                                           IconButton(
                                                               onPressed: () {
-                                                              deleteDiversionRecommendationByRecommendationForm(
+                                                                deleteDiversionRecommendationByRecommendationForm(
                                                                     diversionRecommendationDto[
                                                                         index]);
                                                               },
