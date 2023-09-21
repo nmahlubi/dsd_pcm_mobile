@@ -1,4 +1,5 @@
 import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/recommendation/facility_bed_space_detail.dart';
+import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/previous_involvement_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../model/pcm/accepted_worklist_dto.dart';
@@ -225,6 +226,21 @@ class _GoToAssessmentDrawerPageWidgetState extends State<GoToAssessmentDrawer> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const VictimOrganisationPage(),
+                    settings: RouteSettings(
+                      arguments: widget.acceptedWorklistDto,
+                    ),
+                  ),
+                );
+              },
+              status: widget.isCompleted),
+          createDrawerBodyItemTrail(
+              icon: Icons.arrow_right,
+              text: 'Previous Involvement detail',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PreviousInvolvementDetailPage(),
                     settings: RouteSettings(
                       arguments: widget.acceptedWorklistDto,
                     ),

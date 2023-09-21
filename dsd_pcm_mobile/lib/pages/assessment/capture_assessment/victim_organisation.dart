@@ -1,3 +1,4 @@
+import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/previous_involvement_detail.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -284,7 +285,7 @@ class _VictimOrganisationPageState extends State<VictimOrganisationPage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                const DevelopmentAssessmentPage(),
+                                const PreviousInvolvementDetailPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),

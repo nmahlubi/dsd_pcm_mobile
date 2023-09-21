@@ -1,4 +1,6 @@
 import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/general_detail.dart';
+import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/previous_involvement_detail.dart';
+import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/victim_organisation.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -202,7 +204,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                const GeneralDetailPage(),
+                                const PreviousInvolvementDetailPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),

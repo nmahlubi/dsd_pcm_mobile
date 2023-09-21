@@ -120,7 +120,7 @@ class _ProgramEnrolledSessionOutcomePageState
           appBar: AppBar(
             title: const Text('Module Program Sessions'),
             leading: new IconButton(
-              icon: new Icon(Icons.offline_pin_rounded),
+              icon: new Icon(Icons.backspace),
               onPressed: () => Navigator.of(context).pop(),
             ),
             actions: [

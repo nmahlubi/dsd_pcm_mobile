@@ -286,19 +286,35 @@ class _CompleteAssessmentPageState extends State<CompleteAssessmentPage> {
                                             status: true),
                                         listTileWidget(
                                             icon: Icons.arrow_right,
-                                            text: 'Child Details',
+                                            text: 'General information',
                                             status: true),
                                         listTileWidget(
                                             icon: Icons.arrow_right,
-                                            text: 'Child Details',
+                                            text: 'Health detail',
                                             status: true),
                                         listTileWidget(
                                             icon: Icons.arrow_right,
-                                            text: 'Child Details',
+                                            text: 'Offence Details',
                                             status: true),
                                         listTileWidget(
                                             icon: Icons.arrow_right,
-                                            text: 'Child Details',
+                                            text: 'Previous Involvement',
+                                            status: true),
+                                        listTileWidget(
+                                            icon: Icons.arrow_right,
+                                            text: 'Recommendation',
+                                            status: true),
+                                        listTileWidget(
+                                            icon: Icons.arrow_right,
+                                            text: 'Socio economic',
+                                            status: true),
+                                        listTileWidget(
+                                            icon: Icons.arrow_right,
+                                            text: 'Victim detail',
+                                            status: true),
+                                        listTileWidget(
+                                            icon: Icons.arrow_right,
+                                            text: 'Victim organisation',
                                             status: true),
                                         Row(
                                           children: [

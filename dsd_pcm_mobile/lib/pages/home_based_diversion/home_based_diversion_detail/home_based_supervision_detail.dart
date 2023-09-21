@@ -257,17 +257,9 @@ class _HomeBasedSupervisionDetailPageState
             key: scaffoldKey,
             appBar: AppBar(
               title: const Text("Homebased Supervision Details"),
-              leading: IconButton(
-                icon: const Icon(Icons.offline_pin_rounded),
-                onPressed: () {
-                  if (scaffoldKey.currentState!.isDrawerOpen) {
-                    scaffoldKey.currentState!.closeDrawer();
-                    //close drawer, if drawer is open
-                  } else {
-                    scaffoldKey.currentState!.openDrawer();
-                    //open drawer, if drawer is closed
-                  }
-                },
+              leading: new IconButton(
+                icon: new Icon(Icons.backspace),
+                onPressed: () => Navigator.of(context).pop(),
               ),
               actions: [
                 IconButton(

@@ -303,47 +303,7 @@ class _AssessmentDetailPageState extends State<AssessmentDetailPage> {
                                                       assessmentTimeController
                                                               .text =
                                                           "${pickedTime.hour.toString().padLeft(2, '0')}:${pickedTime.minute.toString().padLeft(2, '0')}:00.0000000";
-                                                      /*DateTime parsedTime =
-                                                          DateFormat.jm().parse(
-                                                              pickedTime
-                                                                  .format(
-                                                                      context)
-                                                                  .toString());*/
-                                                      //String formattedTime = DateFormat('HH:mm:ss').format(pickedTime);
-
-                                                      /*String formattedDate =
-                                                          DateFormat(
-                                                                  'HH:mm:ss')
-                                                              .format(
-                                                                  pickedTime); */ // format date in required form here we use yyyy-MM-dd that means time is removed
-                                                      /*assessmentDateController
-                                                              .text =
-                                                          parsedTime.toString();*/
-                                                      //You can format date as per your need
                                                     }
-
-                                                    /*DateTime? pickedDate =
-                                                        await showDatePicker(
-                                                            context: context,
-                                                            initialDate: DateTime
-                                                                .now(), //get today's date
-                                                            firstDate: DateTime(
-                                                                1800), //DateTime.now() - not to allow to choose before today.
-                                                            lastDate:
-                                                                DateTime(2101));
-
-                                                    if (pickedDate != null) {
-                                                      String formattedDate =
-                                                          DateFormat(
-                                                                  'yyyy-MM-dd')
-                                                              .format(
-                                                                  pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
-                                                      assessmentDateController
-                                                          .text = formattedDate;
-                                                      //You can format date as per your need
-
-                                                    }
-                                                    */
                                                   },
                                                 ),
                                               ),
