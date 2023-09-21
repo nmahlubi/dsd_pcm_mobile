@@ -1,8 +1,7 @@
-import 'package:dsd_pcm_mobile/navigation_drawer/create_drawer_body_item.dart';
+import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/recommendation/facility_bed_space_detail.dart';
 import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/previous_involvement_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../model/pcm/accepted_worklist_dto.dart';
 import '../pages/assessment/capture_assessment/assessment_detail.dart';
 import '../pages/assessment/capture_assessment/care_giver_detail.dart';
@@ -10,7 +9,6 @@ import '../pages/assessment/capture_assessment/child_detail/update_child_detail.
 import '../pages/assessment/capture_assessment/complete_assessment.dart';
 import '../pages/assessment/capture_assessment/development_assessment.dart';
 import '../pages/assessment/capture_assessment/education.dart';
-import '../pages/assessment/capture_assessment/family/family.dart';
 import '../pages/assessment/capture_assessment/family_information.dart';
 import '../pages/assessment/capture_assessment/family_member.dart';
 import '../pages/assessment/capture_assessment/general_detail.dart';
@@ -273,6 +271,21 @@ class _GoToAssessmentDrawerPageWidgetState extends State<GoToAssessmentDrawer> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const RecommandationPage(),
+                    settings: RouteSettings(
+                      arguments: widget.acceptedWorklistDto,
+                    ),
+                  ),
+                );
+              },
+              status: widget.isCompleted),
+            createDrawerBodyItemTrail(
+              icon: Icons.arrow_right,
+              text: 'Facility Bed Space',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const FacilityBedSpacePage(),
                     settings: RouteSettings(
                       arguments: widget.acceptedWorklistDto,
                     ),

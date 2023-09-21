@@ -1,3 +1,4 @@
+import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/recommendation/facility_bed_space_detail.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,7 +14,6 @@ import '../../../util/shared/loading_overlay.dart';
 import '../../../util/shared/randon_generator.dart';
 import '../../probation_officer/accepted_worklist.dart';
 import 'complete_assessment.dart';
-import 'development_assessment.dart';
 
 class GeneralDetailPage extends StatefulWidget {
   const GeneralDetailPage({Key? key}) : super(key: key);
@@ -195,7 +195,7 @@ class _GeneralDetailPageState extends State<GeneralDetailPage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                const DevelopmentAssessmentPage(),
+                                const FacilityBedSpacePage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),

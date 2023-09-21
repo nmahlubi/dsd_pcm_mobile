@@ -1,13 +1,11 @@
-import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/recommendation/facility_bed_space_detail.dart';
+import 'package:dsd_pcm_mobile/model/intake/pcm_order_dto.dart';
+import 'package:dsd_pcm_mobile/model/pcm/order_dto.dart';
+import 'package:dsd_pcm_mobile/model/pcm/recommendations_dto.dart';
+import 'package:dsd_pcm_mobile/navigation_drawer/recommendation_drawer.dart';
+import 'package:dsd_pcm_mobile/service/pcm/recommendations_service.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../model/intake/placement_type_dto.dart';
-import '../../../model/intake/recommendation_type_dto.dart';
-import '../../../model/pcm/accepted_worklist_dto.dart';
-import '../../../model/pcm/recommendations_dto.dart';
-import '../../../navigation_drawer/recommendation_drawer.dart';
-import '../../../service/pcm/recommendations_service.dart';
 import '../../../transform_dynamic/transform_lookup.dart';
 import '../../../util/shared/apierror.dart';
 import '../../../util/shared/apiresponse.dart';
@@ -15,16 +13,15 @@ import '../../../util/shared/apiresults.dart';
 import '../../../util/shared/loading_overlay.dart';
 import '../../../util/shared/randon_generator.dart';
 import '../../probation_officer/accepted_worklist.dart';
-import 'development_assessment.dart';
 
-class RecommandationPage extends StatefulWidget {
-  const RecommandationPage({Key? key}) : super(key: key);
+class OrderDetailPage extends StatefulWidget {
+  const OrderDetailPage({Key? key}) : super(key: key);
 
   @override
-  State<RecommandationPage> createState() => _RecommandationPageState();
+  State<OrderDetailPage> createState() => _OrderDetailPageState();
 }
 
-class _RecommandationPageState extends State<RecommandationPage> {
+class _OrderDetailPageState extends State<OrderDetailPage> {
   SharedPreferences? preferences;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final _loginFormKey = GlobalKey<FormState>();
@@ -33,42 +30,39 @@ class _RecommandationPageState extends State<RecommandationPage> {
     preferences = await SharedPreferences.getInstance();
   }
 
-  final _randomGenerator = RandomGenerator();
+  late RecommendationDto recommendationDto = RecommendationDto();
   final _lookupTransform = LookupTransform();
-  late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
-  final _recommendationsServiceClient = RecommendationsService();
+  final _randomGenerator = RandomGenerator();
+  final _recommendationServiceClient = RecommendationsService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
-  late RecommendationDto recommendationDto = RecommendationDto();
-  late List<RecommendationTypeDto> recommendationTypesDto = [];
-  late List<PlacementTypeDto> placementTypesDto = [];
-  late List<RecommendationDto> recommendationsDto = [];
 
-  ExpandableController captureRecommandationPanelController =
-      ExpandableController();
+  late List<OrderDto> orderDto = [];
+  late List<PcmOrderDto> pcmOrderDto = [];
 
-  final TextEditingController commentsForRecommendationController =
+  ExpandableController captureOrderPanelController = ExpandableController();
+  ExpandableController viewOrdersInfoPanelController = ExpandableController();
+  final TextEditingController reasonForOrderController =
       TextEditingController();
-  int? recommendationTypeDropdownButtonFormField;
-  int? placementTypeDropdownButtonFormField;
-  int? recommandationId;
+
+  int? orderId;
+  int? orderDropdownButtonFormField;
   String? labelButtonAddUpdate = '';
 
   @override
   void initState() {
     super.initState();
-    captureRecommandationPanelController =
-        ExpandableController(initialExpanded: true);
-    labelButtonAddUpdate = 'Add Recommandation';
-    recommandationId = null;
+    captureOrderPanelController = ExpandableController(initialExpanded: false);
+    viewOrdersInfoPanelController = ExpandableController(initialExpanded: true);
+    labelButtonAddUpdate = 'Add Order';
+    orderId = null;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
         setState(() {
-          acceptedWorklistDto =
-              ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
+          recommendationDto =
+              ModalRoute.of(context)!.settings.arguments as RecommendationDto;
           loadLookUpTransformer();
-          loadRecommandationByIntakeAssessmentId(
-              acceptedWorklistDto.intakeAssessmentId);
+          loadOrdersByRecommendationId(recommendationDto.recommendationId);
         });
       });
     });
@@ -77,32 +71,19 @@ class _RecommandationPageState extends State<RecommandationPage> {
   loadLookUpTransformer() async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    placementTypesDto = await _lookupTransform.transformPlacementTypeDto();
-    recommendationTypesDto =
-        await _lookupTransform.transformRecommendationTypeDto();
+    pcmOrderDto = await _lookupTransform.transformOrderDto();
     overlay.hide();
   }
 
-  loadRecommandationByIntakeAssessmentId(int? intakeAssessmentId) async {
+  loadOrdersByRecommendationId(int? recommendationId) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await _recommendationsServiceClient
-        .getRecommendationByIntakeAssessmentId(intakeAssessmentId);
+    apiResponse = await _recommendationServiceClient
+        .getOrderByRecommendationId(recommendationId);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        if (apiResponse.Data != null) {
-        recommendationDto =
-              (apiResponse.Data as RecommendationDto);
-          labelButtonAddUpdate = 'Update Recommandation';
-          recommandationId = recommendationDto.recommendationId;
-          commentsForRecommendationController.text =
-              recommendationDto.commentsForRecommendation!;
-          recommendationTypeDropdownButtonFormField =
-              recommendationDto.recommendationTypeId;
-          placementTypeDropdownButtonFormField =
-              recommendationDto.placementTypeId;
-        }
+        orderDto = (apiResponse.Data as List<OrderDto>);
       });
     } else {
       overlay.hide();
@@ -110,50 +91,63 @@ class _RecommandationPageState extends State<RecommandationPage> {
     }
   }
 
-  addUpdateRecommandation() async {
+  addUpdateOrder() async {
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
     overlay.show();
-    RecommendationDto requestRecommendationDto = RecommendationDto(
-        recommendationId:
-            recommandationId ?? _randomGenerator.getRandomGeneratedNumber(),
-        dateCreated: _randomGenerator.getCurrentDateGenerated(),
-        recommendationTypeId: recommendationTypeDropdownButtonFormField,
-        placementTypeId: placementTypeDropdownButtonFormField,
-        commentsForRecommendation: commentsForRecommendationController.text,
-        createdBy: preferences!.getInt('userId')!,
-        intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
-        recommendationTypeDto: recommendationTypeDropdownButtonFormField != null
-            ? recommendationTypesDto
-                .where((i) =>
-                    i.recommendationTypeId ==
-                    recommendationTypeDropdownButtonFormField)
-                .single
-            : null,
-        placementTypeDto: placementTypeDropdownButtonFormField != null
-            ? placementTypesDto
-                .where((i) =>
-                    i.placementTypeId == placementTypeDropdownButtonFormField)
-                .single
-            : null);
+    OrderDto requestAddOrderDto = OrderDto(
+      orderId: orderId ?? _randomGenerator.getRandomGeneratedNumber(),
+      recommendationId: recommendationDto.recommendationId,
+      recomendationOrderId: orderDropdownButtonFormField,
+      pcmOrderDto: orderDropdownButtonFormField != null
+          ? pcmOrderDto
+              .where(
+                  (o) => o.recomendationOrderId == orderDropdownButtonFormField)
+              .single
+          : null,
+      orderReason: reasonForOrderController.text,
+      createdBy: preferences!.getInt('userId')!,
+      modifiedBy: preferences!.getInt('userId')!,
+      dateCreated: _randomGenerator.getCurrentDateGenerated(),
+    );
 
-    apiResponse = await _recommendationsServiceClient
-        .addUpdateRecommendation(requestRecommendationDto);
+    apiResponse =
+        await _recommendationServiceClient.addUpdateOrder(requestAddOrderDto);
+
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       if (!mounted) return;
-      showSuccessMessage('Successfully $labelButtonAddUpdate.');
+      showSuccessMessage('Successfully $labelButtonAddUpdate');
       navigator.push(
         MaterialPageRoute(
-            builder: (context) => const RecommandationPage(),
-            settings: RouteSettings(
-              arguments: acceptedWorklistDto,
-            )),
+            builder: (context) => const OrderDetailPage()),
       );
     } else {
-      showDialogMessage((apiResponse.ApiError as ApiError));
       overlay.hide();
+      showDialogMessage((apiResponse.ApiError as ApiError));
     }
+  }
+
+  newOrderDetail() {
+    setState(() {
+      labelButtonAddUpdate = 'Add Order';
+      reasonForOrderController.clear();
+      orderDropdownButtonFormField = null;
+      orderId = null;
+    });
+  }
+
+  populateHealthDetailForm(OrderDto orderDto) {
+    setState(() {
+      orderId = orderDto.orderId;
+      captureOrderPanelController = ExpandableController(initialExpanded: true);
+      viewOrdersInfoPanelController =
+          ExpandableController(initialExpanded: false);
+      labelButtonAddUpdate = 'Update Order';
+      reasonForOrderController.text = orderDto.orderReason!;
+      orderDropdownButtonFormField =
+          orderDto.pcmOrderDto!.recomendationOrderId!;
+    });
   }
 
   showDialogMessage(ApiError apiError) {
@@ -170,39 +164,9 @@ class _RecommandationPageState extends State<RecommandationPage> {
     );
   }
 
-/*
-  newMRecommandation() {
-    setState(() {
-      labelButtonAddUpdate = 'Add Recommandation';
-      commentsForRecommendationController.clear();
-      placementTypeDropdownButtonFormField = null;
-      recommendationTypeDropdownButtonFormField = null;
-      recommandationId = null;
-    });
-  }
-  */
-
-/*
-  populateRecommandationForm(RecommendationDto recommendationDto) {
-    setState(() {
-      recommandationId = recommendationDto.recommendationId;
-      captureRecommandationPanelController =
-          ExpandableController(initialExpanded: true);
-      viewRecommandationPanelController =
-          ExpandableController(initialExpanded: false);
-      labelButtonAddUpdate = 'Update Recommandation';
-      commentsForRecommendationController.text =
-          recommendationDto.commentsForRecommendation!;
-      recommendationTypeDropdownButtonFormField =
-          recommendationDto.recommendationTypeId;
-      placementTypeDropdownButtonFormField = recommendationDto.placementTypeId;
-    });
-  }
-  */
-
   @override
   void dispose() {
-    commentsForRecommendationController.dispose();
+    reasonForOrderController.dispose();
     super.dispose();
   }
 
@@ -215,7 +179,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
         child: Scaffold(
             key: scaffoldKey,
             appBar: AppBar(
-              title: const Text("Recommendation"),
+              title: const Text("Order Details"),
               leading: IconButton(
                 icon: const Icon(Icons.offline_pin_rounded),
                 onPressed: () {
@@ -252,38 +216,37 @@ class _RecommandationPageState extends State<RecommandationPage> {
                 children: <Widget>[
                   FloatingActionButton(
                       onPressed: () {
-                        Navigator.push(
+                        /* Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                const DevelopmentAssessmentPage(),
+                            builder: (context) => const AssessmentDetailPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),
                           ),
-                        );
+                        );*/
                       },
                       heroTag: null,
                       child: const Icon(Icons.arrow_back)),
                   FloatingActionButton(
                       onPressed: () {
-                        Navigator.push(
+                        /* Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const FacilityBedSpacePage(),
+                            builder: (context) => const EducationPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),
                           ),
-                        );
+                        );*/
                       },
                       heroTag: null,
                       child: const Icon(Icons.arrow_forward)),
                 ],
               ),
             ),
-             drawer: GoToRecommendationDrawer(
-                recommendationDto: recommendationDto, ),
+          drawer:
+                GoToRecommendationDrawer(recommendationDto: recommendationDto),
             body: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 70),
                 child: Form(
@@ -303,8 +266,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                   scrollOnExpand: true,
                                   scrollOnCollapse: false,
                                   child: ExpandablePanel(
-                                    controller:
-                                        captureRecommandationPanelController,
+                                    controller: captureOrderPanelController,
                                     theme: const ExpandableThemeData(
                                       headerAlignment:
                                           ExpandablePanelHeaderAlignment.center,
@@ -313,7 +275,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                     header: Padding(
                                         padding: const EdgeInsets.all(10),
                                         child: Text(
-                                          "Capture Recommandation",
+                                          "Capture Order",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
@@ -331,105 +293,88 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                         Row(
                                           children: [
                                             Expanded(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(8),
+                                              ),
+                                            ),
+                                            Expanded(
                                                 child: Container(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10),
-                                                    child:
-                                                        DropdownButtonFormField(
-                                                      value:
-                                                          recommendationTypeDropdownButtonFormField,
-                                                      decoration:
-                                                          const InputDecoration(
-                                                        hintText:
-                                                            'Recommandation Type',
-                                                        labelText:
-                                                            'Recommandation Type',
-                                                        border:
-                                                            OutlineInputBorder(
-                                                          borderSide:
-                                                              BorderSide(
-                                                                  width: 1,
-                                                                  color: Colors
-                                                                      .green),
-                                                        ),
+                                                    height: 70,
+                                                    padding: const EdgeInsets
+                                                        .fromLTRB(
+                                                        10, 20, 10, 2),
+                                                    child: OutlinedButton(
+                                                      style: OutlinedButton
+                                                          .styleFrom(
+                                                        minimumSize: const Size
+                                                            .fromHeight(10),
+                                                        backgroundColor:
+                                                            const Color
+                                                                .fromARGB(255,
+                                                                244, 248, 246),
+                                                        shape:
+                                                            const StadiumBorder(),
+                                                        side: const BorderSide(
+                                                            width: 2,
+                                                            color: Colors.blue),
                                                       ),
-                                                      items: recommendationTypesDto
-                                                          .map(
-                                                              (recommandationType) {
-                                                        return DropdownMenuItem(
-                                                            value: recommandationType
-                                                                .recommendationTypeId,
-                                                            child: Text(
-                                                                recommandationType
-                                                                    .description
-                                                                    .toString()));
-                                                      }).toList(),
-                                                      onChanged:
-                                                          (selectedValue) {
-                                                        recommendationTypeDropdownButtonFormField =
-                                                            selectedValue;
+                                                      onPressed: () {
+                                                        newOrderDetail();
                                                       },
-                                                      validator: (value) {
-                                                        if (value == null) {
-                                                          return 'Recommandation Type Required';
-                                                        }
-                                                        return null;
-                                                      },
+                                                      child: const Text('New',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.blue)),
                                                     ))),
-                                          
                                           ],
                                         ),
                                         Row(
                                           children: [
                                             Expanded(
-                                                child: Container(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10),
-                                                    child:
-                                                        DropdownButtonFormField(
-                                                      value:
-                                                          placementTypeDropdownButtonFormField,
-                                                      decoration:
-                                                          const InputDecoration(
-                                                        hintText:
-                                                            'Placement Type',
-                                                        labelText:
-                                                            'Placement Type',
-                                                        border:
-                                                            OutlineInputBorder(
-                                                          borderSide:
-                                                              BorderSide(
-                                                                  width: 1,
-                                                                  color: Colors
-                                                                      .green),
-                                                        ),
+                                              child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  child:
+                                                      DropdownButtonFormField(
+                                                    value:
+                                                        orderDropdownButtonFormField,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      hintText: 'Order(s)',
+                                                      labelText:
+                                                          '-Please select-',
+                                                      border:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            width: 1,
+                                                            color:
+                                                                Colors.green),
                                                       ),
-                                                      items: placementTypesDto
-                                                          .map((placementType) {
-                                                        return DropdownMenuItem(
-                                                            value: placementType
-                                                                .placementTypeId,
-                                                            child: Text(
-                                                                placementType
-                                                                    .description
-                                                                    .toString()));
-                                                      }).toList(),
-                                                      onChanged:
-                                                          (selectedValue) {
-                                                        placementTypeDropdownButtonFormField =
-                                                            selectedValue;
-                                                      },
-                                                      validator: (value) {
-                                                        if (value == null) {
-                                                          return 'Placement Type Required';
-                                                        }
-                                                        return null;
-                                                      },
-                                                    ))),
+                                                    ),
+                                                    items: pcmOrderDto
+                                                        .map((pcmOders) {
+                                                      return DropdownMenuItem(
+                                                          value: pcmOders
+                                                              .recomendationOrderId,
+                                                          child: Text(pcmOders
+                                                              .description
+                                                              .toString()));
+                                                    }).toList(),
+                                                    onChanged: (selectedValue) {
+                                                      orderDropdownButtonFormField =
+                                                          selectedValue;
+                                                    },
+                                                    validator: (value) {
+                                                      if (value == null) {
+                                                        return 'Order required';
+                                                      }
+                                                      return null;
+                                                    },
+                                                  )),
+                                            ),
                                           ],
-                                        ),                                      
+                                        ),
                                         Row(
                                           children: [
                                             Expanded(
@@ -438,18 +383,19 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller:
-                                                      commentsForRecommendationController,
+                                                      reasonForOrderController,
                                                   maxLines: 4,
                                                   decoration:
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
-                                                    labelText: 'Comments',
+                                                    labelText:
+                                                        'Reason for order',
                                                   ),
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Comments Required';
+                                                      return 'Reason for Order Required';
                                                     }
                                                     return null;
                                                   },
@@ -471,18 +417,15 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                                 child: Container(
                                                     height: 70,
                                                     padding: const EdgeInsets
-                                                            .fromLTRB(
+                                                        .fromLTRB(
                                                         10, 20, 10, 2),
                                                     child: OutlinedButton(
                                                       style: OutlinedButton
                                                           .styleFrom(
                                                         backgroundColor:
                                                             const Color
-                                                                    .fromARGB(
-                                                                255,
-                                                                23,
-                                                                22,
-                                                                22),
+                                                                .fromARGB(255,
+                                                                23, 22, 22),
                                                         shape:
                                                             const StadiumBorder(),
                                                         side: const BorderSide(
@@ -493,7 +436,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                                         if (_loginFormKey
                                                             .currentState!
                                                             .validate()) {
-                                                          addUpdateRecommandation();
+                                                          addUpdateOrder();
                                                         }
                                                       },
                                                       child: Text(
@@ -501,7 +444,6 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                                     ))),
                                           ],
                                         ),
-                                     
                                       ],
                                     ),
                                     builder: (_, collapsed, expanded) {
@@ -523,7 +465,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
                           ),
                         )))
                       ]),
-                      /*Row(children: [
+                      Row(children: [
                         Expanded(
                             child: ExpandableNotifier(
                                 child: Padding(
@@ -536,8 +478,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                   scrollOnExpand: true,
                                   scrollOnCollapse: false,
                                   child: ExpandablePanel(
-                                    controller:
-                                        viewRecommandationPanelController,
+                                    controller: viewOrdersInfoPanelController,
                                     theme: const ExpandableThemeData(
                                       headerAlignment:
                                           ExpandablePanelHeaderAlignment.center,
@@ -546,7 +487,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                     header: Padding(
                                         padding: const EdgeInsets.all(10),
                                         child: Text(
-                                          "View Recommandations",
+                                          "View Order Details",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
@@ -561,25 +502,23 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        if (recommendationsDto.isNotEmpty)
+                                        if (orderDto.isNotEmpty)
                                           Row(
                                             children: [
                                               Expanded(
                                                 child: ListView.separated(
                                                   shrinkWrap: true,
-                                                  itemCount:
-                                                      recommendationsDto.length,
+                                                  itemCount: orderDto.length,
                                                   itemBuilder:
                                                       (context, int index) {
-                                                    if (recommendationsDto
-                                                        .isEmpty) {
+                                                    if (orderDto.isEmpty) {
                                                       return const Center(
                                                           child: Text(
-                                                              'No recommandation Found.'));
+                                                              'No order Details Found.'));
                                                     }
                                                     return ListTile(
                                                       title: Text(
-                                                          'Type : ${recommendationsDto[index].recommendationTypeDto?.description ?? ''}',
+                                                          'Order : ${orderDto[index].pcmOrderDto?.description}',
                                                           style: const TextStyle(
                                                               color:
                                                                   Colors.black,
@@ -587,8 +526,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                                                   FontWeight
                                                                       .bold)),
                                                       subtitle: Text(
-                                                          'Placement Type ${recommendationsDto[index].placementTypeDto?.description ?? ''}'
-                                                          'Comments  :  ${recommendationsDto[index].commentsForRecommendation ?? ''}',
+                                                          'Reason for oder : ${orderDto[index].orderReason}. ',
                                                           style:
                                                               const TextStyle(
                                                                   color: Colors
@@ -600,8 +538,8 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                                           //IconButton(onPressed: () {}, icon: const Icon(Icons.favorite)),
                                                           IconButton(
                                                               onPressed: () {
-                                                                populateRecommandationForm(
-                                                                    recommendationsDto[
+                                                                populateHealthDetailForm(
+                                                                    orderDto[
                                                                         index]);
                                                               },
                                                               icon: const Icon(
@@ -647,7 +585,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
                             ),
                           ),
                         ))),
-                      ]),*/
+                      ]),
                     ],
                   ),
                 ))));

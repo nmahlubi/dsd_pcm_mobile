@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dsd_pcm_mobile/model/pcm/order_dto.dart';
 import 'package:http_interceptor/http/intercepted_client.dart';
 
 import '../../domain/repository/assessment/recommandation_repository.dart';
+import '../../model/pcm/diversion_recommendation_dto.dart';
 import '../../model/pcm/recommendations_dto.dart';
 import '../../util/app_url.dart';
 import '../../util/auth_intercept/authorization_interceptor.dart';
@@ -108,4 +110,184 @@ class RecommendationsService {
     }
     return apiResponse;
   }
+
+ Future<ApiResponse> getDiversionRecommendationByRecommendationIdOnline(
+      int? recomendationId) async {
+    ApiResponse apiResponse = ApiResponse();
+    final response = await client.get(
+        Uri.parse("${AppUrl.pcmURL}/Recommendations/DiversionRecommendation/Get/$recomendationId"));
+    switch (response.statusCode) {
+      case 200:
+        apiResponse.Data =
+           apiResponse.Data = (json.decode(response.body) as List)
+            .map((data) => DiversionRecommendationDto.fromJson(data))
+            .toList();
+        break;
+      default:
+        apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+        break;
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> getDiversionRecommendationByRecommendationId(
+      int? recomendationId) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse =
+          await getDiversionRecommendationByRecommendationIdOnline(recomendationId);
+      if (apiResponse.ApiError == null) {
+        List<DiversionRecommendationDto> diversionRecommendationDtoResponse =
+            apiResponse.Data as List<DiversionRecommendationDto>;
+        apiResponse.Data = diversionRecommendationDtoResponse;
+      
+      }
+    } on SocketException {
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> addDiversionRecommendationOnline(
+      DiversionRecommendationDto diversionRecommendationDto) async {
+    return await _httpClientService.httpClientPost(
+        "${AppUrl.pcmURL}/Recommendations/DiversionRecommendation/Add", diversionRecommendationDto);
+  }
+
+  Future<ApiResponse> addDiversionRecommendation(
+      DiversionRecommendationDto diversionRecommendationDto) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse = await addDiversionRecommendationOnline(diversionRecommendationDto);
+      if (apiResponse.ApiError == null) {
+        ApiResults apiResults = (apiResponse.Data as ApiResults);
+        DiversionRecommendationDto diversionRecommendationDtoResponse =
+            DiversionRecommendationDto.fromJson(apiResults.data);
+        apiResponse.Data = diversionRecommendationDtoResponse;
+   
+      }
+    } on SocketException {
+       apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> addUpdateDiversionRecommendationOnline(
+      DiversionRecommendationDto diversionRecommendationDto) async {
+    return await _httpClientService.httpClientPost(
+        "${AppUrl.pcmURL}/Recommendations/DiversionRecommendation/Add", diversionRecommendationDto);
+  }
+
+  Future<ApiResponse> addUpdateDiversionRecommendation(
+      DiversionRecommendationDto diversionRecommendationDto) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse = await addUpdateDiversionRecommendationOnline(diversionRecommendationDto);
+      if (apiResponse.ApiError == null) {
+        ApiResults apiResults = (apiResponse.Data as ApiResults);
+        DiversionRecommendationDto diversionRecommendationDtoResponse =
+            DiversionRecommendationDto.fromJson(apiResults.data);
+        apiResponse.Data = diversionRecommendationDtoResponse;
+    
+      }
+    } on SocketException {
+     apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
+  }
+
+Future<ApiResponse> getOrderByRecommendationIdOnline(
+      int? recommendationId) async {
+    ApiResponse apiResponse = ApiResponse();
+    final response = await client.get(Uri.parse(
+        "${AppUrl.pcmURL}/Recommendations/Order/Get/$recommendationId"));
+    switch (response.statusCode) {
+      case 200:
+        apiResponse.Data = (json.decode(response.body) as List)
+            .map((data) => OrderDto.fromJson(data))
+            .toList();
+        break;
+      default:
+        apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+        break;
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> getOrderByRecommendationId(
+      int? recommendationId) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse = await getOrderByRecommendationIdOnline(recommendationId);
+      if (apiResponse.ApiError == null) {
+        List<OrderDto> recommendationDtoResponse =
+            apiResponse.Data as List<OrderDto>;
+        apiResponse.Data = recommendationDtoResponse;
+      }
+    } on SocketException {
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> addOrderOnline(OrderDto orderDto) async {
+    return await _httpClientService.httpClientPost(
+        "${AppUrl.pcmURL}/Recommendations/Order/Add", orderDto);
+  }
+
+  Future<ApiResponse> addOrder(OrderDto orderDto) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse = await addOrderOnline(orderDto);
+      if (apiResponse.ApiError == null) {
+        ApiResults apiResults = (apiResponse.Data as ApiResults);
+        OrderDto orderDtoResponse = OrderDto.fromJson(apiResults.data);
+        apiResponse.Data = orderDtoResponse;
+      }
+    } on SocketException {
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> addUpdateOrderOnline(OrderDto orderDto) async {
+    return await _httpClientService.httpClientPost(
+        "${AppUrl.pcmURL}/Recommendations/Order/AddUpdate", orderDto);
+  }
+
+  Future<ApiResponse> addUpdateOrder(OrderDto orderDto) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse = await addUpdateOrderOnline(orderDto);
+      if (apiResponse.ApiError == null) {
+        ApiResults apiResults = (apiResponse.Data as ApiResults);
+        OrderDto orderDtoResponse = OrderDto.fromJson(apiResults.data);
+        apiResponse.Data = orderDtoResponse;
+      }
+    } on SocketException {
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
+  }
+
+   Future<ApiResponse> deleteDiversionRecommendationOnline(DiversionRecommendationDto diversionRecommendationDto) async {
+    return await _httpClientService.httpClientDelete(
+        "${AppUrl.pcmURL}/Recommendations/DiversionRecommendation/Delete", diversionRecommendationDto);
+  }
+
+  Future<ApiResponse> deleteDiversionRecommendation(DiversionRecommendationDto diversionRecommendationDto) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse = await deleteDiversionRecommendationOnline(diversionRecommendationDto);
+      if (apiResponse.ApiError == null) {
+        ApiResults apiResults = (apiResponse.Data as ApiResults);
+        OrderDto orderDtoResponse = OrderDto.fromJson(apiResults.data);
+        apiResponse.Data = orderDtoResponse;
+      }
+    } on SocketException {
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
+  }
 }
+

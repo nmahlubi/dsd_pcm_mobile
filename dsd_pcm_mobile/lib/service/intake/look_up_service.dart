@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dsd_pcm_mobile/model/intake/country_dto.dart';
+import 'package:dsd_pcm_mobile/model/intake/pcm_order_dto.dart';
 import 'package:dsd_pcm_mobile/model/intake/program_module_sessions_dto.dart';
 import 'package:dsd_pcm_mobile/model/intake/program_module_dto.dart';
 import 'package:http_interceptor/http/intercepted_client.dart';
@@ -16,7 +18,9 @@ import '../../domain/repository/lookup/placement_type_repository.dart';
 import '../../domain/repository/lookup/preferred_contact_type_repository.dart';
 import '../../domain/repository/lookup/recommendation_type_repository.dart';
 import '../../domain/repository/lookup/relationship_type_repository.dart';
+import '../../model/intake/admission_type.dart';
 import '../../model/intake/compliance_dto.dart';
+import '../../model/intake/cyca_facility_dto.dart';
 import '../../model/intake/disability_type_dto.dart';
 import '../../model/intake/form_of_notification_dto.dart';
 import '../../model/intake/gender_dto.dart';
@@ -25,7 +29,9 @@ import '../../model/intake/identification_type_dto.dart';
 import '../../model/intake/language_dto.dart';
 import '../../model/intake/marital_status_dto.dart';
 import '../../model/intake/nationality_dto.dart';
+import '../../model/intake/organization_dto.dart';
 import '../../model/intake/preferred_contact_type_dto.dart';
+import '../../model/intake/province_dto.dart';
 import '../../model/intake/recommendation_type_dto.dart';
 import '../../model/intake/relationship_type_dto.dart';
 import '../../model/intake/placement_type_dto.dart';
@@ -613,6 +619,138 @@ class LookUpService {
         case 200:
           apiResponse.Data = (json.decode(response.body) as List)
               .map((data) => ProgramModuleSessionDto.fromJson(data))
+              .toList();
+          break;
+        default:
+          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+          break;
+      }
+    } on SocketException {
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
+  }
+
+   Future<ApiResponse> getAdmissionTypes() async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      final response = await client
+          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/AdmissionTypes"));
+
+      switch (response.statusCode) {
+        case 200:
+          apiResponse.Data = (json.decode(response.body) as List)
+              .map((data) => AdmissionTypeDto.fromJson(data))
+              .toList();
+          break;
+        default:
+          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+          break;
+      }
+    } on SocketException {
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
+  }
+
+   Future<ApiResponse> getCycaFacility() async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      final response = await client
+          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/CycaFacility"));
+
+      switch (response.statusCode) {
+        case 200:
+          apiResponse.Data = (json.decode(response.body) as List)
+              .map((data) => CycaFacilityDto.fromJson(data))
+              .toList();
+          break;
+        default:
+          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+          break;
+      }
+    } on SocketException {
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
+  }
+
+    Future<ApiResponse> getProvinces() async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      final response = await client
+          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/Provinces"));
+
+      switch (response.statusCode) {
+        case 200:
+          apiResponse.Data = (json.decode(response.body) as List)
+              .map((data) => ProvinceDto.fromJson(data))
+              .toList();
+          break;
+        default:
+          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+          break;
+      }
+    } on SocketException {
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
+  }
+
+  
+  Future<ApiResponse> getCountries() async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      final response = await client
+          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/Countries"));
+
+      switch (response.statusCode) {
+        case 200:
+          apiResponse.Data = (json.decode(response.body) as List)
+              .map((data) => PcmCountryDto.fromJson(data))
+              .toList();
+          break;
+        default:
+          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+          break;
+      }
+    } on SocketException {
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
+  }
+
+   Future<ApiResponse> getOrganizationsByLocalMunicipalityId(int? localMunicipalityId) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      final response = await client
+          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/Organization/Get/$localMunicipalityId"));
+
+      switch (response.statusCode) {
+        case 200:
+          apiResponse.Data = (json.decode(response.body) as List)
+              .map((data) => OrganizationDto.fromJson(data))
+              .toList();
+          break;
+        default:
+          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+          break;
+      }
+    } on SocketException {
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
+  }
+  Future<ApiResponse> getPcmOrders() async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      final response =
+          await client.get(Uri.parse("${AppUrl.intakeURL}/LookUp/Orders"));
+
+      switch (response.statusCode) {
+        case 200:
+          apiResponse.Data = (json.decode(response.body) as List)
+              .map((data) => PcmOrderDto.fromJson(data))
               .toList();
           break;
         default:

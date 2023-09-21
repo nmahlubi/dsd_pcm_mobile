@@ -141,10 +141,8 @@ class _FamilyInformationPageState extends State<FamilyInformationPage> {
   populateFamilyInformationForm(FamilyInformationDto familyInformationDto) {
     setState(() {
       familyInformationId = familyInformationDto.familyInformationId;
-      captureFamilyInformationPanelController =
-          ExpandableController(initialExpanded: true);
-      viewFamilyInformationPanelController =
-          ExpandableController(initialExpanded: false);
+      captureFamilyInformationPanelController =ExpandableController(initialExpanded: true);
+      viewFamilyInformationPanelController =ExpandableController(initialExpanded: false);
       labelButtonAddUpdate = 'Update Background';
       familyBackgroundController.text = familyInformationDto.familyBackground!;
     });

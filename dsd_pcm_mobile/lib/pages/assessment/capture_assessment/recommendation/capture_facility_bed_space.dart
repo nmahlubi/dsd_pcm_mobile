@@ -1,30 +1,32 @@
-import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/recommendation/facility_bed_space_detail.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../model/intake/placement_type_dto.dart';
-import '../../../model/intake/recommendation_type_dto.dart';
-import '../../../model/pcm/accepted_worklist_dto.dart';
-import '../../../model/pcm/recommendations_dto.dart';
-import '../../../navigation_drawer/recommendation_drawer.dart';
-import '../../../service/pcm/recommendations_service.dart';
-import '../../../transform_dynamic/transform_lookup.dart';
-import '../../../util/shared/apierror.dart';
-import '../../../util/shared/apiresponse.dart';
-import '../../../util/shared/apiresults.dart';
-import '../../../util/shared/loading_overlay.dart';
-import '../../../util/shared/randon_generator.dart';
-import '../../probation_officer/accepted_worklist.dart';
-import 'development_assessment.dart';
 
-class RecommandationPage extends StatefulWidget {
-  const RecommandationPage({Key? key}) : super(key: key);
+import '../../../../model/intake/admission_type.dart';
+import '../../../../model/pcm/accepted_worklist_dto.dart';
+import '../../../../model/pcm/facility_bed_space.dart';
+import '../../../../navigation_drawer/go_to_assessment_drawer.dart';
+import '../../../../service/pcm/facility_bed_space_service.dart';
+import '../../../../transform_dynamic/transform_lookup.dart';
+import '../../../../util/shared/apierror.dart';
+import '../../../../util/shared/apiresponse.dart';
+import '../../../../util/shared/apiresults.dart';
+import '../../../../util/shared/loading_overlay.dart';
+import '../../../../util/shared/randon_generator.dart';
+import '../../../probation_officer/accepted_worklist.dart';
+import 'facility_bed_space_detail.dart';
+
+
+// ignore: must_be_immutable
+class CaptureFacilityBedSpaceDetails extends StatefulWidget {
+  late List<FacilityBedSpaceDto> facilityBedSpaceDto;
+   CaptureFacilityBedSpaceDetails({Key? key, required this.facilityBedSpaceDto}) : super(key: key);
 
   @override
-  State<RecommandationPage> createState() => _RecommandationPageState();
+  State<CaptureFacilityBedSpaceDetails> createState() => _CaptureFacilityBedSpaceDetailsState();
 }
 
-class _RecommandationPageState extends State<RecommandationPage> {
+class _CaptureFacilityBedSpaceDetailsState extends State<CaptureFacilityBedSpaceDetails> {
   SharedPreferences? preferences;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final _loginFormKey = GlobalKey<FormState>();
@@ -33,42 +35,39 @@ class _RecommandationPageState extends State<RecommandationPage> {
     preferences = await SharedPreferences.getInstance();
   }
 
-  final _randomGenerator = RandomGenerator();
-  final _lookupTransform = LookupTransform();
   late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
-  final _recommendationsServiceClient = RecommendationsService();
+  final _lookupTransform = LookupTransform();
+  final _randomGenerator = RandomGenerator();
+  final _facilityBedSpaceServiceClient = FacilityBedSpaceService();
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
-  late RecommendationDto recommendationDto = RecommendationDto();
-  late List<RecommendationTypeDto> recommendationTypesDto = [];
-  late List<PlacementTypeDto> placementTypesDto = [];
-  late List<RecommendationDto> recommendationsDto = [];
+  late FacilityBedSpaceDto captureFacilityBedSpaceDto =FacilityBedSpaceDto();
+  late List<AdmissionTypeDto> admissionTypeDto= [];
+  late List<FacilityBedSpaceDto> facilityBedSpaceDtoList = [];
+  ExpandableController captureFacilityBedSpacePanelController =ExpandableController();
+  ExpandableController viewFacilityBedPanelController = ExpandableController();
+  final TextEditingController requestCommentsController = TextEditingController();
 
-  ExpandableController captureRecommandationPanelController =
-      ExpandableController();
-
-  final TextEditingController commentsForRecommendationController =
-      TextEditingController();
-  int? recommendationTypeDropdownButtonFormField;
-  int? placementTypeDropdownButtonFormField;
-  int? recommandationId;
+  int? requestId;
+  int? admissionTypeDropdownButtonFormField;
   String? labelButtonAddUpdate = '';
 
   @override
   void initState() {
     super.initState();
-    captureRecommandationPanelController =
+    captureFacilityBedSpacePanelController =
+        ExpandableController(initialExpanded: false);
+    viewFacilityBedPanelController =
         ExpandableController(initialExpanded: true);
-    labelButtonAddUpdate = 'Add Recommandation';
-    recommandationId = null;
+    labelButtonAddUpdate = 'Add Facility Bed Space';
+    requestId = null;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       initializePreference().whenComplete(() {
         setState(() {
           acceptedWorklistDto =
               ModalRoute.of(context)!.settings.arguments as AcceptedWorklistDto;
           loadLookUpTransformer();
-          loadRecommandationByIntakeAssessmentId(
-              acceptedWorklistDto.intakeAssessmentId);
+          loadFacilityBedSpaceByIntakeAssessmentId(acceptedWorklistDto.intakeAssessmentId);
         });
       });
     });
@@ -77,32 +76,18 @@ class _RecommandationPageState extends State<RecommandationPage> {
   loadLookUpTransformer() async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    placementTypesDto = await _lookupTransform.transformPlacementTypeDto();
-    recommendationTypesDto =
-        await _lookupTransform.transformRecommendationTypeDto();
+    admissionTypeDto = await _lookupTransform.transformAdmissionTypeDto();
     overlay.hide();
   }
-
-  loadRecommandationByIntakeAssessmentId(int? intakeAssessmentId) async {
+loadFacilityBedSpaceByIntakeAssessmentId(int? intakeAssessmentId) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await _recommendationsServiceClient
-        .getRecommendationByIntakeAssessmentId(intakeAssessmentId);
+    apiResponse = await _facilityBedSpaceServiceClient
+        .getFacilityBedSpaceByIntakeAssessmentId(intakeAssessmentId);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
-        if (apiResponse.Data != null) {
-        recommendationDto =
-              (apiResponse.Data as RecommendationDto);
-          labelButtonAddUpdate = 'Update Recommandation';
-          recommandationId = recommendationDto.recommendationId;
-          commentsForRecommendationController.text =
-              recommendationDto.commentsForRecommendation!;
-          recommendationTypeDropdownButtonFormField =
-              recommendationDto.recommendationTypeId;
-          placementTypeDropdownButtonFormField =
-              recommendationDto.placementTypeId;
-        }
+      facilityBedSpaceDtoList = (apiResponse.Data as List<FacilityBedSpaceDto>);
       });
     } else {
       overlay.hide();
@@ -110,50 +95,71 @@ class _RecommandationPageState extends State<RecommandationPage> {
     }
   }
 
-  addUpdateRecommandation() async {
+  addUpdateFacilityBedSpace() async {
     final overlay = LoadingOverlay.of(context);
     final navigator = Navigator.of(context);
     overlay.show();
-    RecommendationDto requestRecommendationDto = RecommendationDto(
-        recommendationId:
-            recommandationId ?? _randomGenerator.getRandomGeneratedNumber(),
-        dateCreated: _randomGenerator.getCurrentDateGenerated(),
-        recommendationTypeId: recommendationTypeDropdownButtonFormField,
-        placementTypeId: placementTypeDropdownButtonFormField,
-        commentsForRecommendation: commentsForRecommendationController.text,
-        createdBy: preferences!.getInt('userId')!,
+    FacilityBedSpaceDto requestAddFacilityBedSpaceRequestDto = FacilityBedSpaceDto(
+        requestId:
+            requestId ?? _randomGenerator.getRandomGeneratedNumber(),
+        
         intakeAssessmentId: acceptedWorklistDto.intakeAssessmentId,
-        recommendationTypeDto: recommendationTypeDropdownButtonFormField != null
-            ? recommendationTypesDto
-                .where((i) =>
-                    i.recommendationTypeId ==
-                    recommendationTypeDropdownButtonFormField)
-                .single
-            : null,
-        placementTypeDto: placementTypeDropdownButtonFormField != null
-            ? placementTypesDto
-                .where((i) =>
-                    i.placementTypeId == placementTypeDropdownButtonFormField)
-                .single
-            : null);
+         admissionTypeId: admissionTypeDropdownButtonFormField,
+            admissionTypeDto: admissionTypeDropdownButtonFormField != null
+                ? admissionTypeDto
+                    .where((a) =>
+                        a.admissionTypeId == admissionTypeDropdownButtonFormField)
+                    .single
+                : null,
+         facilityId: 1,
+            requestStatusId: 1,
+            requestOpenClose: 'Open',
+            requestSubject: 'New Bed Space Request',
+            requestComments: requestCommentsController.text,
+        createdBy: preferences!.getInt('userId')!,
+        modifiedBy: preferences!.getInt('userId')!,
+        dateModified: _randomGenerator.getCurrentDateGenerated(),
+        );
 
-    apiResponse = await _recommendationsServiceClient
-        .addUpdateRecommendation(requestRecommendationDto);
+    apiResponse = await _facilityBedSpaceServiceClient
+        .addUpdateFacilityBedSpace(requestAddFacilityBedSpaceRequestDto);
+
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       if (!mounted) return;
-      showSuccessMessage('Successfully $labelButtonAddUpdate.');
+      showSuccessMessage('Successfully $labelButtonAddUpdate');
       navigator.push(
         MaterialPageRoute(
-            builder: (context) => const RecommandationPage(),
-            settings: RouteSettings(
-              arguments: acceptedWorklistDto,
-            )),
+            builder: (context) => const FacilityBedSpacePage(),
+           ),
       );
     } else {
-      showDialogMessage((apiResponse.ApiError as ApiError));
       overlay.hide();
+      showDialogMessage((apiResponse.ApiError as ApiError));
     }
+  }
+
+  newFacilityBedSpace() {
+    setState(() {
+      labelButtonAddUpdate = 'Add Facility Bed Space';
+      requestCommentsController.clear();
+      admissionTypeDropdownButtonFormField = null;
+      requestId = null;
+    });
+  }
+
+  populateHealthDetailForm(FacilityBedSpaceDto facilityBedSpaceDtoList) {
+    setState(() {
+      requestId = facilityBedSpaceDtoList.requestId;
+      captureFacilityBedSpacePanelController =
+          ExpandableController(initialExpanded: true);
+      viewFacilityBedPanelController =
+          ExpandableController(initialExpanded: false);
+      labelButtonAddUpdate = 'Update Facility Bed Space';
+      requestCommentsController.text = facilityBedSpaceDtoList.requestComments!;
+      admissionTypeDropdownButtonFormField =
+          facilityBedSpaceDtoList.admissionTypeId;
+    });
   }
 
   showDialogMessage(ApiError apiError) {
@@ -170,39 +176,9 @@ class _RecommandationPageState extends State<RecommandationPage> {
     );
   }
 
-/*
-  newMRecommandation() {
-    setState(() {
-      labelButtonAddUpdate = 'Add Recommandation';
-      commentsForRecommendationController.clear();
-      placementTypeDropdownButtonFormField = null;
-      recommendationTypeDropdownButtonFormField = null;
-      recommandationId = null;
-    });
-  }
-  */
-
-/*
-  populateRecommandationForm(RecommendationDto recommendationDto) {
-    setState(() {
-      recommandationId = recommendationDto.recommendationId;
-      captureRecommandationPanelController =
-          ExpandableController(initialExpanded: true);
-      viewRecommandationPanelController =
-          ExpandableController(initialExpanded: false);
-      labelButtonAddUpdate = 'Update Recommandation';
-      commentsForRecommendationController.text =
-          recommendationDto.commentsForRecommendation!;
-      recommendationTypeDropdownButtonFormField =
-          recommendationDto.recommendationTypeId;
-      placementTypeDropdownButtonFormField = recommendationDto.placementTypeId;
-    });
-  }
-  */
-
   @override
   void dispose() {
-    commentsForRecommendationController.dispose();
+    requestCommentsController.dispose();
     super.dispose();
   }
 
@@ -215,7 +191,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
         child: Scaffold(
             key: scaffoldKey,
             appBar: AppBar(
-              title: const Text("Recommendation"),
+              title: const Text("Facility Bed Space"),
               leading: IconButton(
                 icon: const Icon(Icons.offline_pin_rounded),
                 onPressed: () {
@@ -255,9 +231,8 @@ class _RecommandationPageState extends State<RecommandationPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                const DevelopmentAssessmentPage(),
-                            settings: RouteSettings(
+                            builder: (context) => const FacilityBedSpacePage(),
+                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),
                           ),
@@ -265,25 +240,12 @@ class _RecommandationPageState extends State<RecommandationPage> {
                       },
                       heroTag: null,
                       child: const Icon(Icons.arrow_back)),
-                  FloatingActionButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const FacilityBedSpacePage(),
-                            settings: RouteSettings(
-                              arguments: acceptedWorklistDto,
-                            ),
-                          ),
-                        );
-                      },
-                      heroTag: null,
-                      child: const Icon(Icons.arrow_forward)),
+
                 ],
               ),
             ),
-             drawer: GoToRecommendationDrawer(
-                recommendationDto: recommendationDto, ),
+             drawer: GoToAssessmentDrawer(
+                acceptedWorklistDto: acceptedWorklistDto, isCompleted: true),
             body: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 70),
                 child: Form(
@@ -304,7 +266,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                   scrollOnCollapse: false,
                                   child: ExpandablePanel(
                                     controller:
-                                        captureRecommandationPanelController,
+                                        captureFacilityBedSpacePanelController,
                                     theme: const ExpandableThemeData(
                                       headerAlignment:
                                           ExpandablePanelHeaderAlignment.center,
@@ -313,7 +275,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                     header: Padding(
                                         padding: const EdgeInsets.all(10),
                                         child: Text(
-                                          "Capture Recommandation",
+                                          "Capture Facility Bed Space",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
@@ -331,105 +293,45 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                         Row(
                                           children: [
                                             Expanded(
-                                                child: Container(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10),
-                                                    child:
-                                                        DropdownButtonFormField(
-                                                      value:
-                                                          recommendationTypeDropdownButtonFormField,
-                                                      decoration:
-                                                          const InputDecoration(
-                                                        hintText:
-                                                            'Recommandation Type',
-                                                        labelText:
-                                                            'Recommandation Type',
-                                                        border:
-                                                            OutlineInputBorder(
-                                                          borderSide:
-                                                              BorderSide(
-                                                                  width: 1,
-                                                                  color: Colors
-                                                                      .green),
-                                                        ),
-                                                      ),
-                                                      items: recommendationTypesDto
-                                                          .map(
-                                                              (recommandationType) {
-                                                        return DropdownMenuItem(
-                                                            value: recommandationType
-                                                                .recommendationTypeId,
-                                                            child: Text(
-                                                                recommandationType
-                                                                    .description
-                                                                    .toString()));
-                                                      }).toList(),
-                                                      onChanged:
-                                                          (selectedValue) {
-                                                        recommendationTypeDropdownButtonFormField =
-                                                            selectedValue;
-                                                      },
-                                                      validator: (value) {
-                                                        if (value == null) {
-                                                          return 'Recommandation Type Required';
-                                                        }
-                                                        return null;
-                                                      },
-                                                    ))),
-                                          
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(8),
+                                              ),
+                                            ),
                                             Expanded(
                                                 child: Container(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10),
-                                                    child:
-                                                        DropdownButtonFormField(
-                                                      value:
-                                                          placementTypeDropdownButtonFormField,
-                                                      decoration:
-                                                          const InputDecoration(
-                                                        hintText:
-                                                            'Placement Type',
-                                                        labelText:
-                                                            'Placement Type',
-                                                        border:
-                                                            OutlineInputBorder(
-                                                          borderSide:
-                                                              BorderSide(
-                                                                  width: 1,
-                                                                  color: Colors
-                                                                      .green),
-                                                        ),
+                                                    height: 70,
+                                                    padding: const EdgeInsets
+                                                            .fromLTRB(
+                                                        10, 20, 10, 2),
+                                                    child: OutlinedButton(
+                                                      style: OutlinedButton
+                                                          .styleFrom(
+                                                        minimumSize: const Size
+                                                            .fromHeight(10),
+                                                        backgroundColor:
+                                                            const Color
+                                                                    .fromARGB(
+                                                                255,
+                                                                244,
+                                                                248,
+                                                                246),
+                                                        shape:
+                                                            const StadiumBorder(),
+                                                        side: const BorderSide(
+                                                            width: 2,
+                                                            color: Colors.blue),
                                                       ),
-                                                      items: placementTypesDto
-                                                          .map((placementType) {
-                                                        return DropdownMenuItem(
-                                                            value: placementType
-                                                                .placementTypeId,
-                                                            child: Text(
-                                                                placementType
-                                                                    .description
-                                                                    .toString()));
-                                                      }).toList(),
-                                                      onChanged:
-                                                          (selectedValue) {
-                                                        placementTypeDropdownButtonFormField =
-                                                            selectedValue;
+                                                      onPressed: () {
+                                                        newFacilityBedSpace();
                                                       },
-                                                      validator: (value) {
-                                                        if (value == null) {
-                                                          return 'Placement Type Required';
-                                                        }
-                                                        return null;
-                                                      },
+                                                      child: const Text('New',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.blue)),
                                                     ))),
                                           ],
-                                        ),                                      
+                                        ),
                                         Row(
                                           children: [
                                             Expanded(
@@ -438,23 +340,70 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                                     const EdgeInsets.all(10),
                                                 child: TextFormField(
                                                   controller:
-                                                      commentsForRecommendationController,
-                                                  maxLines: 4,
+                                                      requestCommentsController,
+                                                  maxLines: 2,
                                                   decoration:
                                                       const InputDecoration(
                                                     border:
                                                         OutlineInputBorder(),
-                                                    labelText: 'Comments',
+                                                    labelText: 'Request Comments',
                                                   ),
                                                   validator: (value) {
                                                     if (value == null ||
                                                         value.isEmpty) {
-                                                      return 'Comments Required';
+                                                      return 'Request Comments';
                                                     }
                                                     return null;
                                                   },
                                                 ),
                                               ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  child:
+                                                      DropdownButtonFormField(
+                                                    value:
+                                                        admissionTypeDropdownButtonFormField,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      hintText: 'Admission Type',
+                                                      labelText:
+                                                          'Admission Type',
+                                                      border:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            width: 1,
+                                                            color:
+                                                                Colors.green),
+                                                      ),
+                                                    ),
+                                                    items: admissionTypeDto
+                                                        .map((admissionType) {
+                                                      return DropdownMenuItem(
+                                                          value: admissionType
+                                                              .admissionTypeId,
+                                                          child: Text(
+                                                              admissionType
+                                                                  .description
+                                                                  .toString()));
+                                                    }).toList(),
+                                                    onChanged: (selectedValue) {
+                                                      admissionTypeDropdownButtonFormField =
+                                                          selectedValue;
+                                                    },
+                                                    validator: (value) {
+                                                      if (value == null) {
+                                                        return 'Admission Type required';
+                                                      }
+                                                      return null;
+                                                    },
+                                                  )),
                                             ),
                                           ],
                                         ),
@@ -493,7 +442,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                                         if (_loginFormKey
                                                             .currentState!
                                                             .validate()) {
-                                                          addUpdateRecommandation();
+                                                          addUpdateFacilityBedSpace();
                                                         }
                                                       },
                                                       child: Text(
@@ -501,7 +450,6 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                                     ))),
                                           ],
                                         ),
-                                     
                                       ],
                                     ),
                                     builder: (_, collapsed, expanded) {
@@ -523,7 +471,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
                           ),
                         )))
                       ]),
-                      /*Row(children: [
+                      Row(children: [
                         Expanded(
                             child: ExpandableNotifier(
                                 child: Padding(
@@ -536,8 +484,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                   scrollOnExpand: true,
                                   scrollOnCollapse: false,
                                   child: ExpandablePanel(
-                                    controller:
-                                        viewRecommandationPanelController,
+                                    controller: viewFacilityBedPanelController,
                                     theme: const ExpandableThemeData(
                                       headerAlignment:
                                           ExpandablePanelHeaderAlignment.center,
@@ -546,7 +493,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                     header: Padding(
                                         padding: const EdgeInsets.all(10),
                                         child: Text(
-                                          "View Recommandations",
+                                          "View Facility Bed Space",
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge,
@@ -561,25 +508,26 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        if (recommendationsDto.isNotEmpty)
+                                        if (facilityBedSpaceDtoList.isNotEmpty)
                                           Row(
                                             children: [
                                               Expanded(
                                                 child: ListView.separated(
                                                   shrinkWrap: true,
                                                   itemCount:
-                                                      recommendationsDto.length,
+                                                      facilityBedSpaceDtoList
+                                                          .length,
                                                   itemBuilder:
                                                       (context, int index) {
-                                                    if (recommendationsDto
+                                                    if (facilityBedSpaceDtoList
                                                         .isEmpty) {
                                                       return const Center(
                                                           child: Text(
-                                                              'No recommandation Found.'));
+                                                              'No facility bed space Found.'));
                                                     }
                                                     return ListTile(
                                                       title: Text(
-                                                          'Type : ${recommendationsDto[index].recommendationTypeDto?.description ?? ''}',
+                                                          'Admission Type : ${facilityBedSpaceDtoList[index].admissionTypeDto?.description}',
                                                           style: const TextStyle(
                                                               color:
                                                                   Colors.black,
@@ -587,8 +535,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                                                   FontWeight
                                                                       .bold)),
                                                       subtitle: Text(
-                                                          'Placement Type ${recommendationsDto[index].placementTypeDto?.description ?? ''}'
-                                                          'Comments  :  ${recommendationsDto[index].commentsForRecommendation ?? ''}',
+                                                          'Request Comments : ${facilityBedSpaceDtoList[index].requestComments}. ',
                                                           style:
                                                               const TextStyle(
                                                                   color: Colors
@@ -600,9 +547,9 @@ class _RecommandationPageState extends State<RecommandationPage> {
                                                           //IconButton(onPressed: () {}, icon: const Icon(Icons.favorite)),
                                                           IconButton(
                                                               onPressed: () {
-                                                                populateRecommandationForm(
-                                                                    recommendationsDto[
-                                                                        index]);
+                                                                // populateHealthDetailForm(
+                                                                //     facilityBedSpaceDtoList[
+                                                                //         index]);
                                                               },
                                                               icon: const Icon(
                                                                   Icons.edit,
@@ -647,7 +594,7 @@ class _RecommandationPageState extends State<RecommandationPage> {
                             ),
                           ),
                         ))),
-                      ]),*/
+                      ]),
                     ],
                   ),
                 ))));
