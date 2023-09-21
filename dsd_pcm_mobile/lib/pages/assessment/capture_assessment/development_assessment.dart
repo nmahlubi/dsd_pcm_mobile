@@ -1,7 +1,7 @@
+import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/general_detail.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../model/pcm/accepted_worklist_dto.dart';
 import '../../../model/pcm/development_assessment_dto.dart';
 import '../../../navigation_drawer/go_to_assessment_drawer.dart';
@@ -13,7 +13,7 @@ import '../../../util/shared/loading_overlay.dart';
 import '../../../util/shared/randon_generator.dart';
 import '../../probation_officer/accepted_worklist.dart';
 import 'recommendation.dart';
-import 'victim_organisation.dart';
+
 
 class DevelopmentAssessmentPage extends StatefulWidget {
   const DevelopmentAssessmentPage({Key? key}) : super(key: key);
@@ -202,7 +202,7 @@ class _DevelopmentAssessmentPagetate extends State<DevelopmentAssessmentPage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                const VictimOrganisationPage(),
+                                const GeneralDetailPage(),
                             settings: RouteSettings(
                               arguments: acceptedWorklistDto,
                             ),
