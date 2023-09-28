@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'package:dsd_pcm_mobile/model/child_notification/incoming_cases_dto.dart';
 import 'package:http_interceptor/http/intercepted_client.dart';
 
 import '../../model/child_notification/notification_case_dto.dart';
@@ -71,6 +72,27 @@ class NotificationService {
       switch (response.statusCode) {
         case 200:
           apiResponse.Data = json.decode(response.body);
+          break;
+        default:
+          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+          break;
+      }
+    } on SocketException {
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> getCountedIncomingCasesBySupervisor(
+      String? username) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      final response = await client.get(Uri.parse(
+          "${AppUrl.childNotificationURL}/Notification/Cases/Counted/Incoming/${username}"));
+      switch (response.statusCode) {
+        case 200:
+          apiResponse.Data =
+              IncomingCasesDto.fromJson(json.decode(response.body));
           break;
         default:
           apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));

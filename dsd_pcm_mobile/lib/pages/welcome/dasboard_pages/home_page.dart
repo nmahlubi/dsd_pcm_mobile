@@ -1,3 +1,4 @@
+import 'package:dsd_pcm_mobile/model/child_notification/incoming_cases_dto.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -26,6 +27,7 @@ class _HomePageState extends State<HomePage> {
   final _notificationServiceClient = NotificationService();
   late ApiResponse apiResponse = ApiResponse();
   late MobileDashboardDto mobileDashboardDto = MobileDashboardDto();
+  late IncomingCasesDto incomingCasesDto = IncomingCasesDto();
   late int overdueCases = 0;
 
   @override
@@ -37,6 +39,7 @@ class _HomePageState extends State<HomePage> {
           mobileDashboardDto = MobileDashboardDto(
               reAssignedCases: 0, newPropationOfficerInbox: 0, newWorklist: 0);
           loadDashboardbyUser();
+          loadCountedIncomingCasesBySupervisor();
           if (preferences?.getBool('supervisor') == true) {
             loadCountedOverdueCasesBySupervisor();
           }
@@ -78,6 +81,23 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  loadCountedIncomingCasesBySupervisor() async {
+    final overlay = LoadingOverlay.of(context);
+    overlay.show();
+    apiResponse =
+        await _notificationServiceClient.getCountedIncomingCasesBySupervisor(
+            preferences!.getString('username')!);
+    if ((apiResponse.ApiError) == null) {
+      overlay.hide();
+      setState(() {
+        incomingCasesDto = (apiResponse.Data as IncomingCasesDto);
+      });
+    } else {
+      showDialogMessage((apiResponse.ApiError as ApiError));
+      overlay.hide();
+    }
+  }
+
   showDialogMessage(ApiError apiError) {
     final messageDialog = ScaffoldMessenger.of(context);
     messageDialog.showSnackBar(
@@ -109,9 +129,16 @@ class _HomePageState extends State<HomePage> {
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const <Widget>[
-                                Text('Inbox (notification cases)',
+                              children: <Widget>[
+                                const Text('Inbox (notification cases)',
                                     style: TextStyle(color: Colors.green)),
+                                Text(
+                                    incomingCasesDto.newIncomingCasesInbox
+                                        .toString(),
+                                    style: const TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 34.0))
                               ],
                             ),
                             Material(
