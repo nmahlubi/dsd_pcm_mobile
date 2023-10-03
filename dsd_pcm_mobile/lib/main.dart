@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dsd_pcm_mobile/connectivity_check/network_controller.dart';
 import 'package:dsd_pcm_mobile/connectivity_check/showmessage.dart';
+import 'package:dsd_pcm_mobile/domain/repository/assessment/order_repository.dart';
+import 'package:dsd_pcm_mobile/domain/repository/lookup/pcm_order_repository.dart';
 import 'package:dsd_pcm_mobile/sessions/session.dart';
 import 'package:dsd_pcm_mobile/sessions/session_manager.dart';
 import 'package:flutter/material.dart';
@@ -102,6 +104,8 @@ final _schoolRepository = SchoolRepository();
 final _personEducationRepository = PersonEducationRepository();
 final _formOfNotificationRepository = FormOfNotificationRepository();
 final _assesmentRegisterRepository = AssesmentRegisterRepository();
+final _pcmOrderDetailRepository = PcmOrderDetailRepository();
+final _orderDetailRepository = OrderDetailRepository();
 
 ///
 ///
@@ -171,6 +175,8 @@ Future<void> main() async {
   await _formOfNotificationRepository.initialize(); //43
   await _assesmentRegisterRepository.initialize(); //44
   await _personEducationRepository.initialize(); //45
+  await _orderDetailRepository.initialize(); //46
+  await _pcmOrderDetailRepository.initialize(); //45
 
 /*
   Workmanager().initialize(

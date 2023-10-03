@@ -14,6 +14,7 @@ import '../../domain/repository/lookup/identification_type_repository.dart';
 import '../../domain/repository/lookup/language_repository.dart';
 import '../../domain/repository/lookup/marital_status_repository.dart';
 import '../../domain/repository/lookup/nationality_repository.dart';
+import '../../domain/repository/lookup/pcm_order_repository.dart';
 import '../../domain/repository/lookup/placement_type_repository.dart';
 import '../../domain/repository/lookup/preferred_contact_type_repository.dart';
 import '../../domain/repository/lookup/recommendation_type_repository.dart';
@@ -57,7 +58,7 @@ class LookUpService {
   final placementTypeRepository = PlacementTypeRepository();
   final recommendationTypeRepository = RecommendationTypeRepository();
   final formOfNotificationRepository = FormOfNotificationRepository();
-  // final preliminaryStatusRepository = PreliminaryStatusRepository();
+  final pcmOrderDetailRepository = PcmOrderDetailRepository();
 
   Future<ApiResponse> getGendersOnline() async {
     ApiResponse apiResponse = ApiResponse();
@@ -428,7 +429,7 @@ class LookUpService {
             recommendationTypeRepository.getAllRecommendationTypes();
         return apiResponse;
       }
-      apiResponse = await getPreferredContactTypesOnline();
+      apiResponse = await getRecommendationTypesOnline();
       if (apiResponse.ApiError == null) {
         List<RecommendationTypeDto> recommendationTypeDtoResponse =
             apiResponse.Data as List<RecommendationTypeDto>;
@@ -631,7 +632,7 @@ class LookUpService {
     return apiResponse;
   }
 
-   Future<ApiResponse> getAdmissionTypes() async {
+  Future<ApiResponse> getAdmissionTypes() async {
     ApiResponse apiResponse = ApiResponse();
     try {
       final response = await client
@@ -653,7 +654,7 @@ class LookUpService {
     return apiResponse;
   }
 
-   Future<ApiResponse> getCycaFacility() async {
+  Future<ApiResponse> getCycaFacility() async {
     ApiResponse apiResponse = ApiResponse();
     try {
       final response = await client
@@ -675,11 +676,11 @@ class LookUpService {
     return apiResponse;
   }
 
-    Future<ApiResponse> getProvinces() async {
+  Future<ApiResponse> getProvinces() async {
     ApiResponse apiResponse = ApiResponse();
     try {
-      final response = await client
-          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/Provinces"));
+      final response =
+          await client.get(Uri.parse("${AppUrl.intakeURL}/LookUp/Provinces"));
 
       switch (response.statusCode) {
         case 200:
@@ -697,12 +698,11 @@ class LookUpService {
     return apiResponse;
   }
 
-  
   Future<ApiResponse> getCountries() async {
     ApiResponse apiResponse = ApiResponse();
     try {
-      final response = await client
-          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/Countries"));
+      final response =
+          await client.get(Uri.parse("${AppUrl.intakeURL}/LookUp/Countries"));
 
       switch (response.statusCode) {
         case 200:
@@ -720,11 +720,12 @@ class LookUpService {
     return apiResponse;
   }
 
-   Future<ApiResponse> getOrganizationsByLocalMunicipalityId(int? localMunicipalityId) async {
+  Future<ApiResponse> getOrganizationsByLocalMunicipalityId(
+      int? localMunicipalityId) async {
     ApiResponse apiResponse = ApiResponse();
     try {
-      final response = await client
-          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/Organization/Get/$localMunicipalityId"));
+      final response = await client.get(Uri.parse(
+          "${AppUrl.intakeURL}/LookUp/Organization/Get/$localMunicipalityId"));
 
       switch (response.statusCode) {
         case 200:
@@ -741,24 +742,42 @@ class LookUpService {
     }
     return apiResponse;
   }
+
+  Future<ApiResponse> getPcmOrdersOnline() async {
+    ApiResponse apiResponse = ApiResponse();
+
+    final response =
+        await client.get(Uri.parse("${AppUrl.intakeURL}/LookUp/Orders"));
+
+    switch (response.statusCode) {
+      case 200:
+        apiResponse.Data = (json.decode(response.body) as List)
+            .map((data) => PcmOrderDto.fromJson(data))
+            .toList();
+        break;
+      default:
+        apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+        break;
+    }
+    return apiResponse;
+  }
+
   Future<ApiResponse> getPcmOrders() async {
     ApiResponse apiResponse = ApiResponse();
     try {
-      final response =
-          await client.get(Uri.parse("${AppUrl.intakeURL}/LookUp/Orders"));
-
-      switch (response.statusCode) {
-        case 200:
-          apiResponse.Data = (json.decode(response.body) as List)
-              .map((data) => PcmOrderDto.fromJson(data))
-              .toList();
-          break;
-        default:
-          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
-          break;
+      if (pcmOrderDetailRepository.getAllPcmOrderlDetails().isNotEmpty) {
+        apiResponse.Data = pcmOrderDetailRepository.getAllPcmOrderlDetails();
+        return apiResponse;
+      }
+      apiResponse = await getPcmOrdersOnline();
+      if (apiResponse.ApiError == null) {
+        List<PcmOrderDto> pcmOrderDtooResponse =
+            apiResponse.Data as List<PcmOrderDto>;
+        apiResponse.Data = pcmOrderDtooResponse;
+        pcmOrderDetailRepository.savePcmOrderDetailItems(pcmOrderDtooResponse);
       }
     } on SocketException {
-      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+      apiResponse.Data = pcmOrderDetailRepository.getAllPcmOrderlDetails();
     }
     return apiResponse;
   }

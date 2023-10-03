@@ -160,6 +160,8 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {
+        organizationDto = [];
+        programmesDto = [];
         organizationTypeDto = (apiResponse.Data as List<OrganizationTypeDto>);
       });
     } else {
@@ -168,12 +170,12 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
     }
   }
 
-  loadOrganizationByOrganizationTypeId(
+  loadOrganizationByOrganizationTypeAndLocalMunicipality(
       int? localMunicipalityId, int? organizationTypeId) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse =
-        await _organizationServiceClient.getOrganizationByLocalMunicipalityId(
+    apiResponse = await _organizationServiceClient
+        .getOrganizationByOrganizationTypeAndLocalMunicipality(
             localMunicipalityId!, organizationTypeId!);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
@@ -288,14 +290,13 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
       provinceDropdownButtonFormField = null;
       localMunicipalityDropdownButtonFormField = null;
       organizationTypeDropdownButtonFormField = null;
-      organizationTypeDropdownButtonFormField = null;
+      organizationDropdownButtonFormField = null;
       pcmDiversionRecommId = null;
     });
   }
 
   @override
   void dispose() {
- 
     super.dispose();
   }
 
@@ -530,8 +531,11 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
                                                     }).toList(),
                                                     onChanged:
                                                         (selectedValue) async {
-                                                      localMunicipalityDropdownButtonFormField =
-                                                          null;
+                                                      setState(() {
+                                                        localMunicipalityDropdownButtonFormField =
+                                                            null;
+                                                      });
+
                                                       districtDropdownButtonForm =
                                                           selectedValue;
                                                       if (selectedValue !=
@@ -583,8 +587,6 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
                                                                   .toString()));
                                                     }).toList(),
                                                     onChanged: (selectedValue) {
-                                                      organizationDropdownButtonFormField =
-                                                          null;
                                                       localMunicipalityDropdownButtonFormField =
                                                           selectedValue;
                                                       if (selectedValue !=
@@ -634,17 +636,17 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
                                                                   .toString()));
                                                     }).toList(),
                                                     onChanged: (selectedValue) {
-                                                      organizationDropdownButtonFormField =
-                                                          null;
+                                                      setState(() {
+                                                        organizationDropdownButtonFormField =
+                                                            null;
+                                                      });
                                                       organizationTypeDropdownButtonFormField =
                                                           selectedValue;
                                                       if (selectedValue !=
                                                           null) {
-                                                        loadOrganizationByOrganizationTypeId(
+                                                        loadOrganizationByOrganizationTypeAndLocalMunicipality(
                                                             localMunicipalityDropdownButtonFormField,
                                                             selectedValue);
-                                                        print(
-                                                            localMunicipalityDropdownButtonFormField);
                                                       }
                                                     },
                                                     validator: (value) {
@@ -657,6 +659,7 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
                                             )
                                           ],
                                         ),
+
                                         Row(
                                           children: [
                                             Expanded(
@@ -690,15 +693,16 @@ class _ServiceProviderPageState extends State<ServiceProviderPage> {
                                                                   .toString()));
                                                     }).toList(),
                                                     onChanged: (selectedValue) {
-                                                      programmesDropdownButtonFormField =
-                                                          null;
+                                                      setState(() {
+                                                        programmesDropdownButtonFormField =
+                                                            null;
+                                                      });
                                                       organizationDropdownButtonFormField =
                                                           selectedValue;
                                                       if (selectedValue !=
                                                           null) {
                                                         loadProgrammesByOrganizationId(
                                                             selectedValue);
-                                                        print(selectedValue);
                                                       }
                                                     },
                                                     validator: (value) {

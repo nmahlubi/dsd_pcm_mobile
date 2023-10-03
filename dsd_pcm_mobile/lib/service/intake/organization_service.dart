@@ -11,11 +11,12 @@ class OrganizationService {
   final client =
       InterceptedClient.build(interceptors: [AuthorizationInterceptor()]);
 
-  Future<ApiResponse> getOrganizationByLocalMunicipalityId(int? localMunicipalityId, int? organizationTypeId) async {
+  Future<ApiResponse> getOrganizationByOrganizationTypeAndLocalMunicipality(
+      int? localMunicipalityId, int? organizationTypeId) async {
     ApiResponse apiResponse = ApiResponse();
     try {
-      final response = await client
-          .get(Uri.parse("${AppUrl.intakeURL}/LookUp/Organization/GetAll/$localMunicipalityId/$organizationTypeId"));
+      final response = await client.get(Uri.parse(
+          "${AppUrl.intakeURL}/LookUp/Organization/GetAll/$localMunicipalityId/$organizationTypeId"));
 
       switch (response.statusCode) {
         case 200:
@@ -30,9 +31,8 @@ class OrganizationService {
           break;
       }
     } on SocketException {
-     apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
     }
     return apiResponse;
   }
-
 }
