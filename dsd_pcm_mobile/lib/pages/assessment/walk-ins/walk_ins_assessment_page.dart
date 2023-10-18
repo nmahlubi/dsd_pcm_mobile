@@ -328,14 +328,11 @@ class _WorkInsAssessmentPageState extends State<WorkInsAssessmentPage> {
                                     loadSearchedPersonByIdentificationNumber(
                                         identificationController.text
                                             .toString());
+                                  } else {
+                                    loadSearchedPersonByClientReferenceNumber(
+                                        clientsReferenceNumberController.text
+                                            .toString());
                                   }
-                                  // } else if (isNamesFieldValid &&
-                                  //     isSurnameFieldValid &&
-                                  //     isDateOfBirthFieldValid) {
-                                  //   loadSearchedPersonByIdentificationNumber(
-                                  //       identificationController.text
-                                  //           .toString());
-                                  // }
                                 },
                                 child: const Text('Search'),
                               )),
