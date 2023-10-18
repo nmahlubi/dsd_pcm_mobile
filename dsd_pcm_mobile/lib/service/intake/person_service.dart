@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dsd_pcm_mobile/model/intake/client_dto.dart';
 import 'package:dsd_pcm_mobile/model/intake/person_dto.dart';
 import 'package:http_interceptor/http/intercepted_client.dart';
 
@@ -112,5 +113,97 @@ class PersonService {
   Future<ApiResponse> searchAddUdatePersonOnline(PersonDto personDto) async {
     return await _httpClientService.httpClientPost(
         "${AppUrl.intakeURL}/Person/AddPersonNotExist", personDto);
+  }
+
+  Future<ApiResponse> getSearchedWalkedInChild(
+      String? firstName, String? lastName, String? dateOfBirth) async {
+    ApiResponse apiResponse = ApiResponse();
+    final response = await client.get(Uri.parse(
+        "${AppUrl.intakeURL}/Person/$firstName/$lastName/$dateOfBirth"));
+    switch (response.statusCode) {
+      case 200:
+        apiResponse.Data = (json.decode(response.body) as List)
+            .map((data) => PersonDto.fromJson(data))
+            .toList();
+        break;
+      default:
+        apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+        break;
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> getSearchedWalkedInChildByIdentitficationNumberOnline(
+      String? identificationNumber) async {
+    ApiResponse apiResponse = ApiResponse();
+    final response = await client
+        .get(Uri.parse("${AppUrl.intakeURL}/Person/$identificationNumber"));
+    switch (response.statusCode) {
+      case 200:
+        apiResponse.Data = (json.decode(response.body) as List)
+            .map((data) => PersonDto.fromJson(data))
+            .toList();
+        break;
+      default:
+        apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+        break;
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> getSearchedWalkedInChildByIdentitficationNumber(
+      String? identificationNumber) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse = await getSearchedWalkedInChildByIdentitficationNumberOnline(
+          identificationNumber);
+      if (apiResponse.ApiError == null) {
+        List<PersonDto> personDtoResponse = apiResponse.Data as List<PersonDto>;
+
+        apiResponse.Data = personDtoResponse;
+        //_recommendationRepository.saveRecommendation(recommendationDtoResponse);
+      }
+    } on SocketException {
+      //apiResponse.Data =_recommendationRepository.getRecommendationById(intakeAssessmentId!);
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> getSearchedWalkedInChildByClientReferenceNumberOnline(
+      String? clientReferenceNumber) async {
+    ApiResponse apiResponse = ApiResponse();
+    final response = await client
+        .get(Uri.parse("${AppUrl.intakeURL}/Client/$clientReferenceNumber"));
+    switch (response.statusCode) {
+      case 200:
+        apiResponse.Data = (json.decode(response.body) as List)
+            .map((data) => ClientDto.fromJson(data))
+            .toList();
+        break;
+      default:
+        apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+        break;
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> getSearchedWalkedInChildByClientReferenceNumber(
+      String? clientReferenceNumber) async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      apiResponse = await getSearchedWalkedInChildByClientReferenceNumberOnline(
+          clientReferenceNumber);
+      if (apiResponse.ApiError == null) {
+        List<ClientDto> clientDtoResponse = apiResponse.Data as List<ClientDto>;
+
+        apiResponse.Data = clientDtoResponse;
+        //_recommendationRepository.saveRecommendation(recommendationDtoResponse);
+      }
+    } on SocketException {
+      //apiResponse.Data =_recommendationRepository.getRecommendationById(intakeAssessmentId!);
+      apiResponse.ApiError = ApiError(error: "Connection Error. Please retry");
+    }
+    return apiResponse;
   }
 }
