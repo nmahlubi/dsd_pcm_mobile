@@ -79,6 +79,13 @@ class _NavigationDrawerMenuWidgetState extends State<NavigationDrawerMenu> {
           if (preferences?.getBool('supervisor') == false)
             createDrawerBodyItem(
               icon: Icons.inbox,
+              text: 'Assessment',
+              onTap: () =>
+                  Navigator.pushReplacementNamed(context, '/Assessment'),
+            ),
+          if (preferences?.getBool('supervisor') == false)
+            createDrawerBodyItem(
+              icon: Icons.inbox,
               text: 'My Worklist',
               onTap: () =>
                   Navigator.pushReplacementNamed(context, '/accepted-worklist'),
