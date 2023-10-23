@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dsd_pcm_mobile/domain/repository/lookup/disability_repository.dart';
 import 'package:dsd_pcm_mobile/model/intake/country_dto.dart';
+import 'package:dsd_pcm_mobile/model/intake/disability_dto.dart';
 import 'package:dsd_pcm_mobile/model/intake/pcm_order_dto.dart';
 import 'package:dsd_pcm_mobile/model/intake/program_module_sessions_dto.dart';
 import 'package:dsd_pcm_mobile/model/intake/program_module_dto.dart';
@@ -49,6 +51,7 @@ class LookUpService {
   final genderRepository = GenderRepository();
   final relationshipTypeRepository = RelationshipTypeRepository();
   final healthStatusRepository = HealthStatusRepository();
+  final disabilityRepository = DisabilityRepository();
   final disabilityTypeRepository = DisabilityTypeRepository();
   final languageRepository = LanguageRepository();
   final nationalityRepository = NationalityRepository();
@@ -206,6 +209,43 @@ class LookUpService {
       }
     } on SocketException {
       apiResponse.Data = disabilityTypeRepository.getAllDisabilityTypes();
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> getDisabilitiesOnline() async {
+    ApiResponse apiResponse = ApiResponse();
+    final response =
+        await client.get(Uri.parse("${AppUrl.intakeURL}/LookUp/Disability"));
+    switch (response.statusCode) {
+      case 200:
+        apiResponse.Data = (json.decode(response.body) as List)
+            .map((data) => DisabilityDto.fromJson(data))
+            .toList();
+        break;
+      default:
+        apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
+        break;
+    }
+    return apiResponse;
+  }
+
+  Future<ApiResponse> getDisabilities() async {
+    ApiResponse apiResponse = ApiResponse();
+    try {
+      if (disabilityRepository.getAllDisabilities().isNotEmpty) {
+        apiResponse.Data = disabilityRepository.getAllDisabilities();
+        return apiResponse;
+      }
+      apiResponse = await getDisabilitiesOnline();
+      if (apiResponse.ApiError == null) {
+        List<DisabilityDto> disabilityDtoResponse =
+            apiResponse.Data as List<DisabilityDto>;
+        apiResponse.Data = disabilityDtoResponse;
+        disabilityRepository.saveDisabilityItems(disabilityDtoResponse);
+      }
+    } on SocketException {
+      apiResponse.Data = disabilityRepository.getAllDisabilities();
     }
     return apiResponse;
   }

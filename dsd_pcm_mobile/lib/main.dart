@@ -4,6 +4,7 @@ import 'package:dsd_pcm_mobile/connectivity_check/network_controller.dart';
 import 'package:dsd_pcm_mobile/connectivity_check/showmessage.dart';
 import 'package:dsd_pcm_mobile/domain/repository/assessment/order_repository.dart';
 import 'package:dsd_pcm_mobile/domain/repository/lookup/pcm_order_repository.dart';
+import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/create_child_details.dart';
 import 'package:dsd_pcm_mobile/sessions/session.dart';
 import 'package:dsd_pcm_mobile/sessions/session_manager.dart';
 import 'package:flutter/material.dart';
@@ -280,6 +281,7 @@ class MyApp extends StatelessWidget {
               const LoginAuthenticatePage(title: 'Authentification'),
           '/dashboard': (context) =>
               DashboardPage(session: session, title: 'Dashboard'),
+          '/create-child-details': (context) => const CreateChildDetailPage(),
           '/notification-cases': (context) => const NotificationCasesPage(),
           '/allocated-cases': (context) => const AllocatedCasesPage(),
           '/accepted-worklist': (context) => const AcceptedWorklistPage(),

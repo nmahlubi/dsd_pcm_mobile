@@ -8,6 +8,7 @@ class BackgroundJobOfflineLookUp {
   Future<void> startRunningBackgroundSyncLookUpJob() async {
     await _lookupSync.syncGender();
     await _lookupSync.syncDisabilityType();
+    await _lookupSync.syncDisability();
     await _lookupSync.syncHealthStatuses();
     await _lookupSync.syncIdentificationTypes();
     await _lookupSync.syncLanguages();

@@ -1,4 +1,5 @@
 import 'package:dsd_pcm_mobile/model/intake/cyca_facility_dto.dart';
+import 'package:dsd_pcm_mobile/model/intake/disability_dto.dart';
 import 'package:dsd_pcm_mobile/model/intake/pcm_order_dto.dart';
 import 'package:dsd_pcm_mobile/model/intake/program_module_sessions_dto.dart';
 import 'package:dsd_pcm_mobile/model/pcm/preliminaryStatus_dto.dart';
@@ -35,6 +36,7 @@ class LookupTransform {
   late ApiResponse apiResponse = ApiResponse();
   late List<IdentificationTypeDto> identificationTypesDto = [];
   late List<DisabilityTypeDto> disabilityTypesDto = [];
+  late List<DisabilityDto> disabilitiesDto = [];
   late List<GenderDto> gendersDto = [];
   late List<PreferredContactTypeDto> preferredContactTypesDto = [];
   late List<LanguageDto> languagesDto = [];
@@ -58,9 +60,9 @@ class LookupTransform {
   late List<ProvinceDto> provinceDto = [];
   late List<PcmCountryDto> pcmCountryDto = [];
   late List<DistrictDto> districtDto = [];
-  late List<LocalMunicipalityDto> localMunicipalityDto=[];
-  late List<OrganizationTypeDto> organizationTypeDto=[];
-  late List<OrganizationDto> organizationDto=[];
+  late List<LocalMunicipalityDto> localMunicipalityDto = [];
+  late List<OrganizationTypeDto> organizationTypeDto = [];
+  late List<OrganizationDto> organizationDto = [];
   late List<PcmOrderDto> pcmOrderDto = [];
 
   Future<List<IdentificationTypeDto>> transformIdentificationTypeDto() async {
@@ -78,6 +80,14 @@ class LookupTransform {
       disabilityTypesDto = (apiResponse.Data as List<DisabilityTypeDto>);
     }
     return disabilityTypesDto;
+  }
+
+  Future<List<DisabilityDto>> transformDisabilitiesDto() async {
+    apiResponse = await _lookUpServiceClient.getDisabilities();
+    if ((apiResponse.ApiError) == null) {
+      disabilitiesDto = (apiResponse.Data as List<DisabilityDto>);
+    }
+    return disabilitiesDto;
   }
 
   Future<List<GenderDto>> transformGendersDto() async {
@@ -237,15 +247,18 @@ class LookupTransform {
     }
     return pcmCountryDto;
   }
-  
-   Future<List<OrganizationDto>> transformOrganizationDto(int? localMunicipalityId) async {
-    apiResponse = await _lookUpServiceClient.getOrganizationsByLocalMunicipalityId(localMunicipalityId);
+
+  Future<List<OrganizationDto>> transformOrganizationDto(
+      int? localMunicipalityId) async {
+    apiResponse = await _lookUpServiceClient
+        .getOrganizationsByLocalMunicipalityId(localMunicipalityId);
     if ((apiResponse.ApiError) == null) {
       organizationDto = (apiResponse.Data as List<OrganizationDto>);
     }
     return organizationDto;
   }
-   Future<List<PcmOrderDto>> transformOrderDto() async {
+
+  Future<List<PcmOrderDto>> transformOrderDto() async {
     apiResponse = await _lookUpServiceClient.getPcmOrders();
     if ((apiResponse.ApiError) == null) {
       pcmOrderDto = (apiResponse.Data as List<PcmOrderDto>);
