@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:dsd_pcm_mobile/domain/repository/lookup/disability_repository.dart';
+import 'package:dsd_pcm_mobile/model/intake/disability_dto.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../domain/repository/lookup/disability_type_repository.dart';
@@ -37,6 +39,7 @@ class LookupSync {
   final _relationshipTypeRepository = RelationshipTypeRepository();
   final _healthStatusRepository = HealthStatusRepository();
   final _disabilityTypeRepository = DisabilityTypeRepository();
+  final _disabilityRepository = DisabilityRepository();
   final _languageRepository = LanguageRepository();
   final _nationalityRepository = NationalityRepository();
   final _maritalStatusRepository = MaritalStatusRepository();
@@ -48,6 +51,7 @@ class LookupSync {
   late ApiResponse apiResponse = ApiResponse();
   late List<IdentificationTypeDto> identificationTypesDto = [];
   late List<DisabilityTypeDto> disabilityTypesDto = [];
+  late List<DisabilityDto> disabilitiesDto = [];
   late List<GenderDto> gendersDto = [];
   late List<PreferredContactTypeDto> preferredContactTypesDto = [];
   late List<LanguageDto> languagesDto = [];
@@ -119,6 +123,21 @@ class LookupSync {
     } on SocketException catch (_) {
       if (kDebugMode) {
         print('Unable to access _lookUpService.syncDisabilityType endpoint');
+      }
+    }
+  }
+
+  Future<void> syncDisability() async {
+    try {
+      apiResponse = await _lookUpService.getDisabilitiesOnline();
+      if ((apiResponse.ApiError) == null) {
+        disabilitiesDto = (apiResponse.Data as List<DisabilityDto>);
+        await _disabilityRepository.deleteAllDisabilities();
+        await _disabilityRepository.saveDisabilityItems(disabilitiesDto);
+      }
+    } on SocketException catch (_) {
+      if (kDebugMode) {
+        print('Unable to access _lookUpService.syncDisability endpoint');
       }
     }
   }

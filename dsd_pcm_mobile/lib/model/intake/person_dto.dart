@@ -1,3 +1,5 @@
+import 'package:dsd_pcm_mobile/model/intake/disability_dto.dart';
+
 import 'disability_type_dto.dart';
 import 'gender_dto.dart';
 import 'identification_type_dto.dart';
@@ -32,12 +34,14 @@ class PersonDto {
     int? populationGroupId,
     int? nationalityId,
     int? disabilityTypeId,
+    int? disabilityId,
     int? citizenshipId,
     String? dateLastModified,
     String? modifiedBy,
     String? createdBy,
     String? dateCreated,
     DisabilityTypeDto? disabilityTypeDto,
+    DisabilityDto? disabilityDto,
     GenderDto? genderDto,
     LanguageDto? languageDto,
     MaritalStatusDto? maritalStatusDto,
@@ -71,12 +75,14 @@ class PersonDto {
     _populationGroupId = populationGroupId;
     _nationalityId = nationalityId;
     _disabilityTypeId = disabilityTypeId;
+    _disabilityId = disabilityId;
     _citizenshipId = citizenshipId;
     _dateLastModified = dateLastModified;
     _modifiedBy = modifiedBy;
     _createdBy = createdBy;
     _dateCreated = dateCreated;
     _disabilityTypeDto = disabilityTypeDto;
+    _disabilityDto = disabilityDto;
     _genderDto = genderDto;
     _languageDto = languageDto;
     _maritalStatusDto = maritalStatusDto;
@@ -112,6 +118,7 @@ class PersonDto {
     _populationGroupId = json['populationGroupId'];
     _nationalityId = json['nationalityId'];
     _disabilityTypeId = json['disabilityTypeId'];
+    _disabilityId = json['disabilityId'];
     _citizenshipId = json['citizenshipId'];
     _dateLastModified = json['dateLastModified'];
     _modifiedBy = json['modifiedBy'];
@@ -119,6 +126,9 @@ class PersonDto {
     _dateCreated = json['dateCreated'];
     _disabilityTypeDto = json['disabilityTypeDto'] != null
         ? DisabilityTypeDto.fromJson(json['disabilityTypeDto'])
+        : null;
+    _disabilityDto = json['disabilityDto'] != null
+        ? DisabilityDto.fromJson(json['disabilityDto'])
         : null;
     _genderDto = json['genderDto'] != null
         ? GenderDto.fromJson(json['genderDto'])
@@ -180,12 +190,14 @@ class PersonDto {
   int? _populationGroupId;
   int? _nationalityId;
   int? _disabilityTypeId;
+  int? _disabilityId;
   int? _citizenshipId;
   String? _dateLastModified;
   String? _modifiedBy;
   String? _createdBy;
   String? _dateCreated;
   DisabilityTypeDto? _disabilityTypeDto;
+  DisabilityDto? _disabilityDto;
   GenderDto? _genderDto;
   LanguageDto? _languageDto;
   NationalityDto? _nationalityDto;
@@ -220,12 +232,14 @@ class PersonDto {
   int? get populationGroupId => _populationGroupId;
   int? get nationalityId => _nationalityId;
   int? get disabilityTypeId => _disabilityTypeId;
+  int? get disabilityId => _disabilityTypeId;
   int? get citizenshipId => _citizenshipId;
   String? get dateLastModified => _dateLastModified;
   String? get modifiedBy => _modifiedBy;
   String? get createdBy => _createdBy;
   String? get dateCreated => _dateCreated;
   DisabilityTypeDto? get disabilityTypeDto => _disabilityTypeDto;
+  DisabilityDto? get disabilityDto => _disabilityDto;
   GenderDto? get genderDto => _genderDto;
   LanguageDto? get languageDto => _languageDto;
   NationalityDto? get nationalityDto => _nationalityDto;
@@ -262,6 +276,7 @@ class PersonDto {
     map['populationGroupId'] = _populationGroupId;
     map['nationalityId'] = _nationalityId;
     map['disabilityTypeId'] = _disabilityTypeId;
+    map['disabilityId'] = _disabilityId;
     map['citizenshipId'] = _citizenshipId;
     map['dateLastModified'] = _dateLastModified;
     map['modifiedBy'] = _modifiedBy;
@@ -269,6 +284,9 @@ class PersonDto {
     map['dateCreated'] = _dateCreated;
     if (_disabilityTypeDto != null) {
       map['disabilityTypeDto'] = _disabilityTypeDto?.toJson();
+    }
+    if (_disabilityDto != null) {
+      map['disabilityDto'] = _disabilityDto?.toJson();
     }
     if (_genderDto != null) {
       map['genderDto'] = _genderDto?.toJson();

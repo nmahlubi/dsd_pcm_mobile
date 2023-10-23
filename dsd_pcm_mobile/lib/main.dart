@@ -281,6 +281,7 @@ class MyApp extends StatelessWidget {
               const LoginAuthenticatePage(title: 'Authentification'),
           '/dashboard': (context) =>
               DashboardPage(session: session, title: 'Dashboard'),
+          '/create-child-details': (context) => const CreateChildDetailPage(),
           '/notification-cases': (context) => const NotificationCasesPage(),
           '/allocated-cases': (context) => const AllocatedCasesPage(),
           '/accepted-worklist': (context) => const AcceptedWorklistPage(),

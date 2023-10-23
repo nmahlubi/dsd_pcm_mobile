@@ -1,9 +1,9 @@
 import 'package:dsd_pcm_mobile/model/pcm/programme_module_dto.dart';
+import 'package:dsd_pcm_mobile/service/pcm/programme_module_service.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../model/pcm/accepted_worklist_dto.dart';
-import '../../../../service/programme_module_service.dart';
 import '../../../../util/shared/apierror.dart';
 import '../../../../util/shared/apiresponse.dart';
 import '../../../../util/shared/apiresults.dart';
@@ -25,8 +25,8 @@ class _DiversionModulePageState extends State<DiversionModulePage> {
   }
 
   late AcceptedWorklistDto acceptedWorklistDto = AcceptedWorklistDto();
-  final ProgrammeModuleService programmeModuleServiceClient =
-      ProgrammeModuleService();
+  final ProgramModuleService programmeModuleServiceClient =
+      ProgramModuleService();
   late List<ProgrammeModuleDto> programmeModulesDto = [];
   late ApiResponse apiResponse = ApiResponse();
   late ApiResults apiResults = ApiResults();
@@ -48,8 +48,8 @@ class _DiversionModulePageState extends State<DiversionModulePage> {
   loadProgrammeModuleByModuleId(int? moduleId) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
-    apiResponse = await programmeModuleServiceClient
-        .getProgrammeModuleByModuleId(moduleId);
+    apiResponse =
+        await programmeModuleServiceClient.getProgrammeModuleById(moduleId);
     if ((apiResponse.ApiError) == null) {
       overlay.hide();
       setState(() {

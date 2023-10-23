@@ -1,3 +1,5 @@
+import 'package:dsd_pcm_mobile/model/intake/disability_dto.dart';
+
 import '../model/intake/address_type_dto.dart';
 import '../model/intake/disability_type_dto.dart';
 import '../model/intake/gender_dto.dart';
@@ -15,6 +17,7 @@ class PersonTransform {
   late ApiResponse apiResponse = ApiResponse();
   late List<IdentificationTypeDto> identificationTypesDto = [];
   late List<DisabilityTypeDto> disabilityTypesDto = [];
+  late List<DisabilityDto> disabilitiesDto = [];
   late List<GenderDto> gendersDto = [];
   late List<PreferredContactTypeDto> preferredContactTypesDto = [];
   late List<LanguageDto> languagesDto = [];
