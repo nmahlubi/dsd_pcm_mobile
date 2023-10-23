@@ -4,7 +4,7 @@ import 'package:dsd_pcm_mobile/connectivity_check/network_controller.dart';
 import 'package:dsd_pcm_mobile/connectivity_check/showmessage.dart';
 import 'package:dsd_pcm_mobile/domain/repository/assessment/order_repository.dart';
 import 'package:dsd_pcm_mobile/domain/repository/lookup/pcm_order_repository.dart';
-import 'package:dsd_pcm_mobile/pages/assessment/capture_assessment/create_child_details.dart';
+import 'package:dsd_pcm_mobile/pages/assessment/walk-ins/walk_ins_assessment_page.dart';
 import 'package:dsd_pcm_mobile/sessions/session.dart';
 import 'package:dsd_pcm_mobile/sessions/session_manager.dart';
 import 'package:flutter/material.dart';
@@ -289,7 +289,8 @@ class MyApp extends StatelessWidget {
           '/overdue-cases': (context) => const OverdueCasesPage(),
           '/sync-manual-offline': (context) => const SyncingOfflineManualPage(),
           '/preliminary': (context) => const PreliminaryPage(),
-          '/home-based': (context) => const HomeBasedDiversionPage()
+          '/home-based': (context) => const HomeBasedDiversionPage(),
+          '/Assessment': (context) => const WorkInsAssessmentPage()
         },
       ),
     );

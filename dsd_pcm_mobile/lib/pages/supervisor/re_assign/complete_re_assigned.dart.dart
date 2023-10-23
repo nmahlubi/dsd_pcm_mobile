@@ -157,8 +157,8 @@ class _CompleteReAssignedCasesPageState
     ReAllocateCase reAllocateCase = ReAllocateCase(
         endPointPOId: allocatedCaseSupervisorDto.endpointPoId,
         probationOfficerId: probationOfficeDropdownButtonFormField,
-        modifiedBy: preferences!.getInt('userId')!);
-
+        modifiedBy: preferences!.getInt('userId')!,
+        dateReAllocated: allocatedCaseSupervisorDto.dateAllocated);
     apiResponse =
         await endPointInboxServiceClient.reAllocateCase(reAllocateCase);
 
