@@ -281,7 +281,6 @@ class MyApp extends StatelessWidget {
               const LoginAuthenticatePage(title: 'Authentification'),
           '/dashboard': (context) =>
               DashboardPage(session: session, title: 'Dashboard'),
-          '/create-child-details': (context) => const CreateChildDetailPage(),
           '/notification-cases': (context) => const NotificationCasesPage(),
           '/allocated-cases': (context) => const AllocatedCasesPage(),
           '/accepted-worklist': (context) => const AcceptedWorklistPage(),
@@ -290,7 +289,7 @@ class MyApp extends StatelessWidget {
           '/sync-manual-offline': (context) => const SyncingOfflineManualPage(),
           '/preliminary': (context) => const PreliminaryPage(),
           '/home-based': (context) => const HomeBasedDiversionPage(),
-          '/Assessment': (context) => const WorkInsAssessmentPage()
+          '/Assessment': (context) => const WalkInsAssessmentPage()
         },
       ),
     );
