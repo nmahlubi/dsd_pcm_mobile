@@ -59,24 +59,16 @@ class PersonService {
   Future<ApiResponse> addPerson(PersonDto personDto) async {
     ApiResponse apiResponse = ApiResponse();
     try {
-      final response = await client.post(
-          Uri.parse("${AppUrl.intakeURL}/Person/Add"),
-          body: json.encode(personDto),
-          headers: {'Content-Type': 'application/json'});
-      switch (response.statusCode) {
-        case 200:
-          ApiResults apiResults =
-              ApiResults.fromJson(json.decode(response.body));
-          apiResponse.Data = apiResults;
-          PersonDto personDto = PersonDto.fromJson(json.decode(response.body));
-          apiResponse.Data = personDto;
-          _personRepository.savePerson(personDto, 8);
-          break;
-        default:
-          apiResponse.ApiError = ApiError.fromJson(json.decode(response.body));
-          break;
+      apiResponse = await addPersonOnline(personDto);
+
+      if (apiResponse.ApiError == null) {
+        ApiResults apiResults = (apiResponse.Data as ApiResults);
+        PersonDto prsonDetailDtoResponse = PersonDto.fromJson(apiResults.data);
+        apiResponse.Data = prsonDetailDtoResponse;
+        _personRepository.savePerson(personDto, 8);
       }
     } on SocketException {
+      _personRepository.savePerson(personDto, 8);
       apiResponse.Data = _personRepository.getPersonById(personDto.personId!);
     }
     return apiResponse;

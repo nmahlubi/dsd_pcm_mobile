@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dsd_pcm_mobile/main.dart';
+import 'package:dsd_pcm_mobile/pages/assessment/walk-ins/walk_ins_assessment_page.dart';
 import 'package:dsd_pcm_mobile/pages/authenticate/login_authenticate.dart';
 import 'package:dsd_pcm_mobile/pages/welcome/dashboard.dart';
 import 'package:dsd_pcm_mobile/sessions/session.dart';
@@ -87,17 +88,6 @@ class _CreateChildDetailPageState extends State<CreateChildDetailPage> {
         });
       });
     });
-  }
-
-  redirectToLoginPage() {
-    if (globalNavigatorKey.currentContext != null) {
-      Navigator.pop(globalNavigatorKey.currentContext!);
-      Navigator.push(
-          globalNavigatorKey.currentContext!,
-          MaterialPageRoute(
-              builder: (context) =>
-                  const LoginAuthenticatePage(title: "Login Page")));
-    }
   }
 
   loadLookUpTransformer() async {
@@ -226,6 +216,17 @@ class _CreateChildDetailPageState extends State<CreateChildDetailPage> {
     }
   }
 
+  redirectToLoginPage() {
+    if (globalNavigatorKey.currentContext != null) {
+      Navigator.pop(globalNavigatorKey.currentContext!);
+      Navigator.push(
+          globalNavigatorKey.currentContext!,
+          MaterialPageRoute(
+              builder: (context) =>
+                  const LoginAuthenticatePage(title: "Login Page")));
+    }
+  }
+
   showDialogMessage(ApiError apiError) {
     final messageDialog = ScaffoldMessenger.of(context);
     messageDialog.showSnackBar(
@@ -289,8 +290,7 @@ class _CreateChildDetailPageState extends State<CreateChildDetailPage> {
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          DashboardPage(session: session, title: 'Dashboard')),
+                      builder: (context) => WalkInsAssessmentPage()),
                 ),
               ),
               actions: [

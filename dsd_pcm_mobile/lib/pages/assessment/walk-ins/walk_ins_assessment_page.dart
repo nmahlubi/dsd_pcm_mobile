@@ -1,5 +1,6 @@
 import 'package:dsd_pcm_mobile/model/intake/client_dto.dart';
 import 'package:dsd_pcm_mobile/model/intake/person_dto.dart';
+import 'package:dsd_pcm_mobile/pages/assessment/walk-ins/create_child_details.dart';
 import 'package:dsd_pcm_mobile/service/intake/person_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -10,14 +11,14 @@ import '../../../util/shared/apiresponse.dart';
 import '../../../util/shared/loading_overlay.dart';
 import '../capture_assessment/child_detail/update_child_detail.dart';
 
-class WorkInsAssessmentPage extends StatefulWidget {
-  const WorkInsAssessmentPage({Key? key}) : super(key: key);
+class WalkInsAssessmentPage extends StatefulWidget {
+  const WalkInsAssessmentPage({Key? key}) : super(key: key);
 
   @override
-  State<WorkInsAssessmentPage> createState() => _WorkInsAssessmentPageState();
+  State<WalkInsAssessmentPage> createState() => _WalkInsAssessmentPageState();
 }
 
-class _WorkInsAssessmentPageState extends State<WorkInsAssessmentPage> {
+class _WalkInsAssessmentPageState extends State<WalkInsAssessmentPage> {
   SharedPreferences? preferences;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final _walkInFormKey = GlobalKey<FormState>();
@@ -126,7 +127,7 @@ class _WorkInsAssessmentPageState extends State<WorkInsAssessmentPage> {
         child: Scaffold(
             key: scaffoldKey,
             appBar: AppBar(
-              title: const Text('Assessment'),
+              title: const Text('Child Details Assessment'),
             ),
             drawer: const NavigationDrawerMenu(),
             body: Padding(
@@ -156,7 +157,13 @@ class _WorkInsAssessmentPageState extends State<WorkInsAssessmentPage> {
                                       width: 2, color: Colors.blue),
                                 ),
                                 onPressed: () {
-                                  // generateDateOfBirth();
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const CreateChildDetailPage(),
+                                    ),
+                                  );
                                 },
                                 child: const Text('Create'),
                               )),
