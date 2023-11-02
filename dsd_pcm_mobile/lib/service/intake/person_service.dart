@@ -173,8 +173,8 @@ class PersonService {
   Future<ApiResponse> getSearchedWalkedInChildByClientReferenceNumberOnline(
       String? clientReferenceNumber) async {
     ApiResponse apiResponse = ApiResponse();
-    final response = await client
-        .get(Uri.parse("${AppUrl.intakeURL}/Client/$clientReferenceNumber"));
+    final response = await client.get(
+        Uri.parse("${AppUrl.intakeURL}/Client/get/$clientReferenceNumber"));
     switch (response.statusCode) {
       case 200:
         apiResponse.Data = (json.decode(response.body) as List)
