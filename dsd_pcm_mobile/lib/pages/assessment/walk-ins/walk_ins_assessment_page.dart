@@ -32,6 +32,8 @@ class _WalkInsAssessmentPageState extends State<WalkInsAssessmentPage> {
   late List<PersonDto> personDto = [];
   late List<ClientDto> clientDto = [];
   late PersonDto singlePersonDto = PersonDto();
+  List<dynamic> items = [];
+
   final TextEditingController clientsReferenceNumberController =
       TextEditingController();
   TextEditingController identificationController = TextEditingController();
@@ -39,6 +41,7 @@ class _WalkInsAssessmentPageState extends State<WalkInsAssessmentPage> {
   final TextEditingController surnameController = TextEditingController();
   final TextEditingController dateOfBirthController = TextEditingController();
   String searchString = "";
+  bool showClientData = false;
 
   @override
   void initState() {
@@ -120,6 +123,8 @@ class _WalkInsAssessmentPageState extends State<WalkInsAssessmentPage> {
 
   @override
   Widget build(BuildContext context) {
+    //List<dynamic> combinedList = [...personDto, ...clientDto];
+    List<dynamic> combinedList = showClientData ? clientDto : personDto;
     return WillPopScope(
         onWillPop: () async {
           return false;
@@ -301,44 +306,75 @@ class _WalkInsAssessmentPageState extends State<WalkInsAssessmentPage> {
                                       width: 2, color: Colors.blue),
                                 ),
                                 onPressed: () {
-                                  // if (_walkInFormKey.currentState!
-                                  //     .validate()) {}
-                                  // generateDateOfBirth();
-
-                                  // bool isNamesFieldValid =
-                                  //     _walkInFormKey.currentState!.validate();
-                                  // bool isSurnameFieldValid =
-                                  //     _walkInFormKey.currentState!.validate();
-
-                                  // bool isDateOfBirthFieldValid =
-                                  //     _walkInFormKey.currentState!.validate();
-                                  if (_walkInFormKey.currentState!.validate()) {
-                                  } else if (identificationController
+                                  setState(() {
+                                    showClientData = !showClientData;
+                                  });
+                                  if (clientsReferenceNumberController
                                           .text.isEmpty &&
-                                      clientsReferenceNumberController
-                                          .text.isEmpty &&
-                                      namesController.text.isNotEmpty &&
-                                      surnameController.text.isNotEmpty &&
-                                      dateOfBirthController.text.isNotEmpty) {
-                                    loadSearchedPerson(
-                                      namesController.text.toString(),
-                                      surnameController.text.toString(),
-                                      dateOfBirthController.text.toString(),
-                                    );
-                                  } else if (identificationController
-                                          .text.isNotEmpty &&
-                                      clientsReferenceNumberController
-                                          .text.isEmpty &&
+                                      identificationController.text.isEmpty &&
                                       namesController.text.isEmpty &&
                                       surnameController.text.isEmpty &&
                                       dateOfBirthController.text.isEmpty) {
-                                    loadSearchedPersonByIdentificationNumber(
-                                        identificationController.text
-                                            .toString());
-                                  } else {
-                                    loadSearchedPersonByClientReferenceNumber(
-                                        clientsReferenceNumberController.text
-                                            .toString());
+                                    // All fields are empty, you can display an error message or perform an action.
+                                    showDialogMessage(ApiError(
+                                        error:
+                                            "Please enter at least one search criteria"));
+                                  } else if (identificationController
+                                          .text.isNotEmpty &&
+                                      clientsReferenceNumberController
+                                          .text.isNotEmpty) {
+                                    showDialogMessage(ApiError(
+                                        error:
+                                            "Please enter either identity number or client reference number"));
+                                  } else if (clientsReferenceNumberController
+                                      .text.isNotEmpty) {
+                                    if (identificationController
+                                            .text.isNotEmpty ||
+                                        namesController.text.isNotEmpty ||
+                                        surnameController.text.isNotEmpty ||
+                                        dateOfBirthController.text.isNotEmpty) {
+                                      // Display an error message or perform necessary actions here.
+                                      showDialogMessage(ApiError(
+                                          error:
+                                              "Please enter only Client Reference Number"));
+                                    } else {
+                                      loadSearchedPersonByClientReferenceNumber(
+                                          clientsReferenceNumberController
+                                              .text);
+                                    }
+                                  } else if (identificationController
+                                      .text.isNotEmpty) {
+                                    if (clientsReferenceNumberController
+                                            .text.isNotEmpty ||
+                                        namesController.text.isNotEmpty ||
+                                        surnameController.text.isNotEmpty ||
+                                        dateOfBirthController.text.isNotEmpty) {
+                                      // Display an error message or perform necessary actions here.
+                                      showDialogMessage(ApiError(
+                                          error:
+                                              "Please enter only identity Number"));
+                                    } else {
+                                      loadSearchedPersonByIdentificationNumber(
+                                          identificationController.text);
+                                    }
+                                  } else if (namesController.text.isNotEmpty &&
+                                      surnameController.text.isNotEmpty &&
+                                      dateOfBirthController.text.isNotEmpty) {
+                                    if (clientsReferenceNumberController
+                                            .text.isNotEmpty ||
+                                        identificationController
+                                            .text.isNotEmpty) {
+                                      // Display an error message or perform necessary actions here.
+                                      showDialogMessage(ApiError(
+                                          error:
+                                              "Please enter only names, surname and date of birth"));
+                                    } else {
+                                      loadSearchedPerson(
+                                        namesController.text.toString(),
+                                        surnameController.text.toString(),
+                                        dateOfBirthController.text.toString(),
+                                      );
+                                    }
                                   }
                                 },
                                 child: const Text('Search'),
@@ -349,33 +385,66 @@ class _WalkInsAssessmentPageState extends State<WalkInsAssessmentPage> {
                     Expanded(
                       child: ListView.separated(
                         shrinkWrap: true,
-                        itemCount: personDto.length,
+                        itemCount: combinedList.length,
                         itemBuilder: (context, int index) {
-                          if (personDto.isEmpty) {
+                          if (combinedList.isEmpty) {
                             return const Center(
                                 child: Text('No worklist Found.'));
                           }
-                          return ListTile(
-                              title:
-                                  Text(personDto[index].firstName.toString()),
-                              subtitle: Text(
-                                  personDto[index].lastName.toString(),
-                                  style: const TextStyle(color: Colors.grey)),
-                              trailing: const Icon(
-                                  Icons.play_circle_fill_rounded,
-                                  color: Colors.green),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const UpdateChildDetailPage(),
-                                    settings: RouteSettings(
-                                      arguments: personDto[index],
+                          final dynamic item = combinedList[index];
+
+                          if (item is PersonDto) {
+                            return ListTile(
+                                title:
+                                    Text(personDto[index].firstName.toString()),
+                                subtitle: Text(
+                                    personDto[index].lastName.toString(),
+                                    style: const TextStyle(color: Colors.grey)),
+                                trailing: const Icon(
+                                    Icons.play_circle_fill_rounded,
+                                    color: Colors.green),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const UpdateChildDetailPage(),
+                                      settings: RouteSettings(
+                                        arguments: personDto[index],
+                                      ),
                                     ),
-                                  ),
-                                );
-                              });
+                                  );
+                                });
+                          } else if (item is ClientDto) {
+                            return ListTile(
+                                title: Text(clientDto[index]
+                                    .personDto!
+                                    .firstName
+                                    .toString()),
+                                subtitle: Text(
+                                    clientDto[index]
+                                        .personDto!
+                                        .lastName
+                                        .toString(),
+                                    style: const TextStyle(color: Colors.grey)),
+                                trailing: const Icon(
+                                    Icons.play_circle_fill_rounded,
+                                    color: Colors.green),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const UpdateChildDetailPage(),
+                                      settings: RouteSettings(
+                                        arguments: personDto[index],
+                                      ),
+                                    ),
+                                  );
+                                });
+                          } else {
+                            // Handle other object types if necessary
+                          }
                           // : Container();
                         },
                         separatorBuilder: (context, index) {

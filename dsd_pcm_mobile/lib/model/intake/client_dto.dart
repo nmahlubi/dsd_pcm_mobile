@@ -5,8 +5,8 @@ class ClientDto {
     int? clientId,
     int? personId,
     String? referenceNumber,
-    int? createdBy,
-    int? modifiedBy,
+    String? createdBy,
+    String? modifiedBy,
     String? dateCreated,
     String? dateLastModified,
     bool? isActive,
@@ -42,8 +42,8 @@ class ClientDto {
   int? _districtId;
   int? _personId;
   String? _referenceNumber;
-  int? _createdBy;
-  int? _modifiedBy;
+  String? _createdBy;
+  String? _modifiedBy;
   String? _dateCreated;
   String? _dateLastModified;
   bool? _isActive;
@@ -53,8 +53,8 @@ class ClientDto {
   int? get clientId => _districtId;
   int? get personId => _personId;
   String? get referenceNumber => _referenceNumber;
-  int? get createdBy => _createdBy;
-  int? get modifiedBy => _modifiedBy;
+  String? get createdBy => _createdBy;
+  String? get modifiedBy => _modifiedBy;
   String? get dateCreated => _dateCreated;
   String? get dateLastModified => _dateLastModified;
   bool? get isActive => _isActive;
