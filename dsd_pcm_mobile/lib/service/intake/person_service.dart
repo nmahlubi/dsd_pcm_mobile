@@ -111,7 +111,7 @@ class PersonService {
       String? firstName, String? lastName, String? dateOfBirth) async {
     ApiResponse apiResponse = ApiResponse();
     final response = await client.get(Uri.parse(
-        "${AppUrl.intakeURL}/Person/$firstName/$lastName/$dateOfBirth"));
+        "${AppUrl.intakeURL}/Person/SearchByNameSurnameDOB/$firstName/$lastName?dateOfBirth=$dateOfBirth"));
     switch (response.statusCode) {
       case 200:
         apiResponse.Data = (json.decode(response.body) as List)
