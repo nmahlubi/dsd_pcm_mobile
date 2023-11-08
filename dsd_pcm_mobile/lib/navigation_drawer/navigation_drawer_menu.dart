@@ -79,7 +79,7 @@ class _NavigationDrawerMenuWidgetState extends State<NavigationDrawerMenu> {
           if (preferences?.getBool('supervisor') == false)
             createDrawerBodyItem(
               icon: Icons.inbox,
-              text: 'Create Child Details',
+              text: 'Assessment',
               onTap: () =>
                   Navigator.pushReplacementNamed(context, '/Assessment'),
             ),
